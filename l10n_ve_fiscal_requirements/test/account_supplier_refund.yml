@@ -1,0 +1,622 @@
+-
+  I set the context that will be used for the encoding of all the invoices of this file
+-
+  !context
+    'type': 'in_invoice'
+-
+  1.- In order to test account refund with "Create a draft refund" method
+-
+  1.1.- I create a supplier invoice
+-
+  !record {model: account.invoice, id: account_invoice_supplier0, view: account.invoice_supplier_form }: &supplier_invoice
+    account_id: account.a_pay
+    company_id: base.main_company
+    currency_id: base.EUR
+    invoice_line:
+      - account_id: account.a_expense
+        name: '[PCSC234] PC Assemble SC234'
+        price_unit: 300.0
+        product_id: product.product_product_3
+        quantity: 10.0
+        uos_id: product.product_uom_unit
+    journal_id: account.expenses_journal
+    partner_id: base.res_partner_12
+    reference_type: none
+    type: 'in_invoice'
+-
+  1.2.- I check that Initially supplier invoice state is "Draft"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier0}:
+    - state == 'draft'
+-
+  1.3.- I check that the supplier invoice is a "Supplier Invoice"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier0, string: This is not a supplier invoice}:
+    - type == 'in_invoice'
+-
+  1.4.- I change the state of invoice to open by clicking Validate button
+-
+  !workflow {model: account.invoice, action: invoice_open, ref: account_invoice_supplier0}
+-
+  1.5.- I check that the invoice state is now "Open"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier0}:
+    - state == 'open'
+-
+  1.6.- I create a supplier refund using the method "Create a draft refund" and 
+  check the state of the account invoice refund resulting
+-
+  !python {model: account.invoice.refund}: |
+    import time
+    values = {
+        'date': time.strftime('%Y-%m-%d'),
+        'period': self.pool.get('account.period').find(
+            cr, uid, time.strftime('%Y/%m/%d'), {'company_id': ref('base.main_company')})[0],
+        'journal_id': ref('account.refund_expenses_journal'),
+        'description': 'Desde el test',
+        'nro_ctrl': 'Desde el test',
+        'filter_refund': 'refund',
+    }
+    wzr_id = self.create(cr, uid, values)
+    context['wzr_id'] = wzr_id
+    context['active_ids'] = [ref('account_invoice_supplier0')]
+    rfnd_id = self.invoice_refund(cr, uid, [wzr_id], context=context)
+    context['rfnd_id'] = rfnd_id
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_supplier_inv_brw = obj_inv.browse(cr, uid, rfnd_id['domain'][1][2])    
+    assert rfnd_supplier_inv_brw[0].state == 'draft', 'The supplier refund was not properly created, the state must be Draft.'
+-
+  1.7.- I check the correct asigning of parent_id in the supplier refund created, for that
+  the supplier refund must have the supplier invoice id in the fiel parent_id
+-
+  !python {model: account.invoice.refund}: |
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_supplier_inv_brw = obj_inv.browse(cr, uid, context['rfnd_id']['domain'][1][2])
+    supplier_inv_brw = obj_inv.browse(cr, uid, ref('account_invoice_supplier0'))    
+    assert (rfnd_supplier_inv_brw[0].parent_id.id == supplier_inv_brw.id), 'The supplier refund dont have the correct parent_id.'
+-
+  2.- In order to test account refund with "Create refund and reconcile" method
+-
+  2.1.- I create a new supplier invoice
+-
+  !record {model: account.invoice, id: account_invoice_supplier1, view: account.invoice_supplier_form }:
+    <<: *supplier_invoice
+-
+  2.2.- I check that Initially supplier invoice state is "Draft"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier1}:
+    - state == 'draft'
+-
+  2.3.- I check that the supplier invoice is a "Supplier Invoice"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier1, string: This is not a supplier invoice}:
+    - type == 'in_invoice'
+-
+  2.4.- I change the state of invoice to open by clicking Validate button
+-
+  !workflow {model: account.invoice, action: invoice_open, ref: account_invoice_supplier1}
+-
+  2.5.- I check that the invoice state is now "Open"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier1}:
+    - state == 'open'
+-
+  2.6.- I create a supplier refund using the method "Create refund and reconcile" and 
+  check the state of the account invoice refund resulting
+-
+  !python {model: account.invoice.refund}: |
+    import time
+    values = {
+        'date': time.strftime('%Y-%m-%d'),
+        'period': self.pool.get('account.period').find(
+            cr, uid, time.strftime('%Y/%m/%d'), {'company_id': ref('base.main_company')})[0],
+        'journal_id': ref('account.refund_expenses_journal'),
+        'description': 'Desde el test',
+        'nro_ctrl': 'Desde el test',
+        'filter_refund': 'cancel',
+    }
+    wzr_id = self.create(cr, uid, values)
+    context['wzr_id'] = wzr_id
+    context['active_ids'] = [ref('account_invoice_supplier1')]
+    rfnd_id = self.invoice_refund(cr, uid, [wzr_id], context=context)
+    context['rfnd_id'] = rfnd_id
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_supplier_inv_brw = obj_inv.browse(cr, uid, rfnd_id['domain'][1][2])    
+    assert rfnd_supplier_inv_brw[0].state == 'paid', 'The supplier refund was not properly created, the state must be Paid.'
+-
+  2.7.- I check the correct asigning of parent_id in the supplier refund created, for that
+  the supplier refund must have the supplier invoice id in the fiel parent_id
+-
+  !python {model: account.invoice.refund}: |
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_supplier_inv_brw = obj_inv.browse(cr, uid, context['rfnd_id']['domain'][1][2])
+    supplier_inv_brw = obj_inv.browse(cr, uid, ref('account_invoice_supplier1'))    
+    assert (rfnd_supplier_inv_brw[0].parent_id.id == supplier_inv_brw.id), 'The supplier refund dont have the correct parent_id.'
+-
+  3.- In order to test account refund with "Create refund, reconcile and create a new draft invoice"
+  method
+-
+  3.1.- I create a new supplier invoice
+-
+  !record {model: account.invoice, id: account_invoice_supplier2, view: account.invoice_supplier_form }:
+    <<: *supplier_invoice
+-
+  3.2.- I check that Initially supplier invoice state is "Draft"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier2}:
+    - state == 'draft'
+-
+  3.3.- I check that the supplier invoice is a "Supplier Invoice"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier2, string: This is not a supplier invoice}:
+    - type == 'in_invoice'
+-
+  3.4.- I change the state of invoice to open by clicking Validate button
+-
+  !workflow {model: account.invoice, action: invoice_open, ref: account_invoice_supplier2}
+-
+  3.5.- I check that the invoice state is now "Open"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier2}:
+    - state == 'open'
+-
+  3.6.- I create a supplier refund using the method "Create refund, reconcile and create a new draft invoice" and 
+  check the state of the account invoice refund resulting
+-
+  !python {model: account.invoice.refund}: |
+    import time
+    values = {
+        'date': time.strftime('%Y-%m-%d'),
+        'period': self.pool.get('account.period').find(
+            cr, uid, time.strftime('%Y/%m/%d'), {'company_id': ref('base.main_company')})[0],
+        'journal_id': ref('account.refund_expenses_journal'),
+        'description': 'Desde el test',
+        'nro_ctrl': 'Desde el test',
+        'filter_refund': 'modify',
+    }
+    wzr_id = self.create(cr, uid, values)
+    context['wzr_id'] = wzr_id
+    context['active_ids'] = [ref('account_invoice_supplier2')]
+    rfnd_id = self.invoice_refund(cr, uid, [wzr_id], context=context)
+    context['rfnd_id'] = rfnd_id
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_supplier_inv_brw = obj_inv.browse(cr, uid, rfnd_id['domain'][1][2])    
+    assert rfnd_supplier_inv_brw[0].state == 'paid', 'The supplier refund was not properly created, the state must be Paid.'
+-
+  3.7.- I check the correct asigning of parent_id in the supplier refund created, for that
+  the supplier refund must have the supplier invoice id in the fiel parent_id
+-
+  !python {model: account.invoice.refund}: |
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_supplier_inv_brw = obj_inv.browse(cr, uid, context['rfnd_id']['domain'][1][2])
+    supplier_inv_brw = obj_inv.browse(cr, uid, ref('account_invoice_supplier2'))    
+    assert (rfnd_supplier_inv_brw[0].parent_id.id == supplier_inv_brw.id), 'The supplier refund dont have the correct parent_id.'
+-
+  3.8.- I check that the new supplier invoice was created in Draft state
+-
+  !python {model: account.invoice.refund}: |
+    obj_inv = self.pool.get('account.invoice')
+    inv_src = obj_inv.search(cr, uid, [], order='id')
+    supplier_inv_brw = obj_inv.browse(cr, uid, inv_src[-1])
+    assert supplier_inv_brw.state == 'draft', 'The new supplier invoice was not properly created, the state must be Draft.'
+-
+  4.- In order to test account refund with "Create a draft refund" method in a "Paid" invoice
+-
+  4.1.- I create a new partner
+-
+  !record {model: 'res.partner', id: res_partner10}:
+    name: Juan Garcia
+    use_parent_address: True
+    function: Tests
+    email: juan@garcia.com
+    supplier: True
+-
+  4.2.- I create a Purchase Journal.
+-
+  !record {model: account.journal, id: purchase_journal_debit}:
+    code: pjou_test
+    company_id: base.main_company
+    name: Purchase Journal For Debit Credit Note Tests
+    sequence_id: account.sequence_purchase_journal
+    type: purchase
+-
+  4.3.- I create a new supplier invoice
+-
+  !record {model: account.invoice, id: account_invoice_supplier3, view: account.invoice_supplier_form }:
+    account_id: account.a_pay
+    company_id: base.main_company
+    currency_id: base.EUR
+    invoice_line:
+      - account_id: account.a_expense
+        name: '[PCSC234] PC Assemble SC234'
+        price_unit: 300.0
+        product_id: product.product_product_3
+        quantity: 10.0
+        uos_id: product.product_uom_unit
+    journal_id: purchase_journal_debit
+    partner_id: res_partner10
+    reference_type: none
+    type: 'in_invoice'
+-
+  4.4.- I check that initially supplier invoice state is "Draft"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier3}:
+    - state == 'draft'
+-
+  4.5.- I check that the supplier invoice is a "Supplier Invoice"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier3, string: This is not a supplier invoice}:
+    - type == 'in_invoice'
+-
+  4.6.- I change the state of invoice to open by clicking Validate button
+-
+  !workflow {model: account.invoice, action: invoice_open, ref: account_invoice_supplier3}
+-
+  4.7.- I check that the invoice state is now "Open"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier3}:
+    - state == 'open'
+-
+  4.8.- I check that a payment entry gets created in the account.move.line
+-
+  !python {model: account.invoice}: |
+    acc_id=self.browse(cr, uid, ref("account_invoice_supplier3"))
+    assert(acc_id.move_id)
+-
+  4.9.- I create a Bank Journal.
+-
+  !record {model: account.journal, id: bank_journal_debit}:
+    name: Bank Journal For Debit Credit Note Tests
+    code: bjou_test
+    type: bank
+    analytic_journal_id: account.sit
+    sequence_id: account.sequence_bank_journal
+    default_debit_account_id: account.cash
+    default_credit_account_id: account.cash
+    company_id: base.main_company
+-
+  4.10.- I will create and post an account voucher of amount 3450.00 for the partner Juan Garcia.
+-
+  !record {model: account.voucher, id: account_voucher0, view: account_voucher.view_vendor_payment_form}:
+    type: payment
+    account_id: account.cash
+    amount: 3450.00
+    company_id: base.main_company
+    journal_id: bank_journal_debit
+    name: Voucher x
+    narration: PC Assemble SC234
+    line_dr_ids:
+      - account_id: account.cash
+        amount: 3450.00
+        name: Voucher x
+    partner_id: res_partner10
+    reference: none
+-
+  4.11.- I check that initially vendor voucher is in the "Draft" state
+-
+  !assert {model: account.voucher, id: account_voucher0}:
+    - state == 'draft'
+-
+  4.12.- I create voucher by clicking on create button
+-
+  !workflow {model: account.voucher, action: proforma_voucher, ref: account_voucher0}
+-
+  4.13.- I check that the voucher state is "Posted"
+-
+  !assert {model: account.voucher, id: account_voucher0}:
+    - state == 'posted'
+-
+  4.14.- I check if the state of the invoice is "Paid"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier3}:
+    - state == 'paid'
+-
+  4.15.- I modified the sale journal record so it can cancel invoice
+-
+  !record {model: account.journal, id: purchase_journal_debit}:
+    update_posted: 1
+-
+  4.16.- I modified the cash journal record so it can cancel invoice
+-
+  !record {model: account.journal, id: bank_journal_debit}:
+    update_posted: 1
+-
+  4.17.- I create a Purchase Refund Journal.
+-
+  !record {model: account.journal, id: purchase_refund_journal_debit}:
+    code: sprjou_test
+    company_id: base.main_company
+    name: Purchase Refund Journal For Debit Credit Note Tests
+    sequence_id: account.sequence_refund_purchase_journal
+    type: purchase_refund
+-
+  4.18.- I create a supplier refund using the method "Create a draft refund" and 
+  check the state of the account invoice refund resulting
+-
+  !python {model: account.invoice.refund}: |
+    import time
+    values = {
+        'date': time.strftime('%Y-%m-%d'),
+        'period': self.pool.get('account.period').find(
+            cr, uid, time.strftime('%Y/%m/%d'), {'company_id': ref('base.main_company')})[0],
+        'journal_id': ref('purchase_refund_journal_debit'),
+        'description': 'Desde el test',
+        'nro_ctrl': 'Desde el test',
+        'filter_refund': 'refund',
+    }
+    wzr_id = self.create(cr, uid, values)
+    assert wzr_id, 'The wizard instance was not created.'
+    context['wzr_id'] = wzr_id
+    context['active_ids'] = [ref('account_invoice_supplier3')]
+    rfnd_id = self.invoice_refund(cr, uid, [wzr_id], context=context)
+    assert rfnd_id, 'The refund was not created.'
+    context['rfnd_id'] = rfnd_id
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_supplier_inv_brw = obj_inv.browse(cr, uid, rfnd_id['domain'][1][2])
+    assert rfnd_supplier_inv_brw[0].state == 'draft', 'The supplier refund was not properly created, the state must be Draft.'
+-
+  4.19.- I check the correct asigning of parent_id in the supplier refund created, for that
+  the supplier refund must have the supplier invoice id in the fiel parent_id
+-
+  !python {model: account.invoice.refund}: |
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_supplier_inv_brw = obj_inv.browse(cr, uid, context['rfnd_id']['domain'][1][2])
+    supplier_inv_brw = obj_inv.browse(cr, uid, ref('account_invoice_supplier3'))    
+    assert (rfnd_supplier_inv_brw[0].parent_id.id == supplier_inv_brw.id), 'The supplier refund dont have the correct parent_id.'
+-
+  5.- In order to test account refund with "Create refund and reconcile" method in a "Paid" invoice
+-
+  5.1.- I create a new partner
+-
+  !record {model: 'res.partner', id: res_partner11}:
+    name: Maria Garcia
+    use_parent_address: True
+    function: Tests
+    email: maria@garcia.com
+    supplier: True
+-
+  5.2.- I create a new supplier invoice
+-
+  !record {model: account.invoice, id: account_invoice_supplier4, view: account.invoice_supplier_form }:
+    account_id: account.a_pay
+    company_id: base.main_company
+    currency_id: base.EUR
+    invoice_line:
+      - account_id: account.a_expense
+        name: '[PCSC234] PC Assemble SC234'
+        price_unit: 300.0
+        product_id: product.product_product_3
+        quantity: 10.0
+        uos_id: product.product_uom_unit
+    journal_id: purchase_journal_debit
+    partner_id: res_partner11
+    reference_type: none
+    type: 'in_invoice'
+-
+  5.3.- I check that initially supplier invoice state is "Draft"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier4}:
+    - state == 'draft'
+-
+  5.4.- I check that the supplier invoice is a "Supplier Invoice"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier4, string: This is not a supplier invoice}:
+    - type == 'in_invoice'
+-
+  5.5.- I change the state of invoice to open by clicking Validate button
+-
+  !workflow {model: account.invoice, action: invoice_open, ref: account_invoice_supplier4}
+-
+  5.6.- I check that the invoice state is now "Open"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier4}:
+    - state == 'open'
+-
+  5.7.- I check that a payment entry gets created in the account.move.line
+-
+  !python {model: account.invoice}: |
+    acc_id=self.browse(cr, uid, ref("account_invoice_supplier4"))
+    assert(acc_id.move_id)
+-
+  5.8.- I will create and post an account voucher of amount 3450.00 for the partner Maria Garcia.
+-
+  !record {model: account.voucher, id: account_voucher1, view: account_voucher.view_vendor_payment_form}:
+    type: payment
+    account_id: account.cash
+    amount: 3450.00
+    company_id: base.main_company
+    journal_id: bank_journal_debit
+    name: Voucher x
+    narration: PC Assemble SC234
+    line_dr_ids:
+      - account_id: account.cash
+        amount: 3450.00
+        name: Voucher x
+    partner_id: res_partner11
+    reference: none
+-
+  5.9.- I check that initially vendor voucher is in the "Draft" state
+-
+  !assert {model: account.voucher, id: account_voucher1}:
+    - state == 'draft'
+-
+  5.10.- I create voucher by clicking on create button
+-
+  !workflow {model: account.voucher, action: proforma_voucher, ref: account_voucher1}
+-
+  5.11.- I check that the voucher state is "Posted"
+-
+  !assert {model: account.voucher, id: account_voucher1}:
+    - state == 'posted'
+-
+  5.12.- I check if the state of the invoice is "Paid"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier4}:
+    - state == 'paid'
+-
+  5.13.- I create a supplier refund using the method "Create refund and reconcile" and 
+  check the state of the account invoice refund resulting
+-
+  !python {model: account.invoice.refund}: |
+    import time
+    values = {
+        'date': time.strftime('%Y-%m-%d'),
+        'period': self.pool.get('account.period').find(
+            cr, uid, time.strftime('%Y/%m/%d'), {'company_id': ref('base.main_company')})[0],
+        'journal_id': ref('purchase_refund_journal_debit'),
+        'description': 'Desde el test',
+        'nro_ctrl': 'Desde el test',
+        'filter_refund': 'cancel',
+    }
+    wzr_id = self.create(cr, uid, values)
+    assert wzr_id, 'The wizard instance was not created.'
+    context['wzr_id'] = wzr_id
+    context['active_ids'] = [ref('account_invoice_supplier4')]
+    rfnd_id = self.invoice_refund(cr, uid, [wzr_id], context=context)
+    assert rfnd_id, 'The refund was not created.'
+    context['rfnd_id'] = rfnd_id
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_supplier_inv_brw = obj_inv.browse(cr, uid, rfnd_id['domain'][1][2])
+    assert rfnd_supplier_inv_brw[0].state == 'paid', 'The supplier refund was not properly created, the state must be Paid.'
+-
+  5.14.- I check the correct asigning of parent_id in the supplier refund created, for that
+  the supplier refund must have the supplier invoice id in the fiel parent_id
+-
+  !python {model: account.invoice.refund}: |
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_supplier_inv_brw = obj_inv.browse(cr, uid, context['rfnd_id']['domain'][1][2])
+    supplier_inv_brw = obj_inv.browse(cr, uid, ref('account_invoice_supplier4'))    
+    assert (rfnd_supplier_inv_brw[0].parent_id.id == supplier_inv_brw.id), 'The supplier refund dont have the correct parent_id.'
+-
+  6.- In order to test account refund with "Create refund, reconcile and create a new draft invoice" 
+  method in a "Paid" invoice
+-
+  6.1.- I create a new partner
+-
+  !record {model: 'res.partner', id: res_partner12}:
+    name: Pablo Garcia
+    use_parent_address: True
+    function: Tests
+    email: pablo@garcia.com
+    supplier: True
+-
+  6.2.- I create a new supplier invoice
+-
+  !record {model: account.invoice, id: account_invoice_supplier5, view: account.invoice_supplier_form }:
+    account_id: account.a_pay
+    company_id: base.main_company
+    currency_id: base.EUR
+    invoice_line:
+      - account_id: account.a_expense
+        name: '[PCSC234] PC Assemble SC234'
+        price_unit: 300.0
+        product_id: product.product_product_3
+        quantity: 10.0
+        uos_id: product.product_uom_unit
+    journal_id: purchase_journal_debit
+    partner_id: res_partner12
+    reference_type: none
+    type: 'in_invoice'
+-
+  6.3.- I check that initially supplier invoice state is "Draft"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier5}:
+    - state == 'draft'
+-
+  6.4.- I check that the supplier invoice is a "Supplier Invoice"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier5, string: This is not a supplier invoice}:
+    - type == 'in_invoice'
+-
+  6.5.- I change the state of invoice to open by clicking Validate button
+-
+  !workflow {model: account.invoice, action: invoice_open, ref: account_invoice_supplier5}
+-
+  5.6.- I check that the invoice state is now "Open"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier5}:
+    - state == 'open'
+-
+  6.7.- I check that a payment entry gets created in the account.move.line
+-
+  !python {model: account.invoice}: |
+    acc_id=self.browse(cr, uid, ref("account_invoice_supplier5"))
+    assert(acc_id.move_id)
+-
+  6.8.- I will create and post an account voucher of amount 3450.00 for the partner Maria Garcia.
+-
+  !record {model: account.voucher, id: account_voucher2, view: account_voucher.view_vendor_payment_form}:
+    type: payment
+    account_id: account.cash
+    amount: 3450.00
+    company_id: base.main_company
+    journal_id: bank_journal_debit
+    name: Voucher x
+    narration: PC Assemble SC234
+    line_dr_ids:
+      - account_id: account.cash
+        amount: 3450.00
+        name: Voucher x
+    partner_id: res_partner12
+    reference: none
+-
+  6.9.- I check that initially vendor voucher is in the "Draft" state
+-
+  !assert {model: account.voucher, id: account_voucher2}:
+    - state == 'draft'
+-
+  6.10.- I create voucher by clicking on create button
+-
+  !workflow {model: account.voucher, action: proforma_voucher, ref: account_voucher2}
+-
+  6.11.- I check that the voucher state is "Posted"
+-
+  !assert {model: account.voucher, id: account_voucher2}:
+    - state == 'posted'
+-
+  6.12.- I check if the state of the invoice is "Paid"
+-
+  !assert {model: account.invoice, id: account_invoice_supplier5}:
+    - state == 'paid'
+-
+  6.13.- I create a supplier refund using the method "Create refund, reconcile and create a new draft invoice" and 
+  check the state of the account invoice refund resulting
+-
+  !python {model: account.invoice.refund}: |
+    import time
+    values = {
+        'date': time.strftime('%Y-%m-%d'),
+        'period': self.pool.get('account.period').find(
+            cr, uid, time.strftime('%Y/%m/%d'), {'company_id': ref('base.main_company')})[0],
+        'journal_id': ref('purchase_refund_journal_debit'),
+        'description': 'Desde el test',
+        'nro_ctrl': 'Desde el test',
+        'filter_refund': 'modify',
+    }
+    wzr_id = self.create(cr, uid, values)
+    assert wzr_id, 'The wizard instance was not created.'
+    context['wzr_id'] = wzr_id
+    context['active_ids'] = [ref('account_invoice_supplier5')]
+    rfnd_id = self.invoice_refund(cr, uid, [wzr_id], context=context)
+    assert rfnd_id, 'The refund was not created.'
+    context['rfnd_id'] = rfnd_id
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_supplier_inv_brw = obj_inv.browse(cr, uid, rfnd_id['domain'][1][2])
+    assert rfnd_supplier_inv_brw[0].state == 'paid', 'The supplier refund was not properly created, the state must be Paid.'
+-
+  6.14.- I check the correct asigning of parent_id in the supplier refund created, for that
+  the supplier refund must have the supplier invoice id in the fiel parent_id
+-
+  !python {model: account.invoice.refund}: |
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_supplier_inv_brw = obj_inv.browse(cr, uid, context['rfnd_id']['domain'][1][2])
+    supplier_inv_brw = obj_inv.browse(cr, uid, ref('account_invoice_supplier5'))    
+    assert (rfnd_supplier_inv_brw[0].parent_id.id == supplier_inv_brw.id), 'The supplier refund dont have the correct parent_id.'
+-
+  6.15.- I check that the new supplier invoice was created in Draft state
+-
+  !python {model: account.invoice.refund}: |
+    obj_inv = self.pool.get('account.invoice')
+    inv_src = obj_inv.search(cr, uid, [], order='id')
+    supplier_inv_brw = obj_inv.browse(cr, uid, inv_src[-1])
+    assert supplier_inv_brw.state == 'draft', 'The new supplier invoice was not properly created, the state must be Draft.'

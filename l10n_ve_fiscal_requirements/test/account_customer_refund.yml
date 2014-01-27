@@ -1,0 +1,596 @@
+-
+  I set the context that will be used for the encoding of all the invoices of this file
+-
+  !context
+    'type': 'out_invoice'
+-
+  1.- In order to test account refund with "Create a draft refund" method
+-
+  1.1.- I create a customer invoice
+-
+  !record {model: account.invoice, id: account_invoice_customer0, view: account.invoice_form}: &customer_invoice
+    payment_term: account.account_payment_term_advance
+    journal_id: account.sales_journal
+    partner_id: base.res_partner_3
+    reference_type: none
+    name: 'Test Customer Invoice - debit_credit_note'
+    invoice_line:
+      - product_id: product.product_product_5
+        price_unit: 850.0
+        quantity: 1.0
+-       
+  1.2.- I check that Initially customer invoice state is "Draft"
+-
+  !assert {model: account.invoice, id: account_invoice_customer0}:
+    - state == 'draft'
+-
+  1.3.- I check that the customer invoice is a "Customer Invoice"
+-
+  !assert {model: account.invoice, id: account_invoice_customer0, string: This is not a customer invoice}:
+    - type == 'out_invoice'
+-
+  1.4.- I change the state of invoice to open by clicking Validate button
+-
+  !workflow {model: account.invoice, action: invoice_open, ref: account_invoice_customer0}
+-
+  1.5.- I check that the invoice state is now "Open"
+-
+  !assert {model: account.invoice, id: account_invoice_customer0}:
+    - state == 'open'
+-
+  1.6.- I create a customer refund using the method "Create a draft refund" and 
+  check the state of the account invoice refund resulting
+-
+  !python {model: account.invoice.refund}: |
+    import time
+    values = {
+        'date': time.strftime('%Y-%m-%d'),
+        'period': self.pool.get('account.period').find(
+            cr, uid, time.strftime('%Y/%m/%d'), {'company_id': ref('base.main_company')})[0],
+        'journal_id': ref('account.refund_expenses_journal'),
+        'description': 'Desde el test',
+        'filter_refund': 'refund',
+    }
+    wzr_id = self.create(cr, uid, values)
+    assert wzr_id, 'The wizard instance was not created.'
+    context['wzr_id'] = wzr_id
+    context['active_ids'] = [ref('account_invoice_customer0')]
+    rfnd_id = self.invoice_refund(cr, uid, [wzr_id], context=context)
+    assert rfnd_id, 'The refund was not created.'
+    context['rfnd_id'] = rfnd_id
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_customer_inv_brw = obj_inv.browse(cr, uid, rfnd_id['domain'][1][2])    
+    assert rfnd_customer_inv_brw[0].state == 'draft', 'The customer refund was not properly created, the state must be Draft.'
+-
+  1.7.- I check the correct asigning of parent_id in the customer refund created, for that
+  the customer refund must have the customer invoice id in the fiel parent_id
+-
+  !python {model: account.invoice.refund}: |
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_customer_inv_brw = obj_inv.browse(cr, uid, context['rfnd_id']['domain'][1][2])
+    customer_inv_brw = obj_inv.browse(cr, uid, ref('account_invoice_customer0'))
+    assert (rfnd_customer_inv_brw[0].parent_id.id == customer_inv_brw.id), 'The customer refund dont have the correct parent_id.'
+-
+  2.- In order to test account refund with "Create refund and reconcile" method
+-
+  2.1.- I create a new customer invoice
+-
+  !record {model: account.invoice, id: account_invoice_customer1, view: account.invoice_form }:
+    <<: *customer_invoice
+-
+  2.2.- I check that Initially customer invoice state is "Draft"
+-
+  !assert {model: account.invoice, id: account_invoice_customer1}:
+    - state == 'draft'
+-
+  2.3.- I check that the customer invoice is a "Customer Invoice"
+-
+  !assert {model: account.invoice, id: account_invoice_customer1, string: This is not a customer invoice}:
+    - type == 'out_invoice'
+-
+  2.4.- I change the state of invoice to open by clicking Validate button
+-
+  !workflow {model: account.invoice, action: invoice_open, ref: account_invoice_customer1}
+-
+  2.5.- I check that the invoice state is now "Open"
+-
+  !assert {model: account.invoice, id: account_invoice_customer1}:
+    - state == 'open'
+-
+  2.6.- I create a customer refund using the method "Create refund and reconcile" and 
+  check the state of the account invoice refund resulting
+-
+  !python {model: account.invoice.refund}: |
+    import time
+    values = {
+        'date': time.strftime('%Y-%m-%d'),
+        'period': self.pool.get('account.period').find(
+            cr, uid, time.strftime('%Y/%m/%d'), {'company_id': ref('base.main_company')})[0],
+        'journal_id': ref('account.refund_expenses_journal'),
+        'description': 'Desde el test',
+        'filter_refund': 'cancel',
+    }
+    wzr_id = self.create(cr, uid, values)
+    assert wzr_id, 'The wizard instance was not created.'
+    context['wzr_id'] = wzr_id
+    context['active_ids'] = [ref('account_invoice_customer1')]
+    rfnd_id = self.invoice_refund(cr, uid, [wzr_id], context=context)
+    assert rfnd_id, 'The refund was not created.'
+    context['rfnd_id'] = rfnd_id
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_customer_inv_brw = obj_inv.browse(cr, uid, rfnd_id['domain'][1][2])    
+    assert rfnd_customer_inv_brw[0].state == 'paid', 'The customer refund was not properly created, the state must be Paid.'
+-
+  2.7.- I check the correct asigning of parent_id in the customer refund created, for that
+  the customer refund must have the customer invoice id in the fiel parent_id
+-
+  !python {model: account.invoice.refund}: |
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_customer_inv_brw = obj_inv.browse(cr, uid, context['rfnd_id']['domain'][1][2])
+    customer_inv_brw = obj_inv.browse(cr, uid, ref('account_invoice_customer1'))    
+    assert (rfnd_customer_inv_brw[0].parent_id.id == customer_inv_brw.id), 'The customer refund dont have the correct parent_id.'
+-
+  3.- In order to test account refund with "Create refund, reconcile and create a new draft invoice"
+  method 
+-  
+  3.1.- I create a new customer invoice
+-
+  !record {model: account.invoice, id: account_invoice_customer2, view: account.invoice_form }:
+    <<: *customer_invoice
+-
+  3.2.- I check that Initially customer invoice state is "Draft"
+-
+  !assert {model: account.invoice, id: account_invoice_customer2}:
+    - state == 'draft'
+-
+  3.3.- I check that the customer invoice is a "Customer Invoice"
+-
+  !assert {model: account.invoice, id: account_invoice_customer2, string: This is not a customer invoice}:
+    - type == 'out_invoice'
+-
+  3.4.- I change the state of invoice to open by clicking Validate button
+-
+  !workflow {model: account.invoice, action: invoice_open, ref: account_invoice_customer2}
+-
+  3.5.- I check that the invoice state is now "Open"
+-
+  !assert {model: account.invoice, id: account_invoice_customer2}:
+    - state == 'open'
+-
+  3.6.- I create a customer refund using the method "Create refund, reconcile and create a new draft invoice" and 
+  check the state of the account invoice refund resulting
+-
+  !python {model: account.invoice.refund}: |
+    import time
+    values = {
+        'date': time.strftime('%Y-%m-%d'),
+        'period': self.pool.get('account.period').find(
+            cr, uid, time.strftime('%Y/%m/%d'), {'company_id': ref('base.main_company')})[0],
+        'journal_id': ref('account.refund_expenses_journal'),
+        'description': 'Desde el test',
+        'filter_refund': 'modify',
+    }
+    wzr_id = self.create(cr, uid, values)
+    assert wzr_id, 'The wizard instance was not created.'
+    context['wzr_id'] = wzr_id
+    context['active_ids'] = [ref('account_invoice_customer2')]
+    rfnd_id = self.invoice_refund(cr, uid, [wzr_id], context=context)
+    assert rfnd_id, 'The refund was not created.'
+    context['rfnd_id'] = rfnd_id
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_customer_inv_brw = obj_inv.browse(cr, uid, rfnd_id['domain'][1][2])    
+    assert rfnd_customer_inv_brw[0].state == 'paid', 'The customer refund was not properly created, the state must be Paid.'
+-
+  3.7.- I check the correct asigning of parent_id in the customer refund created, for that
+  the customer refund must have the customer invoice id in the fiel parent_id
+-
+  !python {model: account.invoice.refund}: |
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_customer_inv_brw = obj_inv.browse(cr, uid, context['rfnd_id']['domain'][1][2])
+    customer_inv_brw = obj_inv.browse(cr, uid, ref('account_invoice_customer2'))    
+    assert (rfnd_customer_inv_brw[0].parent_id.id == customer_inv_brw.id), 'The customer refund dont have the correct parent_id.'
+-
+  3.8.- I check that the new customer invoice was created in Draft state
+-
+  !python {model: account.invoice.refund}: |
+    obj_inv = self.pool.get('account.invoice')
+    inv_src = obj_inv.search(cr, uid, [], order='id')
+    customer_inv_brw = obj_inv.browse(cr, uid, inv_src[-1])
+    assert customer_inv_brw.state == 'draft', 'The new customer invoice was not properly created, the state must be Draft.'
+-
+  4.- In order to test account refund with "Create a draft refund" method in a "Paid" invoice
+-
+  4.1.- I create a new partner
+-
+  !record {model: 'res.partner', id: res_partner8}:
+    name: Juan Perez
+    use_parent_address: True
+    function: Tests
+    email: juan@perez.com
+-
+  4.2.- I create a Sale Journal.
+-
+  !record {model: account.journal, id: sale_journal_debit}:
+    code: sjou_test
+    company_id: base.main_company
+    name: Sale Journal For Debit Credit Note Tests
+    sequence_id: account.sequence_sale_journal
+    type: sale
+-
+  4.3.- I create a new customer invoice
+-
+  !record {model: account.invoice, id: account_invoice_customer3}:
+    account_id: account.a_recv
+    company_id: base.main_company
+    currency_id: base.EUR
+    invoice_line:
+      - account_id: account.a_sale
+        name: '[PCSC234] PC Assemble SC234'
+        price_unit: 450.0
+        quantity: 1.0
+        product_id: product.product_product_3
+        uos_id: product.product_uom_unit
+    journal_id: sale_journal_debit
+    partner_id: res_partner8
+-
+  4.4.- I check that Initially customer invoice state is "Draft"
+-
+  !assert {model: account.invoice, id: account_invoice_customer3}:
+    - state == 'draft'
+-
+  4.5.- I check that the customer invoice is a "Customer Invoice"
+-
+  !assert {model: account.invoice, id: account_invoice_customer3, string: This is not a customer invoice}:
+    - type == 'out_invoice'
+-
+  4.6.- I change the state of invoice to open by clicking Validate button
+-
+  !workflow {model: account.invoice, action: invoice_open, ref: account_invoice_customer3}
+-
+  4.7.- I check that the invoice state is now "Open"
+-
+  !assert {model: account.invoice, id: account_invoice_customer3}:
+    - state == 'open'
+-
+  4.8.- I check that a payment entry gets created in the account.move.line
+-
+  !python {model: account.invoice}: |
+    acc_id=self.browse(cr, uid, ref("account_invoice_customer3"))
+    assert(acc_id.move_id)
+-
+  4.9.- I create a Cash Journal.
+-
+  !record {model: account.journal, id: cash_journal_debit}:
+    code: cjou_test
+    company_id: base.main_company
+    name: Cash Journal For Debit Credit Note Tests
+    sequence_id: account.sequence_cash_journal
+    type: cash
+-
+  4.10.- I will create and post an account voucher of amount 450.0 for the partner Juan Perez.
+-
+  !python {model: account.voucher}: |
+    import netsvc
+    import time
+    vals = {}
+    journal_id = self.default_get(cr, uid, ['journal_id']).get('journal_id',None)
+    res = self.onchange_partner_id(cr, uid, [], ref("res_partner8"), journal_id, 0.0, 1, ttype='receipt', date=False)
+    vals = {
+        'account_id': ref('account.cash'),
+        'amount': 517.50,
+        'company_id': ref('base.main_company'),
+        'journal_id': ref('cash_journal_debit'),
+        'partner_id': ref('res_partner8'),
+        'period_id': self.pool.get('account.period').find(
+            cr, uid, time.strftime('%Y/%m/%d'), {'company_id': ref('base.main_company')})[0],
+        'type': 'receipt',
+    }
+    if not res['value']['line_cr_ids']:
+      res['value']['line_cr_ids'] = [{'type': 'cr', 'account_id': ref('account.a_recv'),}]
+    res['value']['line_cr_ids'][0]['amount'] = 517.50
+    vals['line_cr_ids'] = [(0,0,i) for i in res['value']['line_cr_ids']]
+    id = self.create(cr, uid, vals)
+    voucher_id = self.browse(cr, uid, id)
+    assert (voucher_id.state=='draft'), "Voucher is not in draft state"
+    wf_service = netsvc.LocalService("workflow")
+    wf_service.trg_validate(uid, 'account.voucher', voucher_id.id, 'proforma_voucher', cr)
+-
+  4.11.- I check if the state of the invoice is "Paid"
+-
+  !assert {model: account.invoice, id: account_invoice_customer3}:
+    - state == 'paid'
+-
+  4.12.- I modified the sale journal record so it can cancel invoice
+-
+  !record {model: account.journal, id: sale_journal_debit}:
+    update_posted: 1
+-
+  4.13.- I modified the cash journal record so it can cancel invoice
+-
+  !record {model: account.journal, id: cash_journal_debit}:
+    update_posted: 1
+-
+  4.14.- I create a Sale Refund Journal.
+-
+  !record {model: account.journal, id: sale_refund_journal_debit}:
+    code: csrjou_test
+    company_id: base.main_company
+    name: Sale Refund Journal For Debit Credit Note Tests
+    sequence_id: account.sequence_refund_sales_journal
+    type: sale_refund
+-
+  4.15.- I create a customer refund using the method "Create a draft refund" and 
+  check the state of the account invoice refund resulting
+-
+  !python {model: account.invoice.refund}: |
+    import time
+    values = {
+        'date': time.strftime('%Y-%m-%d'),
+        'period': self.pool.get('account.period').find(
+            cr, uid, time.strftime('%Y/%m/%d'), {'company_id': ref('base.main_company')})[0],
+        'journal_id': ref('sale_refund_journal_debit'),
+        'description': 'Desde el test',
+        'filter_refund': 'refund',
+    }
+    wzr_id = self.create(cr, uid, values)
+    assert wzr_id, 'The wizard instance was not created.'
+    context['wzr_id'] = wzr_id
+    context['active_ids'] = [ref('account_invoice_customer3')]
+    rfnd_id = self.invoice_refund(cr, uid, [wzr_id], context=context)
+    assert rfnd_id, 'The refund was not created.'
+    context['rfnd_id'] = rfnd_id
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_customer_inv_brw = obj_inv.browse(cr, uid, rfnd_id['domain'][1][2])
+    assert rfnd_customer_inv_brw[0].state == 'draft', 'The customer refund was not properly created, the state must be Draft.'
+-
+  4.16.- I check the correct asigning of parent_id in the customer refund created, for that
+  the customer refund must have the customer invoice id in the fiel parent_id
+-
+  !python {model: account.invoice.refund}: |
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_customer_inv_brw = obj_inv.browse(cr, uid, context['rfnd_id']['domain'][1][2])
+    customer_inv_brw = obj_inv.browse(cr, uid, ref('account_invoice_customer3'))    
+    assert (rfnd_customer_inv_brw[0].parent_id.id == customer_inv_brw.id), 'The customer refund dont have the correct parent_id.'
+-
+  5.- In order to test account refund with "Create refund and reconcile" method in a "Paid" invoice
+-
+  5.1.- I create a new partner
+-
+  !record {model: 'res.partner', id: res_partner7}:
+    name: Pedro Perez
+    use_parent_address: True
+    function: Tests
+    email: pedro@perez.com
+-
+  5.2.- I create a new customer invoice
+-
+  !record {model: account.invoice, id: account_invoice_customer4}:
+    account_id: account.a_recv
+    company_id: base.main_company
+    currency_id: base.EUR
+    invoice_line:
+      - account_id: account.a_sale
+        name: '[PCSC234] PC Assemble SC234'
+        price_unit: 450.0
+        quantity: 1.0
+        product_id: product.product_product_3
+        uos_id: product.product_uom_unit
+    journal_id: sale_journal_debit
+    partner_id: res_partner7
+-
+  5.3.- I check that Initially customer invoice state is "Draft"
+-
+  !assert {model: account.invoice, id: account_invoice_customer4}:
+    - state == 'draft'
+-
+  5.4.- I check that the customer invoice is a "Customer Invoice"
+-
+  !assert {model: account.invoice, id: account_invoice_customer4, string: This is not a customer invoice}:
+    - type == 'out_invoice'
+-
+  5.5.- I change the state of invoice to open by clicking Validate button
+-
+  !workflow {model: account.invoice, action: invoice_open, ref: account_invoice_customer4}
+-
+  5.6.- I check that the invoice state is now "Open"
+-
+  !assert {model: account.invoice, id: account_invoice_customer4}:
+    - state == 'open'
+-
+  5.7.- I check that a payment entry gets created in the account.move.line
+-
+  !python {model: account.invoice}: |
+    acc_id=self.browse(cr, uid, ref("account_invoice_customer4"))
+    assert(acc_id.move_id)
+-
+  5.8.- I will create and post an account voucher of amount 450.0 for the partner Pedro Perez.
+-
+  !python {model: account.voucher}: |
+    import netsvc
+    import time
+    vals = {}
+    journal_id = self.default_get(cr, uid, ['journal_id']).get('journal_id',None)
+    res = self.onchange_partner_id(cr, uid, [], ref("res_partner7"), journal_id, 0.0, 1, ttype='receipt', date=False)
+    vals = {
+        'account_id': ref('account.cash'),
+        'amount': 517.50,
+        'company_id': ref('base.main_company'),
+        'journal_id': ref('cash_journal_debit'),
+        'partner_id': ref('res_partner7'),
+        'period_id': self.pool.get('account.period').find(
+            cr, uid, time.strftime('%Y/%m/%d'), {'company_id': ref('base.main_company')})[0],
+        'type': 'receipt',
+    }
+    if not res['value']['line_cr_ids']:
+      res['value']['line_cr_ids'] = [{'type': 'cr', 'account_id': ref('account.a_recv'),}]
+    res['value']['line_cr_ids'][0]['amount'] = 517.50
+    vals['line_cr_ids'] = [(0,0,i) for i in res['value']['line_cr_ids']]
+    id = self.create(cr, uid, vals)
+    voucher_id = self.browse(cr, uid, id)
+    assert (voucher_id.state=='draft'), "Voucher is not in draft state"
+    wf_service = netsvc.LocalService("workflow")
+    wf_service.trg_validate(uid, 'account.voucher', voucher_id.id, 'proforma_voucher', cr)
+-
+  5.9.- I check if the state of the invoice is "Paid"
+-
+  !assert {model: account.invoice, id: account_invoice_customer4}:
+    - state == 'paid'
+-
+  5.10.- I create a customer refund using the method "Create refund and reconcile" and 
+  check the state of the account invoice refund resulting
+-
+  !python {model: account.invoice.refund}: |
+    import time
+    values = {
+        'date': time.strftime('%Y-%m-%d'),
+        'period': self.pool.get('account.period').find(
+            cr, uid, time.strftime('%Y/%m/%d'), {'company_id': ref('base.main_company')})[0],
+        'journal_id': ref('sale_refund_journal_debit'),
+        'description': 'Desde el test',
+        'filter_refund': 'cancel',
+    }
+    wzr_id = self.create(cr, uid, values)
+    assert wzr_id, 'The wizard instance was not created.'
+    context['wzr_id'] = wzr_id
+    context['active_ids'] = [ref('account_invoice_customer4')]
+    rfnd_id = self.invoice_refund(cr, uid, [wzr_id], context=context)
+    assert rfnd_id, 'The refund was not created.'
+    context['rfnd_id'] = rfnd_id
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_customer_inv_brw = obj_inv.browse(cr, uid, rfnd_id['domain'][1][2])
+    assert rfnd_customer_inv_brw[0].state == 'paid', 'The customer refund was not properly created, the state must be Paid.'
+-
+  5.11.- I check the correct asigning of parent_id in the customer refund created, for that
+  the customer refund must have the customer invoice id in the fiel parent_id
+-
+  !python {model: account.invoice.refund}: |
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_customer_inv_brw = obj_inv.browse(cr, uid, context['rfnd_id']['domain'][1][2])
+    customer_inv_brw = obj_inv.browse(cr, uid, ref('account_invoice_customer4'))    
+    assert (rfnd_customer_inv_brw[0].parent_id.id == customer_inv_brw.id), 'The customer refund dont have the correct parent_id.'
+-
+  6.- In order to test account refund with "Create refund, reconcile and create a new draft invoice"
+  method in a "Paid" invoice
+-
+  6.1.- I create a new partner
+-
+  !record {model: 'res.partner', id: res_partner9}:
+    name: Maria Perez
+    use_parent_address: True
+    function: Tests
+    email: maria@perez.com
+-
+  6.2.- I create a new customer invoice
+-
+  !record {model: account.invoice, id: account_invoice_customer5}:
+    account_id: account.a_recv
+    company_id: base.main_company
+    currency_id: base.EUR
+    invoice_line:
+      - account_id: account.a_sale
+        name: '[PCSC234] PC Assemble SC234'
+        price_unit: 450.0
+        quantity: 1.0
+        product_id: product.product_product_3
+        uos_id: product.product_uom_unit
+    journal_id: sale_journal_debit
+    partner_id: res_partner9
+-
+  6.3.- I check that Initially customer invoice state is "Draft"
+-
+  !assert {model: account.invoice, id: account_invoice_customer5}:
+    - state == 'draft'
+-
+  6.4.- I check that the customer invoice is a "Customer Invoice"
+-
+  !assert {model: account.invoice, id: account_invoice_customer5, string: This is not a customer invoice}:
+    - type == 'out_invoice'
+-
+  6.5.- I change the state of invoice to open by clicking Validate button
+-
+  !workflow {model: account.invoice, action: invoice_open, ref: account_invoice_customer5}
+-
+  6.6.- I check that the invoice state is now "Open"
+-
+  !assert {model: account.invoice, id: account_invoice_customer5}:
+    - state == 'open'
+-
+  6.7.- I check that a payment entry gets created in the account.move.line
+-
+  !python {model: account.invoice}: |
+    acc_id=self.browse(cr, uid, ref("account_invoice_customer5"))
+    assert(acc_id.move_id)
+-
+  6.8.- I will create and post an account voucher of amount 450.0 for the partner Maria Perez.
+-
+  !python {model: account.voucher}: |
+    import netsvc
+    import time
+    vals = {}
+    journal_id = self.default_get(cr, uid, ['journal_id']).get('journal_id',None)
+    res = self.onchange_partner_id(cr, uid, [], ref("res_partner9"), journal_id, 0.0, 1, ttype='receipt', date=False)
+    vals = {
+        'account_id': ref('account.cash'),
+        'amount': 517.50,
+        'company_id': ref('base.main_company'),
+        'journal_id': ref('cash_journal_debit'),
+        'partner_id': ref('res_partner9'),
+        'period_id': self.pool.get('account.period').find(
+            cr, uid, time.strftime('%Y/%m/%d'), {'company_id': ref('base.main_company')})[0],
+        'type': 'receipt',
+    }
+    if not res['value']['line_cr_ids']:
+      res['value']['line_cr_ids'] = [{'type': 'cr', 'account_id': ref('account.a_recv'),}]
+    res['value']['line_cr_ids'][0]['amount'] = 517.50
+    vals['line_cr_ids'] = [(0,0,i) for i in res['value']['line_cr_ids']]
+    id = self.create(cr, uid, vals)
+    voucher_id = self.browse(cr, uid, id)
+    assert (voucher_id.state=='draft'), "Voucher is not in draft state"
+    wf_service = netsvc.LocalService("workflow")
+    wf_service.trg_validate(uid, 'account.voucher', voucher_id.id, 'proforma_voucher', cr)
+-
+  6.9.- I check if the state of the invoice is "Paid"
+-
+  !assert {model: account.invoice, id: account_invoice_customer5}:
+    - state == 'paid'
+-
+  6.10.- I create a customer refund using the method "Create refund, reconcile and create a new draft invoice" and 
+  check the state of the account invoice refund resulting
+-
+  !python {model: account.invoice.refund}: |
+    import time
+    values = {
+        'date': time.strftime('%Y-%m-%d'),
+        'period': self.pool.get('account.period').find(
+            cr, uid, time.strftime('%Y/%m/%d'), {'company_id': ref('base.main_company')})[0],
+        'journal_id': ref('sale_refund_journal_debit'),
+        'description': 'Desde el test',
+        'filter_refund': 'modify',
+    }
+    wzr_id = self.create(cr, uid, values)
+    assert wzr_id, 'The wizard instance was not created.'
+    context['wzr_id'] = wzr_id
+    context['active_ids'] = [ref('account_invoice_customer5')]
+    rfnd_id = self.invoice_refund(cr, uid, [wzr_id], context=context)
+    assert rfnd_id, 'The refund was not created.'
+    context['rfnd_id'] = rfnd_id
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_customer_inv_brw = obj_inv.browse(cr, uid, rfnd_id['domain'][1][2])
+    assert rfnd_customer_inv_brw[0].state == 'paid', 'The customer refund was not properly created, the state must be Paid.'
+-
+  6.11.- I check the correct asigning of parent_id in the customer refund created, for that
+  the customer refund must have the customer invoice id in the fiel parent_id
+-
+  !python {model: account.invoice.refund}: |
+    obj_inv = self.pool.get('account.invoice')
+    rfnd_customer_inv_brw = obj_inv.browse(cr, uid, context['rfnd_id']['domain'][1][2])
+    customer_inv_brw = obj_inv.browse(cr, uid, ref('account_invoice_customer5'))    
+    assert (rfnd_customer_inv_brw[0].parent_id.id == customer_inv_brw.id), 'The customer refund dont have the correct parent_id.'
+-
+  6.12.- I check that the new customer invoice was created in Draft state
+-
+  !python {model: account.invoice.refund}: |
+    obj_inv = self.pool.get('account.invoice')
+    inv_src = obj_inv.search(cr, uid, [], order='id')
+    customer_inv_brw = obj_inv.browse(cr, uid, inv_src[-1])
+    assert customer_inv_brw.state == 'draft', 'The new customer invoice was not properly created, the state must be Draft.'
