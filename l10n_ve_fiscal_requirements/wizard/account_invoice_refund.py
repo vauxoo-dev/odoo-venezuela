@@ -99,6 +99,38 @@ class account_invoice_refund(osv.osv_memory):
                 journal_select = journal_obj._name_search(cr, uid, '', [('type', '=', type)], context=context, limit=None, name_get_uid=1)
                 res['fields'][field]['selection'] = journal_select
         return res
+        
+    def cn_iva_validate(self, cr, uid,invoice,context=None):
+        """ Validates if retentions have been changes to move the state confirmed and done
+        """
+        if context is None:
+            context={}
+        ret_iva_id=False
+        ret_islr_id=False
+        im_obj=self.pool.get('ir.model')
+        res = im_obj.browse(cr,uid,im_obj.search(cr, uid, [('model', '=','account.invoice')], context=context),context=context)[0].field_id
+        for i in res:
+            if i.name == 'wh_iva_id':
+                if invoice.wh_iva_id: 
+                    ret_iva_id =  invoice.wh_iva_id.id
+            if i.name == 'islr_wh_doc_id':
+                if invoice.islr_wh_doc_id:
+                    ret_islr_id =  invoice.islr_wh_doc_id.id
+            
+        awi_obj=self.pool.get('account.wh.iva')
+        iwd_obj=self.pool.get('islr.wh.doc')
+        wf_service = netsvc.LocalService("workflow")
+        
+        if ret_iva_id:
+            awi_obj.compute_amount_wh(cr,uid,[ret_iva_id],context=context)
+            wf_service.trg_validate(uid, 'account.wh.iva', ret_iva_id, 'wh_iva_confirmed', cr)
+            wf_service.trg_validate(uid, 'account.wh.iva', ret_iva_id, 'wh_iva_done', cr)
+        
+        if ret_islr_id:
+            iwd_obj.action_confirm1(cr,uid,[ret_islr_id],context=context)
+            wf_service.trg_validate(uid, 'islr.wh.doc', ret_islr_id, 'act_done', cr)
+        
+        return True
 
     def compute_refund(self, cr, uid, ids, mode='refund', context=None):
         """ 
@@ -279,7 +311,39 @@ class account_invoice_refund(osv.osv_memory):
                 orig = self._get_orig(cr, uid, inv, inv.supplier_invoice_number, context)
                 inv_obj.write(cr,uid,created_inv[0],{'origin':inv.origin,'name':wzd_brw.description},context=context)
             return result
+            
+    def validate_wh(self, cr, uid, ids, context=None):
+        """ Method that validate if invoice has non-yet processed withholds.
 
+        return: True: if invoice is does not have wh's or it does have and those ones are validated.
+                False: if invoice is does have and those wh's are not yet validated.
+                
+        in the meantime this function is DUMMY,
+        and the developer should use it to override and get advantage of it.
+        """
+        return True
+
+    def invoice_refund(self, cr, uid, ids, context=None):
+        """ Create a invoice refund
+        """
+        if context is None:
+            context = {}
+        inv_obj = self.pool.get('account.invoice')
+        period_obj = self.pool.get('account.period')
+        wzr_brw = self.browse(cr,uid,ids,context=context)[0]
+        date = wzr_brw.date and wzr_brw.date.split('-') 
+        period = wzr_brw and wzr_brw.period and wzr_brw.period.id 
+        period_ids = date and len(date) == 3 and  period_obj.search(cr,uid,[('code','=','%s/%s'%(date[1],date[0]))],context=context)
+        if period not in period_ids:
+            raise osv.except_osv(_('Error !'), \
+                                     _('The date should be chosen to belong to the period'))    
+        if not self.validate_wh(cr, uid, context.get('active_ids'), context=context):
+            inv= inv_obj.browse(cr,uid,context.get('active_ids'),context=context)[0]
+            raise osv.except_osv(_('Error !'), \
+                                     _('There are non-valid withholds for the document %s which refund is being processed!' % inv and inv.wh_iva_id.code or "vacio" ))
+        self.unreconcile_paid_invoices(cr, uid, context.get('active_ids'), context=context)
+        data_refund = self.browse(cr, uid, ids, context=context)[0].filter_refund
+        return self.compute_refund(cr, uid, ids, data_refund, context=context)
 
 account_invoice_refund()
 
