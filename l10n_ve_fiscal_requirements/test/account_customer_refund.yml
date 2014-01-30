@@ -267,17 +267,19 @@
     sequence_id: account.sequence_cash_journal
     type: cash
 -
-  4.10.- I will create and post an account voucher of amount 450.0 for the partner Juan Perez.
+  4.10.- I will create and post an account voucher with the amount total 
+  of the customer invoice created for the partner Juan Perez.
 -
   !python {model: account.voucher}: |
     import netsvc
     import time
     vals = {}
+    amount_total = self.pool.get('account.invoice').browse(cr, uid, [ref('account_invoice_customer3')], context=None)[0].amount_total
     journal_id = self.default_get(cr, uid, ['journal_id']).get('journal_id',None)
     res = self.onchange_partner_id(cr, uid, [], ref("res_partner8"), journal_id, 0.0, 1, ttype='receipt', date=False)
     vals = {
         'account_id': ref('account.cash'),
-        'amount': 517.50,
+        'amount': amount_total,
         'company_id': ref('base.main_company'),
         'journal_id': ref('cash_journal_debit'),
         'partner_id': ref('res_partner8'),
@@ -287,7 +289,7 @@
     }
     if not res['value']['line_cr_ids']:
       res['value']['line_cr_ids'] = [{'type': 'cr', 'account_id': ref('account.a_recv'),}]
-    res['value']['line_cr_ids'][0]['amount'] = 517.50
+    res['value']['line_cr_ids'][0]['amount'] = amount_total
     vals['line_cr_ids'] = [(0,0,i) for i in res['value']['line_cr_ids']]
     id = self.create(cr, uid, vals)
     voucher_id = self.browse(cr, uid, id)
@@ -403,17 +405,19 @@
     acc_id=self.browse(cr, uid, ref("account_invoice_customer4"))
     assert(acc_id.move_id)
 -
-  5.8.- I will create and post an account voucher of amount 450.0 for the partner Pedro Perez.
+  5.8.- I will create and post an account voucher with the amount total 
+  of the customer invoice created for the partner Pedro Perez.
 -
   !python {model: account.voucher}: |
     import netsvc
     import time
     vals = {}
+    amount_total = self.pool.get('account.invoice').browse(cr, uid, [ref('account_invoice_customer4')], context=None)[0].amount_total
     journal_id = self.default_get(cr, uid, ['journal_id']).get('journal_id',None)
     res = self.onchange_partner_id(cr, uid, [], ref("res_partner7"), journal_id, 0.0, 1, ttype='receipt', date=False)
     vals = {
         'account_id': ref('account.cash'),
-        'amount': 517.50,
+        'amount': amount_total,
         'company_id': ref('base.main_company'),
         'journal_id': ref('cash_journal_debit'),
         'partner_id': ref('res_partner7'),
@@ -423,7 +427,7 @@
     }
     if not res['value']['line_cr_ids']:
       res['value']['line_cr_ids'] = [{'type': 'cr', 'account_id': ref('account.a_recv'),}]
-    res['value']['line_cr_ids'][0]['amount'] = 517.50
+    res['value']['line_cr_ids'][0]['amount'] = amount_total
     vals['line_cr_ids'] = [(0,0,i) for i in res['value']['line_cr_ids']]
     id = self.create(cr, uid, vals)
     voucher_id = self.browse(cr, uid, id)
@@ -521,17 +525,19 @@
     acc_id=self.browse(cr, uid, ref("account_invoice_customer5"))
     assert(acc_id.move_id)
 -
-  6.8.- I will create and post an account voucher of amount 450.0 for the partner Maria Perez.
+  6.8.- I will create and post an account voucher with the amount total 
+  of the customer invoice created for the partner Maria Perez.
 -
   !python {model: account.voucher}: |
     import netsvc
     import time
     vals = {}
+    amount_total = self.pool.get('account.invoice').browse(cr, uid, [ref('account_invoice_customer5')], context=None)[0].amount_total
     journal_id = self.default_get(cr, uid, ['journal_id']).get('journal_id',None)
     res = self.onchange_partner_id(cr, uid, [], ref("res_partner9"), journal_id, 0.0, 1, ttype='receipt', date=False)
     vals = {
         'account_id': ref('account.cash'),
-        'amount': 517.50,
+        'amount': amount_total,
         'company_id': ref('base.main_company'),
         'journal_id': ref('cash_journal_debit'),
         'partner_id': ref('res_partner9'),
@@ -541,7 +547,7 @@
     }
     if not res['value']['line_cr_ids']:
       res['value']['line_cr_ids'] = [{'type': 'cr', 'account_id': ref('account.a_recv'),}]
-    res['value']['line_cr_ids'][0]['amount'] = 517.50
+    res['value']['line_cr_ids'][0]['amount'] = amount_total
     vals['line_cr_ids'] = [(0,0,i) for i in res['value']['line_cr_ids']]
     id = self.create(cr, uid, vals)
     voucher_id = self.browse(cr, uid, id)
