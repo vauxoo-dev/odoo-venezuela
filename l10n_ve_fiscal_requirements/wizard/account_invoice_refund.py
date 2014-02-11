@@ -149,20 +149,20 @@ class account_invoice_refund(osv.osv_memory):
         res_users_obj = self.pool.get('res.users')
         if context is None:
             context = {}
-        for form in  self.read(cr, uid, ids, context=context):
+        for form in self.browse(cr, uid, ids, context=context):
             created_inv = []
             date = False
             period = False
             description = False
             nroctrl = False
             company = res_users_obj.browse(cr, uid, uid, context=context).company_id
-            journal_brw = form.get('journal_id', False)
+            journal_brw = form.journal_id or False
             for inv in inv_obj.browse(cr, uid, context.get('active_ids'), context=context):
                 if inv.state in ['draft', 'proforma2', 'cancel']:
                     raise osv.except_osv(_('Error !'), _('Can not %s draft/proforma/cancel invoice.') % (mode))
                 if inv.reconciled and mode in ('cancel', 'modify'):
                     raise osv.except_osv(_('Error !'), _('Can not %s invoice which is already reconciled, invoice should be unreconciled first. You can only Refund this invoice') % (mode))
-                period = form.get('period') and form.get('period')[0] or False
+                period = form.period.id or False
                 if not period:
 	                #Take period from the current date
                     period = self.pool.get('account.period').find(cr, uid, context=context)
@@ -175,11 +175,11 @@ class account_invoice_refund(osv.osv_memory):
                 if not journal_brw:
                     journal_id = inv.journal_id.id
                 else:
-                    journal_id=journal_brw[0]
+                    journal_id=journal_brw.id
 
-                if form['date']:
-                    date = form['date']
-                    if not form['period']:
+                if form.date:
+                    date = form.date
+                    if not form.period:
                             cr.execute("select name from ir_model_fields \
                                             where model = 'account.period' \
                                             and name = 'company_id'")
@@ -199,14 +199,14 @@ class account_invoice_refund(osv.osv_memory):
                     #Take current date
                     #date = inv.date_invoice
                     date = time.strftime('%Y-%m-%d')
-                if form['description']:
-                    description = form['description']
+                if form.description:
+                    description = form.description
                 else:
                     description = inv.name
                 
                 if inv.type in ('in_invoice','in_refund'):
-                    if form['nro_ctrl']:
-                        nroctrl = form['nro_ctrl']
+                    if form.nro_ctrl:
+                        nroctrl = form.nro_ctrl
                     else:
                         raise osv.except_osv(_('Control Number !'), \
                                             _('Missing Control Number on Invoice Refund!'))
@@ -331,9 +331,9 @@ class account_invoice_refund(osv.osv_memory):
         inv_obj = self.pool.get('account.invoice')
         period_obj = self.pool.get('account.period')
         wzr_brw = self.browse(cr,uid,ids,context=context)[0]
-        date = wzr_brw.date and wzr_brw.date.split('-') 
-        period = wzr_brw and wzr_brw.period and wzr_brw.period.id 
-        period_ids = date and len(date) == 3 and  period_obj.search(cr,uid,[('code','=','%s/%s'%(date[1],date[0]))],context=context)
+        date = wzr_brw.date
+        period = wzr_brw and wzr_brw.period and wzr_brw.period.id
+        period_ids = date and period_obj.search(cr,uid,[('date_start', '<=', date),('date_stop', '>=', date),('special', '=', False)],context=context)
         if period not in period_ids:
             raise osv.except_osv(_('Error !'), \
                                      _('The date should be chosen to belong to the period'))    
