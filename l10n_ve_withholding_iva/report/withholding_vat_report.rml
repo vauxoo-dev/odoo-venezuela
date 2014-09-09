@@ -145,7 +145,7 @@
                 </blockTable>
                 <blockTable colWidths="88.6mm,88.6mm,88.7mm" style="ITEMSWHITE" rowHeights="15mm">
                 <tr>
-                    <td><para style="ITEMSRIF"><b>[[ (o.type == 'in_invoice' and o.third_party_id) and third_party_id.name or o.company_id.partner_id.name ]]</b></para></td>
+                    <td><para style="ITEMSRIF"><b>[[ (o.type == 'in_invoice' and o.third_party_id) and o.third_party_id.name or o.company_id.partner_id.name ]]</b></para></td>
                     <td><para style="ITEMSRIF"><b>[[ (o.type == 'in_invoice' and o.third_party_id) and (o.third_party_id.vat and ('%s-%s-%s'%(o.third_party_id.vat[2:3],o.third_party_id.vat[3:11],o.third_party_id.vat[11:12])) or removeParentNode('para')) or (o.company_id.partner_id.vat and ('%s-%s-%s'%(o.company_id.partner_id.vat[2:3],o.company_id.partner_id.vat[3:11],o.company_id.partner_id.vat[11:12])) or removeParentNode('para')) ]]</b></para></td>
                     <td><para style="ITEMSLEFT"><b>[[ (o.type == 'in_invoice' and o.third_party_id) and (get_partner_addr2(o.third_party_id.id) or '') or (get_partner_addr2(o.company_id.partner_id.id) or '') ]]</b></para></td>
                 </tr>
