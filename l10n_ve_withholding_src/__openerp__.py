@@ -5,7 +5,7 @@
 #    Copyright (C) OpenERP Venezuela (<http://openerp.com.ve>).
 #    All Rights Reserved
 ###############Credits######################################################
-#    Coded by: Humberto Arocha <hbto@vauxoo.com>     
+#    Coded by: Humberto Arocha <hbto@vauxoo.com>
 #    Planified by: Humberto Arocha / Nhomar Hernandez
 #    Audited by: Vauxoo C.A.
 #############################################################################
@@ -22,14 +22,12 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
-
 {
-    "name" : "Compromiso de Responsabilidad Social",
-    "version" : "0.2",
-    "author" : "Vauxoo",
-    "category" : "Generic Modules",
-    "website": "http://wiki.openerp.org.ve/",
-    "description": '''Administración de la Aplicacion del Compromiso de Responsabilidad Social
+    "name": "Compromiso de Responsabilidad Social", 
+    "version": "0.2", 
+    "author": "Vauxoo", 
+    "category": "Generic Modules", 
+    "description": """Administración de la Aplicacion del Compromiso de Responsabilidad Social
 que se establece en el Reglamento de Ley de Contrataciones Públicas, (Gaceta Oficial Nº 39.181 del 19 de mayo de 2009) Decreto Nº 6.708.
 
 **Artículo 34**
@@ -43,34 +41,38 @@ que se establece en el Reglamento de Ley de Contrataciones Públicas, (Gaceta Of
 **Artículo 35**
 
     Rango y normativa interna para el suministro de bienes, prestación de servicios o ejecución de obras, se establece para el Compromiso de Responsabilidad Social un valor mínimo del uno por ciento (1%) y un valor máximo del cinco por ciento (5%) del monto del contrato suscrito, el cual asumirán los Contratistas beneficiarios de la adjudicación del mismo. Los órganos o entes contratantes deberán fijar los porcentajes a ser aplicados a cada condición del Compromiso de Responsabilidad Social, así como, establecer categorías o escalas proporcionales con base en los montos de los contratos a ser suscritos.
-''',
-    "depends" : [
-                "base",
-                "account",
-                "l10n_ve_withholding",
-                ],
-    "init_xml" : [],
-    "demo_xml" : [
-        'demo/demo_journals.xml',
-        'demo/demo_accounts.xml',
-        'demo/demo_company.xml',
+""", 
+    "website": "http://wiki.openerp.org.ve/", 
+    "license": "", 
+    "depends": [
+        "base", 
+        "account", 
+        "l10n_ve_withholding"
+    ], 
+    "demo": [
+        "demo/demo_journals.xml", 
+        "demo/demo_accounts.xml", 
+        "demo/demo_company.xml"
+    ], 
+    "data": [
+        "security/wh_src_security.xml", 
+        "security/ir.model.access.csv", 
+        "wizard/wizard_retention_view.xml", 
+        "view/wh_src_view.xml", 
+        "view/account_invoice_view.xml", 
+        "view/company_view.xml", 
+        "view/partner_view.xml", 
+        "workflow/l10n_ve_wh_src_wf.xml", 
+        "report/wh_src_report.xml"
     ], 
     "test": [
-        'test/aws_customer.yml',
-        'test/aws_supplier.yml',
-    ],
-    "update_xml" : [
-        'security/wh_src_security.xml',
-        'security/ir.model.access.csv',
-        'wizard/wizard_retention_view.xml',
-        'view/wh_src_view.xml',
-        'view/account_invoice_view.xml',
-        'view/company_view.xml',
-        'view/partner_view.xml',
-        'workflow/l10n_ve_wh_src_wf.xml',
-        'report/wh_src_report.xml',
-        
-    ],
-    "active": False,
-    "installable": True,
+        "test/aws_customer.yml", 
+        "test/aws_supplier.yml"
+    ], 
+    "js": [], 
+    "css": [], 
+    "qweb": [], 
+    "installable": True, 
+    "auto_install": False
 }
+#vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

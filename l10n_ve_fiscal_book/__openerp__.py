@@ -4,7 +4,7 @@
 # Copyright (c) 2011 Vauxoo C.A. (http://openerp.com.ve/) All Rights Reserved.
 #                    Luis Escobar <luis@vauxoo.com>
 #                    Tulio Ruiz <tulio@vauxoo.com>
-# 
+#
 #
 # WARNING: This program as such is intended to be used by professional
 # programmers who take the whole responsability of assessing all potential
@@ -28,13 +28,12 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #
 ##############################################################################
-
 {
-    "name" : "Fiscal Report For Venezuela",
-    "version" : "0.5",
-    "depends" : ["account","l10n_ve_withholding_iva","l10n_ve_fiscal_requirements","l10n_ve_imex"],
-    "author" : "Vauxoo",
-    "description" : """
+    "name": "Fiscal Report For Venezuela", 
+    "version": "0.5", 
+    "author": "Vauxoo", 
+    "category": "Generic Modules/Accounting", 
+    "description": """
 Fiscal Book
 ===============================================================================
 Build all Fiscal Reports for Law in Venezuela.
@@ -45,31 +44,38 @@ Parágrafo Segundo: El registro de las operaciones contenidas en el reporte glob
 
 .. note::
     * *El libro de ventas no contempla la sección de Ventas por cuenta de Terceros.*
-""",
-    "website" : "http://openerp.com.ve",
-    "category" : "Generic Modules/Accounting",
-    "init_xml" : [
-    ],
-    "demo_xml" : [
-        "demo/book_base_demo.xml",
-        "demo/sale_book_demo.xml",
-        "demo/purchase_book_demo.xml",
-    ],
-    "update_xml" : [
-        "wizard/fiscal_book_wizard_view.xml",
-        "view/adjustment_book.xml",
-        "view/fiscal_book.xml",
-        "report/fiscal_book_report.xml",
-        "workflow/fb_workflow.xml",
-        "security/fiscal_book_security.xml",
-        "security/ir.model.access.csv",
-        "wizard/change_invoice_sin_cred_view.xml",
-        "view/account_invoice_view.xml",
-    ],
-    "test": [
        # 'test/purchase.yml',
        # 'test/sale.yml',
-    ],
-    "active": False,
-    "installable": True,
+""", 
+    "website": "http://openerp.com.ve", 
+    "license": "", 
+    "depends": [
+        "account", 
+        "l10n_ve_withholding_iva", 
+        "l10n_ve_fiscal_requirements", 
+        "l10n_ve_imex"
+    ], 
+    "demo": [
+        "demo/book_base_demo.xml", 
+        "demo/sale_book_demo.xml", 
+        "demo/purchase_book_demo.xml"
+    ], 
+    "data": [
+        "wizard/fiscal_book_wizard_view.xml", 
+        "view/adjustment_book.xml", 
+        "view/fiscal_book.xml", 
+        "report/fiscal_book_report.xml", 
+        "workflow/fb_workflow.xml", 
+        "security/fiscal_book_security.xml", 
+        "security/ir.model.access.csv", 
+        "wizard/change_invoice_sin_cred_view.xml", 
+        "view/account_invoice_view.xml"
+    ], 
+    "test": [], 
+    "js": [], 
+    "css": [], 
+    "qweb": [], 
+    "installable": True, 
+    "auto_install": False
 }
+#vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

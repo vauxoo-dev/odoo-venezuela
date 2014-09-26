@@ -5,7 +5,7 @@
 #    Copyright (C) OpenERP Venezuela (<http://openerp.com.ve>).
 #    All Rights Reserved
 ###############Credits######################################################
-#    Coded by: javier@vauxoo.com           
+#    Coded by: javier@vauxoo.com
 #    Planified by: Nhomar Hernandez
 #    Audited by: Vauxoo C.A.
 #############################################################################
@@ -23,11 +23,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 {
-    "name" : "Management withholdings Venezuelan laws",
-    "version" : "0.2",
-    "author" : "Vauxoo",
-    "website" : "http://vauxoo.com",
-    "category": 'Generic Modules/Accounting',
+    "name": "Management withholdings Venezuelan laws", 
+    "version": "0.2", 
+    "author": "Vauxoo", 
+    "category": "Generic Modules/Accounting", 
     "description": """- General Method for account move for Venezuela withholding process.
 - Add relation between account invoice tax and account tax, to avoid loss historical relation.
 - Add account journals types or withholding VAT and Income.
@@ -37,24 +36,28 @@
 
 TODO:
 - 
-    """,
-    'init_xml': [],
-    "depends" : ["l10n_ve_fiscal_requirements"],
-    'update_xml': [
-        'security/withholding_security.xml',
-        'security/ir.model.access.csv',    
-        'data/l10n_ve_withholding_data.xml',    
-        'view/l10n_ve_withholding_view.xml',
-        'workflow/wh_action_server.xml',
-    ],
-    'demo_xml': [],
-    'test': [
-        'test/account_supplier_invoice.yml',
-        'test/wh_pay_invoice.yml',
-        ],
-    'installable': True,
-    'active': False,
+""", 
+    "website": "http://vauxoo.com", 
+    "license": "", 
+    "depends": [
+        "l10n_ve_fiscal_requirements"
+    ], 
+    "demo": [], 
+    "data": [
+        "security/withholding_security.xml", 
+        "security/ir.model.access.csv", 
+        "data/l10n_ve_withholding_data.xml", 
+        "view/l10n_ve_withholding_view.xml", 
+        "workflow/wh_action_server.xml"
+    ], 
+    "test": [
+        "test/account_supplier_invoice.yml", 
+        "test/wh_pay_invoice.yml"
+    ], 
+    "js": [], 
+    "css": [], 
+    "qweb": [], 
+    "installable": True, 
+    "auto_install": False
 }
-
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
+#vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
