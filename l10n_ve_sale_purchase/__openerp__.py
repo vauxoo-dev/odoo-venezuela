@@ -23,10 +23,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 {
-    "name": "ISLR Sale and Purchase Functionalities", 
-    "version": "0.3", 
-    "author": "Vauxoo", 
-    "category": "", 
+    "name": "ISLR Sale and Purchase Functionalities",
+    "version": "0.3",
+    "author": "Vauxoo",
+    "category": "",
     "description": """Due to the Dependendy reduction on the l10n_ve_withholding_islr module, it was necessary to incorporate the functionalities regarding with the eliminated dependencies on another module.
 
 Because of that this module was created. This module adds the withholding income concept to the sale and purchase orders. It moves the withholding income concept defined in from the sale order to the stock, and, if the invoice was created from the stock, it moves the withholding income concept to the invoice. This also works the same way for purchase orders.
@@ -35,27 +35,28 @@ Because of that this module was created. This module adds the withholding income
 #        'test/purchase_validation.yml',
 #        'test/sale_order.yml',
 #        'test/sale_validation.yml',
-""", 
-    "website": "http://openerp.com", 
-    "license": "", 
+
+""",
+    "website": "http://openerp.com",
+    "license": "",
     "depends": [
-        "sale", 
-        "purchase", 
-        "stock", 
+        "sale",
+        "purchase",
+        "stock",
         "l10n_ve_withholding_islr"
-    ], 
-    "demo": [], 
+    ],
+    "demo": [],
     "data": [
-        "view/product_view.xml", 
-        "view/stock_view.xml", 
-        "view/purchase_view.xml", 
+        "view/product_view.xml",
+        "view/stock_view.xml",
+        "view/purchase_view.xml",
         "view/sale_order_view.xml"
-    ], 
-    "test": [], 
-    "js": [], 
-    "css": [], 
-    "qweb": [], 
-    "installable": True, 
+    ],
+    "test": [],
+    "js": [],
+    "css": [],
+    "qweb": [],
+    "installable": True,
     "auto_install": False
 }
 

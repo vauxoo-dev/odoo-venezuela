@@ -25,40 +25,41 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
 {
-    "name": "Imex", 
-    "version": "0.2", 
-    "author": "Tecvemar/Vauxoo", 
-    "category": "Generic Modules/Accounting", 
+    "name": "Imex",
+    "version": "0.2",
+    "author": "Tecvemar/Vauxoo",
+    "category": "Generic Modules/Accounting",
     "description": """
 Imex
 ===============================================================
 This modules handles the openerp venezuela localization import
 and export transactions. It specify the customs form model for
 import declaration SENIAT Official FORM (Forma 99086).
-""", 
-    "website": "http://vauxoo.com", 
-    "license": "", 
+
+""",
+    "website": "http://vauxoo.com",
+    "license": "",
     "depends": [
-        "base", 
-        "account", 
-        "decimal_precision", 
+        "base",
+        "account",
+        "decimal_precision",
         "l10n_ve_fiscal_requirements"
-    ], 
-    "demo": [], 
+    ],
+    "demo": [],
     "data": [
-        "security/ir.model.access.csv", 
-        "security/ir_rule.xml", 
-        "view/customs_form_config.xml", 
-        "view/customs_form.xml", 
-        "view/customs_form_menus.xml", 
-        "view/invoice.xml", 
+        "security/ir.model.access.csv",
+        "security/ir_rule.xml",
+        "view/customs_form_config.xml",
+        "view/customs_form.xml",
+        "view/customs_form_menus.xml",
+        "view/invoice.xml",
         "workflow/customs_form.xml"
-    ], 
-    "test": [], 
-    "js": [], 
-    "css": [], 
-    "qweb": [], 
-    "installable": True, 
+    ],
+    "test": [],
+    "js": [],
+    "css": [],
+    "qweb": [],
+    "installable": True,
     "auto_install": False
 }
 

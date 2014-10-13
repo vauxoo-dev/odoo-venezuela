@@ -1,26 +1,27 @@
 {
-    "name": "VAT Write Off", 
-    "version": "0.5", 
-    "author": "Vauxoo", 
-    "category": "Generic Modules/Accounting", 
+    "name": "VAT Write Off",
+    "version": "0.5",
+    "author": "Vauxoo",
+    "category": "Generic Modules/Accounting",
     "description": """
-    """, 
-    "website": "http://openerp.com.ve", 
-    "license": "", 
+
+""",
+    "website": "http://openerp.com.ve",
+    "license": "",
     "depends": [
-        "l10n_ve_fiscal_book", 
+        "l10n_ve_fiscal_book",
         "report_webkit"
-    ], 
-    "demo": [], 
+    ],
+    "demo": [],
     "data": [
-        "report/l10n_ve_vat_write_off_report.xml", 
+        "report/l10n_ve_vat_write_off_report.xml",
         "view/l10n_ve_vat_write_off.xml"
-    ], 
-    "test": [], 
-    "js": [], 
-    "css": [], 
-    "qweb": [], 
-    "installable": False, 
+    ],
+    "test": [],
+    "js": [],
+    "css": [],
+    "qweb": [],
+    "installable": False,
     "auto_install": False
 }
 

@@ -23,10 +23,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 {
-    "name": "Management withholdings Venezuelan laws", 
-    "version": "0.2", 
-    "author": "Vauxoo", 
-    "category": "Generic Modules/Accounting", 
+    "name": "Management withholdings Venezuelan laws",
+    "version": "0.2",
+    "author": "Vauxoo",
+    "category": "Generic Modules/Accounting",
     "description": """- General Method for account move for Venezuela withholding process.
 - Add relation between account invoice tax and account tax, to avoid loss historical relation.
 - Add account journals types or withholding VAT and Income.
@@ -35,29 +35,30 @@
 - Add common tabs on views where they will be used to add information for other modules related to Venezuela. localization.
 
 TODO:
-- 
-""", 
-    "website": "http://vauxoo.com", 
-    "license": "", 
+-
+
+""",
+    "website": "http://vauxoo.com",
+    "license": "",
     "depends": [
         "l10n_ve_fiscal_requirements"
-    ], 
-    "demo": [], 
+    ],
+    "demo": [],
     "data": [
-        "security/withholding_security.xml", 
-        "security/ir.model.access.csv", 
-        "data/l10n_ve_withholding_data.xml", 
-        "view/l10n_ve_withholding_view.xml", 
+        "security/withholding_security.xml",
+        "security/ir.model.access.csv",
+        "data/l10n_ve_withholding_data.xml",
+        "view/l10n_ve_withholding_view.xml",
         "workflow/wh_action_server.xml"
-    ], 
+    ],
     "test": [
-        "test/account_supplier_invoice.yml", 
+        "test/account_supplier_invoice.yml",
         "test/wh_pay_invoice.yml"
-    ], 
-    "js": [], 
-    "css": [], 
-    "qweb": [], 
-    "installable": True, 
+    ],
+    "js": [],
+    "css": [],
+    "qweb": [],
+    "installable": True,
     "auto_install": False
 }
 

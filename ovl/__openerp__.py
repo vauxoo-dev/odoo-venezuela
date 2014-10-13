@@ -20,17 +20,17 @@
 #
 ##############################################################################
 {
-    "name": "OpenERP Venezuelan Localization", 
-    "version": "4.0", 
-    "author": "Vauxoo", 
-    "category": "Localization/Application", 
+    "name": "OpenERP Venezuelan Localization",
+    "version": "4.0",
+    "author": "Vauxoo",
+    "category": "Localization/Application",
     "description": """
 Install all apps needed to comply with Venezuelan laws
 ======================================================
 
 This module will install for you:
 
-  -  l10n_ve_fiscal_requirements 
+  -  l10n_ve_fiscal_requirements
 
   -  l10n_ve_split_invoice
 
@@ -38,7 +38,7 @@ This module will install for you:
 
   -  l10n_ve_imex
 
-  -  l10n_ve_withholding 
+  -  l10n_ve_withholding
 
   -  l10n_ve_withholding_iva
 
@@ -55,47 +55,48 @@ This module will install for you:
 
 Optionals (Not installed by default), uncomment on your/addons/path/ovl/__openerp__.py file this dependencies if you want to use them
 
- - "l10n_ve_sale_purchase", #Install if you want be able set islr 
+ - "l10n_ve_sale_purchase", #Install if you want be able set islr
 
 Concepts from Sales and Purchase
 
-                                     # Level Zero of Modules 
-                 # First Level of Modules 
-                 # Second Level of Modules 
-                 # Third Level of Modules 
-                 # Fourth Level of Modules 
+                                     # Level Zero of Modules
+                 # First Level of Modules
+                 # Second Level of Modules
+                 # Third Level of Modules
+                 # Fourth Level of Modules
                  # Optionals, uncomment if you want to use them Install if you
-                 # want be able set islr 
+                 # want be able set islr
                  #"l10n_ve_sale_purchase",
-                 # Fifth Level of Modules 
+                 # Fifth Level of Modules
                  #"l10n_ve_vat_write_off",
- - "l10n_ve_sale_purchase", #Install if you want be able set islr 
-""", 
-    "website": "http://www.vauxoo.com", 
-    "license": "", 
+ - "l10n_ve_sale_purchase", #Install if you want be able set islr
+
+""",
+    "website": "http://www.vauxoo.com",
+    "license": "",
     "depends": [
-        "account", 
-        "document", 
-        "l10n_ve_fiscal_requirements", 
-        "l10n_ve_split_invoice", 
-        "l10n_ve_generic", 
-        "l10n_ve_imex", 
-        "l10n_ve_withholding", 
-        "l10n_ve_withholding_iva", 
-        "l10n_ve_withholding_islr", 
-        "l10n_ve_withholding_muni", 
-        "l10n_ve_withholding_src", 
+        "account",
+        "document",
+        "l10n_ve_fiscal_requirements",
+        "l10n_ve_split_invoice",
+        "l10n_ve_generic",
+        "l10n_ve_imex",
+        "l10n_ve_withholding",
+        "l10n_ve_withholding_iva",
+        "l10n_ve_withholding_islr",
+        "l10n_ve_withholding_muni",
+        "l10n_ve_withholding_src",
         "l10n_ve_fiscal_book"
-    ], 
-    "demo": [], 
+    ],
+    "demo": [],
     "data": [
         "view/account_invoice_view.xml"
-    ], 
-    "test": [], 
-    "js": [], 
-    "css": [], 
-    "qweb": [], 
-    "installable": True, 
+    ],
+    "test": [],
+    "js": [],
+    "css": [],
+    "qweb": [],
+    "installable": True,
     "auto_install": False
 }
 

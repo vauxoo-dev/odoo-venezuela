@@ -23,10 +23,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 {
-    "name": "Split Invoices", 
-    "version": "0.2", 
-    "author": "Vauxoo", 
-    "category": "Localization", 
+    "name": "Split Invoices",
+    "version": "0.2",
+    "author": "Vauxoo",
+    "category": "Localization",
     "description": """For legal reasons in Venezuela we need just ONE invoice per page, with this module depending on your company configuration you will stablish the number of lines per invoice, with this you will be able of:
 
  - Add module for establishing the number of lines per invoice
@@ -43,23 +43,24 @@
 
 The document should be now splited on N invoices with the number of lines that you specified
 #~        "view/installer_view.xml",
-""", 
-    "website": "http://vauxoo.com", 
-    "license": "", 
+
+""",
+    "website": "http://vauxoo.com",
+    "license": "",
     "depends": [
         "account"
-    ], 
-    "demo": [], 
+    ],
+    "demo": [],
     "data": [
         "view/company_view.xml"
-    ], 
+    ],
     "test": [
         "test/spl_test.yml"
-    ], 
-    "js": [], 
-    "css": [], 
-    "qweb": [], 
-    "installable": True, 
+    ],
+    "js": [],
+    "css": [],
+    "qweb": [],
+    "installable": True,
     "auto_install": False
 }
 

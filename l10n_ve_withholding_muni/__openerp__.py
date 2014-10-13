@@ -23,41 +23,42 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #############################################################################
 {
-    "name": "Local Withholding Venezuelan laws", 
-    "version": "0.2", 
-    "author": "Vauxoo", 
-    "category": "Generic Modules/Accounting", 
+    "name": "Local Withholding Venezuelan laws",
+    "version": "0.2",
+    "author": "Vauxoo",
+    "category": "Generic Modules/Accounting",
     "description": """Management local withholding for Venezuelan tax laws
-""", 
-    "website": "http://vauxoo.com", 
-    "license": "", 
+
+""",
+    "website": "http://vauxoo.com",
+    "license": "",
     "depends": [
         "l10n_ve_withholding"
-    ], 
+    ],
     "demo": [
-        "demo/demo_accounts.xml", 
-        "demo/demo_partners.xml", 
+        "demo/demo_accounts.xml",
+        "demo/demo_partners.xml",
         "demo/demo_journal.xml"
-    ], 
+    ],
     "data": [
-        "data/wh_muni_sequence.xml", 
-        "security/wh_muni_security.xml", 
-        "security/ir.model.access.csv", 
-        "view/account_invoice_view.xml", 
-        "view/partner_view.xml", 
-        "view/wh_muni_view.xml", 
-        "data/wh_muni_sequence.xml", 
-        "report/wh_muni_report.xml", 
+        "data/wh_muni_sequence.xml",
+        "security/wh_muni_security.xml",
+        "security/ir.model.access.csv",
+        "view/account_invoice_view.xml",
+        "view/partner_view.xml",
+        "view/wh_muni_view.xml",
+        "data/wh_muni_sequence.xml",
+        "report/wh_muni_report.xml",
         "workflow/l10n_ve_wh_muni_wf.xml"
-    ], 
+    ],
     "test": [
-        "test/awm_supplier.yml", 
+        "test/awm_supplier.yml",
         "test/awm_customer.yml"
-    ], 
-    "js": [], 
-    "css": [], 
-    "qweb": [], 
-    "installable": True, 
+    ],
+    "js": [],
+    "css": [],
+    "qweb": [],
+    "installable": True,
     "auto_install": False
 }
 

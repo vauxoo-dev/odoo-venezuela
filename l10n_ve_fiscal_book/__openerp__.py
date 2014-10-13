@@ -29,53 +29,54 @@
 #
 ##############################################################################
 {
-    "name": "Fiscal Report For Venezuela", 
-    "version": "0.5", 
-    "author": "Vauxoo", 
-    "category": "Generic Modules/Accounting", 
+    "name": "Fiscal Report For Venezuela",
+    "version": "0.5",
+    "author": "Vauxoo",
+    "category": "Generic Modules/Accounting",
     "description": """
 Fiscal Book
 ===============================================================================
 Build all Fiscal Reports for Law in Venezuela.
 Add 2 new columns because of:
 
-Según Articulo 77 del Reglamento de la Ley del IVA No.5.363 del 12 de Julio de 1999. 
+Según Articulo 77 del Reglamento de la Ley del IVA No.5.363 del 12 de Julio de 1999.
 Parágrafo Segundo: El registro de las operaciones contenidas en el reporte global diario generado por las máquinas fiscales, se reflejarán en el Libro de Ventas del mismo modo que se establece respecto de los comprobantes que se emiten a no contibuyentes, indicando el número de registro de la máquina.
 
 .. note::
     * *El libro de ventas no contempla la sección de Ventas por cuenta de Terceros.*
        # 'test/purchase.yml',
        # 'test/sale.yml',
-""", 
-    "website": "http://openerp.com.ve", 
-    "license": "", 
+
+""",
+    "website": "http://openerp.com.ve",
+    "license": "",
     "depends": [
-        "account", 
-        "l10n_ve_withholding_iva", 
-        "l10n_ve_fiscal_requirements", 
+        "account",
+        "l10n_ve_withholding_iva",
+        "l10n_ve_fiscal_requirements",
         "l10n_ve_imex"
-    ], 
+    ],
     "demo": [
-        "demo/book_base_demo.xml", 
-        "demo/sale_book_demo.xml", 
+        "demo/book_base_demo.xml",
+        "demo/sale_book_demo.xml",
         "demo/purchase_book_demo.xml"
-    ], 
+    ],
     "data": [
-        "wizard/fiscal_book_wizard_view.xml", 
-        "view/adjustment_book.xml", 
-        "view/fiscal_book.xml", 
-        "report/fiscal_book_report.xml", 
-        "workflow/fb_workflow.xml", 
-        "security/fiscal_book_security.xml", 
-        "security/ir.model.access.csv", 
-        "wizard/change_invoice_sin_cred_view.xml", 
+        "wizard/fiscal_book_wizard_view.xml",
+        "view/adjustment_book.xml",
+        "view/fiscal_book.xml",
+        "report/fiscal_book_report.xml",
+        "workflow/fb_workflow.xml",
+        "security/fiscal_book_security.xml",
+        "security/ir.model.access.csv",
+        "wizard/change_invoice_sin_cred_view.xml",
         "view/account_invoice_view.xml"
-    ], 
-    "test": [], 
-    "js": [], 
-    "css": [], 
-    "qweb": [], 
-    "installable": True, 
+    ],
+    "test": [],
+    "js": [],
+    "css": [],
+    "qweb": [],
+    "installable": True,
     "auto_install": False
 }
 

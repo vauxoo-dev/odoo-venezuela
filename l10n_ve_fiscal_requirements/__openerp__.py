@@ -23,10 +23,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ################################################################################
 {
-    "name": "Venezuelan Fiscal Requirements", 
-    "version": "1.0", 
-    "author": "Vauxoo", 
-    "category": "Localization", 
+    "name": "Venezuelan Fiscal Requirements",
+    "version": "1.0",
+    "author": "Vauxoo",
+    "category": "Localization",
     "description": """
 - Invoice Control Number.
 - Tax*except concept, necesary rule by Venezuelan Laws.
@@ -49,7 +49,7 @@ For damaged invoices (Free form formats), you must go to the company and, under 
 create the corresponding journal and account.
 TODO : Include this on wizard configuration.
 
-If you install this module with invoice data on the database, the concept_id will be 
+If you install this module with invoice data on the database, the concept_id will be
 Empty for all those invoices, so, when you try to modify them you have to add a value on
 that field
 
@@ -64,61 +64,62 @@ Custom modules can be found in the following branch:
   * Addons-vauxoo: lp:addons-vauxoo/7.0
 #        'test/fr_debit_note.yml',
 #        'test/fr_refund_note.yml',
-""", 
-    "website": "http://vauxoo.com", 
-    "license": "", 
+
+""",
+    "website": "http://vauxoo.com",
+    "license": "",
     "depends": [
-        "account", 
-        "base_vat", 
-        "account_accountant", 
-        "account_voucher", 
-        "account_cancel", 
+        "account",
+        "base_vat",
+        "account_accountant",
+        "account_voucher",
+        "account_cancel",
         "debit_credit_note"
-    ], 
+    ],
     "demo": [
-        "demo/demo_partners.xml", 
-        "demo/demo_journal.xml", 
-        "demo/demo_invoice.xml", 
+        "demo/demo_partners.xml",
+        "demo/demo_journal.xml",
+        "demo/demo_invoice.xml",
         "demo/demo_taxes.xml"
-    ], 
+    ],
     "data": [
-        "data/l10n_ut_data.xml", 
-        "data/seniat_url_data.xml", 
-        "data/ir_sequence.xml", 
-        "security/security_view.xml", 
-        "security/ir.model.access.csv", 
-        "view/fr_view.xml", 
-        "wizard/wizard_invoice_nro_ctrl_view.xml", 
-        "wizard/wizard_url_seniat_view.xml", 
-        "wizard/update_info_partner.xml", 
-        "wizard/account_invoice_debit_view.xml", 
-        "wizard/search_info_partner_seniat.xml", 
-        "wizard/wizard_nro_ctrl_view.xml", 
-        "view/res_company_view.xml", 
-        "view/l10n_ut_view.xml", 
-        "wizard/wizard_update_name_view.xml", 
-        "view/partner_view.xml", 
-        "view/account_inv_refund_nctrl_view.xml", 
-        "view/account_tax_view.xml", 
+        "data/l10n_ut_data.xml",
+        "data/seniat_url_data.xml",
+        "data/ir_sequence.xml",
+        "security/security_view.xml",
+        "security/ir.model.access.csv",
+        "view/fr_view.xml",
+        "wizard/wizard_invoice_nro_ctrl_view.xml",
+        "wizard/wizard_url_seniat_view.xml",
+        "wizard/update_info_partner.xml",
+        "wizard/account_invoice_debit_view.xml",
+        "wizard/search_info_partner_seniat.xml",
+        "wizard/wizard_nro_ctrl_view.xml",
+        "view/res_company_view.xml",
+        "view/l10n_ut_view.xml",
+        "wizard/wizard_update_name_view.xml",
+        "view/partner_view.xml",
+        "view/account_inv_refund_nctrl_view.xml",
+        "view/account_tax_view.xml",
         "view/account_invoice_view.xml"
-    ], 
+    ],
     "test": [
-        "test/account_customer_invoice.yml", 
-        "test/account_supplier_invoice.yml", 
-        "test/fr_vat_search_test.yml", 
-        "test/fr_ut_test.yml", 
-        "test/fr_vat_test.yml", 
-        "test/fr_tax_test.yml", 
-        "test/fr_address.yml", 
-        "test/fr_sale_test.yml", 
-        "test/fr_purchase_test.yml", 
-        "test/fr_control_number.yml", 
+        "test/account_customer_invoice.yml",
+        "test/account_supplier_invoice.yml",
+        "test/fr_vat_search_test.yml",
+        "test/fr_ut_test.yml",
+        "test/fr_vat_test.yml",
+        "test/fr_tax_test.yml",
+        "test/fr_address.yml",
+        "test/fr_sale_test.yml",
+        "test/fr_purchase_test.yml",
+        "test/fr_control_number.yml",
         "test/fr_damaged.yml"
-    ], 
-    "js": [], 
-    "css": [], 
-    "qweb": [], 
-    "installable": True, 
+    ],
+    "js": [],
+    "css": [],
+    "qweb": [],
+    "installable": True,
     "auto_install": False
 }
 
