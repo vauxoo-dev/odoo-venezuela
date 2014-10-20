@@ -70,7 +70,6 @@ Concepts from Sales and Purchase
                  # Fifth Level of Modules
                  #"l10n_ve_vat_write_off",
  - "l10n_ve_sale_purchase", #Install if you want be able set islr
-
 """,
     "website": "http://www.vauxoo.com",
     "license": "",
@@ -99,5 +98,4 @@ Concepts from Sales and Purchase
     "installable": True,
     "auto_install": False
 }
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

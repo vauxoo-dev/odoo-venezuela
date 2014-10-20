@@ -35,7 +35,6 @@ This is the module to manage the accounting chart for Venezuela in OpenERP.
 ===========================================================================
 
 Este módulo es para manejar un catálogo de cuentas ejemplo para Venezuela.
-
 """,
     "website": "",
     "license": "",
@@ -58,5 +57,4 @@ Este módulo es para manejar un catálogo de cuentas ejemplo para Venezuela.
     "installable": True,
     "auto_install": False
 }
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

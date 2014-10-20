@@ -50,7 +50,6 @@
              #'test/purchase_wh_iva_sequence.yml',
              #'test/sale_wh_iva_sequence.yml',
              #'test/purchase_wh_iva_txt.yml',
-
 """,
     "website": "http://vauxoo.com",
     "license": "",
@@ -88,5 +87,4 @@
     "installable": True,
     "auto_install": False
 }
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

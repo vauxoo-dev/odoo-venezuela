@@ -64,7 +64,6 @@ Custom modules can be found in the following branch:
   * Addons-vauxoo: lp:addons-vauxoo/7.0
 #        'test/fr_debit_note.yml',
 #        'test/fr_refund_note.yml',
-
 """,
     "website": "http://vauxoo.com",
     "license": "",
@@ -122,5 +121,4 @@ Custom modules can be found in the following branch:
     "installable": True,
     "auto_install": False
 }
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

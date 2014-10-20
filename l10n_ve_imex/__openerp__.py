@@ -35,7 +35,6 @@ Imex
 This modules handles the openerp venezuela localization import
 and export transactions. It specify the customs form model for
 import declaration SENIAT Official FORM (Forma 99086).
-
 """,
     "website": "http://vauxoo.com",
     "license": "",
@@ -62,5 +61,4 @@ import declaration SENIAT Official FORM (Forma 99086).
     "installable": True,
     "auto_install": False
 }
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

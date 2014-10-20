@@ -41,7 +41,6 @@
 
         # ,"edi"],
             #"edi/islr_wh_doc_action_data.xml",
-
 """,
     "website": "http://wiki.openerp.org.ve/",
     "license": "",
@@ -88,5 +87,4 @@
     "installable": True,
     "auto_install": False
 }
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -43,7 +43,6 @@
 
 The document should be now splited on N invoices with the number of lines that you specified
 #~        "view/installer_view.xml",
-
 """,
     "website": "http://vauxoo.com",
     "license": "",
@@ -63,5 +62,4 @@ The document should be now splited on N invoices with the number of lines that y
     "installable": True,
     "auto_install": False
 }
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

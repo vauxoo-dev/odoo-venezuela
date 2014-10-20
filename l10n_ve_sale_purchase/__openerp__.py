@@ -35,7 +35,6 @@ Because of that this module was created. This module adds the withholding income
 #        'test/purchase_validation.yml',
 #        'test/sale_order.yml',
 #        'test/sale_validation.yml',
-
 """,
     "website": "http://openerp.com",
     "license": "",
@@ -59,5 +58,4 @@ Because of that this module was created. This module adds the withholding income
     "installable": True,
     "auto_install": False
 }
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

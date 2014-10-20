@@ -41,7 +41,6 @@ que se establece en el Reglamento de Ley de Contrataciones Públicas, (Gaceta Of
 **Artículo 35**
 
     Rango y normativa interna para el suministro de bienes, prestación de servicios o ejecución de obras, se establece para el Compromiso de Responsabilidad Social un valor mínimo del uno por ciento (1%) y un valor máximo del cinco por ciento (5%) del monto del contrato suscrito, el cual asumirán los Contratistas beneficiarios de la adjudicación del mismo. Los órganos o entes contratantes deberán fijar los porcentajes a ser aplicados a cada condición del Compromiso de Responsabilidad Social, así como, establecer categorías o escalas proporcionales con base en los montos de los contratos a ser suscritos.
-
 """,
     "website": "http://wiki.openerp.org.ve/",
     "license": "",
@@ -76,5 +75,4 @@ que se establece en el Reglamento de Ley de Contrataciones Públicas, (Gaceta Of
     "installable": True,
     "auto_install": False
 }
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -41,8 +41,7 @@ This module will install for you:
                 #"document_ftp", #No test
                 #"auth_ldap", #No test
                 #End list of all oficial modules
-
-""",
+    """,
     "website": "http://www.vauxoo.com",
     "license": "",
     "depends": [
@@ -247,5 +246,4 @@ This module will install for you:
     "installable": True,
     "auto_install": False
 }
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
