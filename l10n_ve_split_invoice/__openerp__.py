@@ -43,7 +43,7 @@
 
 The document should be now splited on N invoices with the number of lines that you specified
 #~        "view/installer_view.xml",
-""",
+    """,
     "website": "http://vauxoo.com",
     "license": "",
     "depends": [

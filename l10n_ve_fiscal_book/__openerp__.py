@@ -46,7 +46,7 @@ Parágrafo Segundo: El registro de las operaciones contenidas en el reporte glob
     * *El libro de ventas no contempla la sección de Ventas por cuenta de Terceros.*
        # 'test/purchase.yml',
        # 'test/sale.yml',
-""",
+    """,
     "website": "http://openerp.com.ve",
     "license": "",
     "depends": [

@@ -27,7 +27,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
 {
-    "name": "Management withholding vat based in the Venezuelan tax laws",
+    "name": "Management withholding vat based in the Venezuelan tax la"
+            "ws",
     "version": "1.1",
     "author": "Vauxoo",
     "category": "Generic Modules/Accounting",
@@ -50,7 +51,7 @@
              #'test/purchase_wh_iva_sequence.yml',
              #'test/sale_wh_iva_sequence.yml',
              #'test/purchase_wh_iva_txt.yml',
-""",
+    """,
     "website": "http://vauxoo.com",
     "license": "",
     "depends": [

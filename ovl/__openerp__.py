@@ -70,7 +70,7 @@ Concepts from Sales and Purchase
                  # Fifth Level of Modules
                  #"l10n_ve_vat_write_off",
  - "l10n_ve_sale_purchase", #Install if you want be able set islr
-""",
+    """,
     "website": "http://www.vauxoo.com",
     "license": "",
     "depends": [

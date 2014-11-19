@@ -36,7 +36,7 @@
 
 TODO:
 -
-""",
+    """,
     "website": "http://vauxoo.com",
     "license": "",
     "depends": [

@@ -64,7 +64,7 @@ Custom modules can be found in the following branch:
   * Addons-vauxoo: lp:addons-vauxoo/7.0
 #        'test/fr_debit_note.yml',
 #        'test/fr_refund_note.yml',
-""",
+    """,
     "website": "http://vauxoo.com",
     "license": "",
     "depends": [

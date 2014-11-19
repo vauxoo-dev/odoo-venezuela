@@ -28,7 +28,7 @@
     "author": "Vauxoo",
     "category": "Generic Modules/Accounting",
     "description": """Management local withholding for Venezuelan tax laws
-""",
+    """,
     "website": "http://vauxoo.com",
     "license": "",
     "depends": [

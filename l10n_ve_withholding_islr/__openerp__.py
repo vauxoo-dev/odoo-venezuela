@@ -41,7 +41,7 @@
 
         # ,"edi"],
             #"edi/islr_wh_doc_action_data.xml",
-""",
+    """,
     "website": "http://wiki.openerp.org.ve/",
     "license": "",
     "depends": [

@@ -35,7 +35,7 @@ Because of that this module was created. This module adds the withholding income
 #        'test/purchase_validation.yml',
 #        'test/sale_order.yml',
 #        'test/sale_validation.yml',
-""",
+    """,
     "website": "http://openerp.com",
     "license": "",
     "depends": [

@@ -4,7 +4,7 @@
     "author": "Vauxoo",
     "category": "Generic Modules/Accounting",
     "description": """
-""",
+    """,
     "website": "http://openerp.com.ve",
     "license": "",
     "depends": [
