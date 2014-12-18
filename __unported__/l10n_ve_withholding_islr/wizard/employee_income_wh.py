@@ -19,10 +19,9 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-# import pooler
-# import decimal_precision as dp
+from openerp.addons.decimal_precision import decimal_precision as dp
 # import time
-# import netsvc
+# import workflow
 # import csv
 
 # ---------------------------------------------------------- employee_income_wh
