@@ -19,8 +19,24 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-{"name": "OpenERP Venezuelan Localization",
+{
+    "name": "OpenERP Venezuelan Localization",
     "version": "4.0",
+    "author": "Vauxoo",
+    "category": "Localization/Application",
+    "description": """
+Install all apps needed to comply with Venezuelan laws plus all oficial modules
+======================================================
+
+This module will install for you:
+
+  -  ovl
+
+  - And all oficial modules (account, stock, mrp...)
+
+""",
+    "website": "http://www.vauxoo.com",
+    "license": "",
     "depends": [
         "ovl",
         # Start list of all oficial modules
@@ -219,25 +235,14 @@
         "web_shortcuts"
         # End list of all oficial modules
     ],
-    "author": "Vauxoo",
-    "description": """
-Install all apps needed to comply with Venezuelan laws plus all oficial modules
-======================================================
-
-This module will install for you:
-
-  -  ovl
-
-  - And all oficial modules (account, stock, mrp...)
-                    """,
-    "website": "http://www.vauxoo.com",
-    "category": "Localization/Application",
-    "init_xml": [],
-    "demo_xml": [],
-    "update_xml": [],
+    "demo": [],
+    "data": [],
     "test": [],
-    "images": [],
-    "auto_install": False,
+    "js": [],
+    "css": [],
+    "qweb": [],
     "application": True,
     "installable": False,
- }
+    "auto_install": False
+}
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

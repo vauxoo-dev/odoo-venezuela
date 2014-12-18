@@ -23,14 +23,12 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
-
 {
     "name": "Compromiso de Responsabilidad Social",
     "version": "0.2",
     "author": "Vauxoo",
     "category": "Generic Modules",
-    "website": "http://wiki.openerp.org.ve/",
-    "description": '''
+    "description": """
 Administración de la Aplicacion del Compromiso de Responsabilidad Social que se
 establece en el Reglamento de Ley de Contrataciones Públicas, (Gaceta
 Oficial Nº 39.181 del 19 de mayo de 2009) Decreto Nº 6.708.
@@ -56,34 +54,39 @@ Oficial Nº 39.181 del 19 de mayo de 2009) Decreto Nº 6.708.
     a cada condición del Compromiso de Responsabilidad Social, así como,
     establecer categorías o escalas proporcionales con base en los montos de
     los contratos a ser suscritos.
-''',
+
+""",
+    "website": "http://wiki.openerp.org.ve/",
+    "license": "",
     "depends": [
-                "base",
-                "account",
-                "l10n_ve_withholding",
+        "base",
+        "account",
+        "l10n_ve_withholding"
     ],
-    "init_xml": [],
-    "demo_xml": [
-        'demo/demo_journals.xml',
-        'demo/demo_accounts.xml',
-        'demo/demo_company.xml',
+    "demo": [
+        "demo/demo_journals.xml",
+        "demo/demo_accounts.xml",
+        "demo/demo_company.xml"
+    ],
+    "data": [
+        "security/wh_src_security.xml",
+        "security/ir.model.access.csv",
+        "wizard/wizard_retention_view.xml",
+        "view/wh_src_view.xml",
+        "view/account_invoice_view.xml",
+        "view/company_view.xml",
+        "view/partner_view.xml",
+        "workflow/l10n_ve_wh_src_wf.xml",
+        "report/wh_src_report.xml"
     ],
     "test": [
-        'test/aws_customer.yml',
-        'test/aws_supplier.yml',
+        "test/aws_customer.yml",
+        "test/aws_supplier.yml"
     ],
-    "update_xml": [
-        'security/wh_src_security.xml',
-        'security/ir.model.access.csv',
-        'wizard/wizard_retention_view.xml',
-        'view/wh_src_view.xml',
-        'view/account_invoice_view.xml',
-        'view/company_view.xml',
-        'view/partner_view.xml',
-        'workflow/l10n_ve_wh_src_wf.xml',
-        'report/wh_src_report.xml',
-
-    ],
-    "active": False,
+    "js": [],
+    "css": [],
+    "qweb": [],
     "installable": False,
+    "auto_install": False
 }
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

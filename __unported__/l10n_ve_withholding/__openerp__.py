@@ -27,8 +27,7 @@
     "name": "Management withholdings Venezuelan laws",
     "version": "0.2",
     "author": "Vauxoo",
-    "website": "http://vauxoo.com",
-    "category": 'Generic Modules/Accounting',
+    "category": "Generic Modules/Accounting",
     "description": """
 - General Method for account move for Venezuela withholding process.
 - Add relation between account invoice tax and account tax, to avoid loss
@@ -41,24 +40,29 @@
 
 TODO:
 -
-    """,
-    'init_xml': [],
-    "depends": ["l10n_ve_fiscal_requirements"],
-    'update_xml': [
-        'security/withholding_security.xml',
-        'security/ir.model.access.csv',
-        'data/l10n_ve_withholding_data.xml',
-        'view/l10n_ve_withholding_view.xml',
-        'workflow/wh_action_server.xml',
+
+""",
+    "website": "http://vauxoo.com",
+    "license": "",
+    "depends": [
+        "l10n_ve_fiscal_requirements"
     ],
-    'demo_xml': [],
-    'test': [
-        'test/account_supplier_invoice.yml',
-        'test/wh_pay_invoice.yml',
+    "demo": [],
+    "data": [
+        "security/withholding_security.xml",
+        "security/ir.model.access.csv",
+        "data/l10n_ve_withholding_data.xml",
+        "view/l10n_ve_withholding_view.xml",
+        "workflow/wh_action_server.xml"
     ],
-    'installable': False,
-    'active': False,
+    "test": [
+        "test/account_supplier_invoice.yml",
+        "test/wh_pay_invoice.yml"
+    ],
+    "js": [],
+    "css": [],
+    "qweb": [],
+    "installable": False,
+    "auto_install": False
 }
-
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

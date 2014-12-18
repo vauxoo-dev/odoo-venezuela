@@ -26,14 +26,12 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
-
 {
     "name": "Automatically Calculation Income Withholding",
     "version": "0.1",
     "author": "Vauxoo",
     "category": "General",
-    "website": "http://wiki.openerp.org.ve/",
-    "description": '''
+    "description": """
  - Generate the voucher of income withholding to validate the invoice.
  - Generate the report of voucher of income withholding.
  - Generate the file .xml required by the Venezuelan laws, for agent of income
@@ -47,20 +45,21 @@
 # if you want be able to propose withholding concepts from sales and purchases
     you must install extra module @section{l10n_ve_sale_purchase}.
 
-''',
+""",
+    "website": "http://wiki.openerp.org.ve/",
+    "license": "",
     "depends": [
         "account",
         "l10n_ve_withholding",
         "l10n_ve_fiscal_requirements",
         "product",
-        "report_webkit",
-        # ,"edi"],
+        "report_webkit"
+        # "edi"
     ],
-    "init_xml": [],
-    "demo_xml": [
-        "demo/l10n_ve_islr_withholding_demo.xml",
+    "demo": [
+        "demo/l10n_ve_islr_withholding_demo.xml"
     ],
-    "update_xml": [
+    "data": [
         "view/installer.xml",
         "security/wh_islr_security.xml",
         "security/ir.model.access.csv",
@@ -81,13 +80,17 @@
         # "edi/islr_wh_doc_action_data.xml",
         "wizard/partner_income_wh_print_view.xml",
         "data/partner_income_wh_report_data.xml",
-        "report/partner_income_wh_report.xml",
+        "report/partner_income_wh_report.xml"
     ],
-    'test': [
-        'test/supplier_wh_islr_invoice.yml',
-        'test/supplier_wh_islr_doc.yml',
-        'test/customer_wh_islr_doc.yml',
+    "test": [
+        "test/supplier_wh_islr_invoice.yml",
+        "test/supplier_wh_islr_doc.yml",
+        "test/customer_wh_islr_doc.yml"
     ],
-    "active": False,
+    "js": [],
+    "css": [],
+    "qweb": [],
     "installable": False,
+    "auto_install": False
 }
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

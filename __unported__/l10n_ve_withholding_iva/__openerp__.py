@@ -31,8 +31,7 @@
     "name": "Management withholding vat based in the Venezuelan tax laws",
     "version": "1.1",
     "author": "Vauxoo",
-    "website": "http://vauxoo.com",
-    "category": 'Generic Modules/Accounting',
+    "category": "Generic Modules/Accounting",
     "description": """
 Management withholding vat based in the Venezuelan tax laws.
 
@@ -48,47 +47,50 @@ Management withholding vat based in the Venezuelan tax laws.
  - If you want to be able to print the vat withholding report correctly, It is
    recomended to define the size of the logo of the company in 886 x 236
    pixeles.
+
 """,
+    "website": "http://vauxoo.com",
+    "license": "",
     "depends": [
-                "l10n_ve_withholding"
+        "l10n_ve_withholding"
     ],
-    'data': [
-        'security/wh_iva_security.xml',
-        'security/ir.model.access.csv',
-        'report/withholding_vat_report.xml',
-        'wizard/wizard_retention_view.xml',
-        'wizard/wizard_wh_nro_view.xml',
-        'view/generate_txt_view.xml',
-        'view/account_invoice_view.xml',
-        'view/account_view.xml',
-        'view/partner_view.xml',
-        'view/res_company_view.xml',
-        'view/wh_iva_view.xml',
-        "data/l10n_ve_withholding_data.xml",
-        'report/txt_wh_report.xml',
-        "workflow/wh_iva_workflow.xml",
-        "workflow/wh_action_server.xml",
-    ],
-    'demo': [
+    "demo": [
         "demo/l10n_ve_withholding_iva_sequences_demo.xml",
         "demo/demo_partners.xml",
         "demo/l10n_ve_withholding_iva_demo.xml",
         "demo/demo_taxes.xml",
-        "demo/demo_invoices.xml",
+        "demo/demo_invoices.xml"
     ],
-
-    'test': [
-        # test/purchase_invoice_wh_iva.yml',
-        # test/sale_invoice_wh_iva.yml',
-        # test/sale_wh_iva.yml',
-        # test/purchase_wh_iva.yml',
-        # test/purchase_wh_iva_sequence.yml',
-        # test/sale_wh_iva_sequence.yml',
-        # test/purchase_wh_iva_txt.yml',
+    "data": [
+        "security/wh_iva_security.xml",
+        "security/ir.model.access.csv",
+        "report/withholding_vat_report.xml",
+        "wizard/wizard_retention_view.xml",
+        "wizard/wizard_wh_nro_view.xml",
+        "view/generate_txt_view.xml",
+        "view/account_invoice_view.xml",
+        "view/account_view.xml",
+        "view/partner_view.xml",
+        "view/res_company_view.xml",
+        "view/wh_iva_view.xml",
+        "data/l10n_ve_withholding_data.xml",
+        "report/txt_wh_report.xml",
+        "workflow/wh_iva_workflow.xml",
+        "workflow/wh_action_server.xml"
     ],
-    'installable': False,
-    'active': False,
+    "test": [
+        # "test/purchase_invoice_wh_iva.yml",
+        # "test/sale_invoice_wh_iva.yml",
+        # "test/sale_wh_iva.yml",
+        # "test/purchase_wh_iva.yml",
+        # "test/purchase_wh_iva_sequence.yml",
+        # "test/sale_wh_iva_sequence.yml",
+        # "test/purchase_wh_iva_txt.yml",
+    ],
+    "js": [],
+    "css": [],
+    "qweb": [],
+    "installable": False,
+    "auto_install": False
 }
-
-
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

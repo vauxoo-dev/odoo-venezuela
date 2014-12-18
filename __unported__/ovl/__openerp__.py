@@ -19,33 +19,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
-{"name": "OpenERP Venezuelan Localization",
+{
+    "name": "OpenERP Venezuelan Localization",
     "version": "4.0",
-    "depends": [
-        # Level Zero of Modules
-        "account",
-        "document",
-        # First Level of Modules
-        "l10n_ve_fiscal_requirements",
-        "l10n_ve_split_invoice",
-        "l10n_ve_generic",
-        # Second Level of Modules
-        "l10n_ve_imex",
-        "l10n_ve_withholding",
-        # Third Level of Modules
-        "l10n_ve_withholding_iva",
-        "l10n_ve_withholding_islr",
-        "l10n_ve_withholding_muni",
-        "l10n_ve_withholding_src",
-        # Fourth Level of Modules
-        "l10n_ve_fiscal_book",
-        # Optionals, uncomment if you want to use them Install if you
-        # want be able set islr
-        # "l10n_ve_sale_purchase",
-        # Fifth Level of Modules
-        # "l10n_ve_vat_write_off",
-    ],
     "author": "Vauxoo",
+    "category": "Localization/Application",
     "description": """
 Install all apps needed to comply with Venezuelan laws
 ======================================================
@@ -83,17 +61,44 @@ them
 
 Concepts from Sales and Purchase
 
-                    """,
+
+""",
     "website": "http://www.vauxoo.com",
-    "category": "Localization/Application",
-    "init_xml": [],
-    "demo_xml": [],
+    "license": "",
+    "depends": [
+        # Level Zero of Modules
+        "account",
+        "document",
+        # First Level of Modules
+        "l10n_ve_fiscal_requirements",
+        "l10n_ve_split_invoice",
+        "l10n_ve_generic",
+        # Second Level of Modules
+        "l10n_ve_imex",
+        "l10n_ve_withholding",
+        # Third Level of Modules
+        "l10n_ve_withholding_iva",
+        "l10n_ve_withholding_islr",
+        "l10n_ve_withholding_muni",
+        "l10n_ve_withholding_src",
+        # Fourth Level of Modules
+        "l10n_ve_fiscal_book"
+        # Optionals, uncomment if you want to use them Install if you
+        # want be able set islr
+        # "l10n_ve_sale_purchase",
+        # Fifth Level of Modules
+        # "l10n_ve_vat_write_off",
+    ],
+    "demo": [],
     "data": [
-        'view/account_invoice_view.xml',
+        "view/account_invoice_view.xml"
     ],
     "test": [],
-    "images": [],
-    "auto_install": False,
+    "js": [],
+    "css": [],
+    "qweb": [],
     "application": True,
     "installable": False,
- }
+    "auto_install": False
+}
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

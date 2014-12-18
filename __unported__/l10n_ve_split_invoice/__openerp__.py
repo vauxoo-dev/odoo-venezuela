@@ -23,12 +23,11 @@
 #    You should have received a copy of the GNU Affero General Public License
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ##############################################################################
-
 {
     "name": "Split Invoices",
     "version": "0.2",
-    "depends": ["account"],
     "author": "Vauxoo",
+    "category": "Localization",
     "description": """
 For legal reasons in Venezuela we need just ONE invoice per page, with this
 module depending on your company configuration you will stablish the number
@@ -50,20 +49,25 @@ of lines per invoice, with this you will be able of:
 
 The document should be now splited on N invoices with the number of lines that
 you specified
+
 """,
     "website": "http://vauxoo.com",
-    "category": "Localization",
-    "init_xml": [
+    "license": "",
+    "depends": [
+        "account"
     ],
-    "demo_xml": [
-    ],
-    "update_xml": [
+    "demo": [],
+    "data": [
         #        "view/installer_view.xml",
-        "view/company_view.xml",
+        "view/company_view.xml"
     ],
-    'test': [
-        'test/spl_test.yml',
+    "test": [
+        "test/spl_test.yml"
     ],
-    "active": False,
+    "js": [],
+    "css": [],
+    "qweb": [],
     "installable": False,
+    "auto_install": False
 }
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

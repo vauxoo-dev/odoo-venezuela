@@ -24,10 +24,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
 {
-    'name': 'ISLR Sale and Purchase Functionalities',
-    'version': '0.3',
-    'author': 'Vauxoo',
-    'description': '''
+    "name": "ISLR Sale and Purchase Functionalities",
+    "version": "0.3",
+    "author": "Vauxoo",
+    "category": "",
+    "description": """
 Due to the Dependendy reduction on the l10n_ve_withholding_islr module, it was
 necessary to incorporate the functionalities regarding with the eliminated
 dependencies on another module.
@@ -37,25 +38,34 @@ income concept to the sale and purchase orders. It moves the withholding income
 concept defined in from the sale order to the stock, and, if the invoice was
 created from the stock, it moves the withholding income concept to the
 invoice. This also works the same way for purchase orders.
-    ''',
-    'category': '',
-    'website': 'http://openerp.com',
-    'depends': ['sale', 'purchase', 'stock', 'l10n_ve_withholding_islr'],
-    'update_xml': [
-        'view/product_view.xml',
-        'view/stock_view.xml',
-        'view/purchase_view.xml',
-        'view/sale_order_view.xml',
+
+""",
+    "website": "http://openerp.com",
+    "license": "",
+    "depends": [
+        "sale",
+        "purchase",
+        "stock",
+        "l10n_ve_withholding_islr"
     ],
-    'demo': [],
-    'active': False,
-    'installable': False,
-    'test': [
+    "demo": [],
+    "data": [
+        "view/product_view.xml",
+        "view/stock_view.xml",
+        "view/purchase_view.xml",
+        "view/sale_order_view.xml"
+    ],
+    "test": [
         #        'test/purchase_order.yml',
         #        'test/purchase_picking.yml',
         #        'test/purchase_validation.yml',
         #        'test/sale_order.yml',
         #        'test/sale_validation.yml',
-    ],
-
+],
+    "js": [],
+    "css": [],
+    "qweb": [],
+    "installable": False,
+    "auto_install": False
 }
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
