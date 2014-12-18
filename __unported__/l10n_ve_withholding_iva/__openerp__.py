@@ -86,7 +86,7 @@ Management withholding vat based in the Venezuelan tax laws.
         # test/sale_wh_iva_sequence.yml',
         # test/purchase_wh_iva_txt.yml',
     ],
-    'installable': True,
+    'installable': False,
     'active': False,
 }
 

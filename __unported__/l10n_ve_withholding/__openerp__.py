@@ -56,7 +56,7 @@ TODO:
         'test/account_supplier_invoice.yml',
         'test/wh_pay_invoice.yml',
     ],
-    'installable': True,
+    'installable': False,
     'active': False,
 }
 

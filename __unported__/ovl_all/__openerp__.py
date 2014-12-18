@@ -239,5 +239,5 @@ This module will install for you:
     "images": [],
     "auto_install": False,
     "application": True,
-    "installable": True,
+    "installable": False,
  }

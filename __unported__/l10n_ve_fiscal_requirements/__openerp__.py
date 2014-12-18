@@ -124,6 +124,6 @@ Custom modules can be found in the following branch:
         #        'test/fr_debit_note.yml',
         #        'test/fr_refund_note.yml',
     ],
-    'installable': True,
+    'installable': False,
     'active': False,
 }

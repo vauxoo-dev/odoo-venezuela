@@ -77,5 +77,5 @@ se emiten a no contibuyentes, indicando el número de registro de la máquina.
         # 'test/sale.yml',
     ],
     "active": False,
-    "installable": True,
+    "installable": False,
 }

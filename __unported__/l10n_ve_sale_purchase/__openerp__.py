@@ -49,7 +49,7 @@ invoice. This also works the same way for purchase orders.
     ],
     'demo': [],
     'active': False,
-    'installable': True,
+    'installable': False,
     'test': [
         #        'test/purchase_order.yml',
         #        'test/purchase_picking.yml',

@@ -89,5 +89,5 @@
         'test/customer_wh_islr_doc.yml',
     ],
     "active": False,
-    "installable": True,
+    "installable": False,
 }

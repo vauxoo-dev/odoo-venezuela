@@ -65,5 +65,5 @@ you specified
         'test/spl_test.yml',
     ],
     "active": False,
-    "installable": True,
+    "installable": False,
 }

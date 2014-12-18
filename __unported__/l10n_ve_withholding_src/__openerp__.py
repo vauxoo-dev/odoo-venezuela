@@ -85,5 +85,5 @@ Oficial Nº 39.181 del 19 de mayo de 2009) Decreto Nº 6.708.
 
     ],
     "active": False,
-    "installable": True,
+    "installable": False,
 }
