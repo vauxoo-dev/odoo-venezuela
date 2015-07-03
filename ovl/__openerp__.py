@@ -20,7 +20,7 @@
 #
 ##############################################################################
 {"name": "OpenERP Venezuelan Localization",
-    "version": "4.0",
+    "version": "5.0",
     "depends": [
         # Level Zero of Modules
         "account",
