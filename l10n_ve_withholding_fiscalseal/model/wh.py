@@ -37,6 +37,34 @@ class FiscalSealLine(osv.osv):
             size=64,
             store=True,
             readonly=True),
+        'invoice_total': fields.related(
+            'invoice_id',
+            'amount_total',
+            type='float',
+            string='Invoice Total',
+            store=True,
+            readonly=True),
+        'invoice_tax': fields.related(
+            'invoice_id',
+            'amount_tax',
+            type='float',
+            string='Invoice Tax',
+            store=True,
+            readonly=True),
+        'payment_amount': fields.float(
+            string='Payment Amount',
+            digits_compute=dp.get_precision('Account'),
+            ),
+        'wh_base_amount': fields.float(
+            string='Taxable Amount',
+            digits_compute=dp.get_precision('Account'),
+            help='Amount to be Withheld'
+            ),
+        'wh_tax_amount': fields.float(
+            string='Withheld Tax',
+            digits_compute=dp.get_precision('Account'),
+            help='Withheld Amount'
+            ),
         # 'amount_tax_ret': fields.function(
         #     _amount_all,
         #     method=True,
@@ -58,7 +86,7 @@ class FiscalSealLine(osv.osv):
             ondelete='restrict'),
         'wh_rate': fields.float(
             string='Withholding Fiscal Seal Rate',
-            digits_compute=dp.get_precision('Withhold'),
+            digits_compute=dp.get_precision('Account'),
             help="Fiscal Seal Withholding rate"),
         'date': fields.related(
             'retention_id',
@@ -88,7 +116,7 @@ class FiscalSealLine(osv.osv):
         ok = True
         ai_obj = self.pool.get('account.invoice')
         awfs_obj = self.pool.get('account.wh.fiscalseal')
-        res = ai_obj.browse(cr, uid, invoice, context=context)
+        ai_brw = ai_obj.browse(cr, uid, invoice, context=context)
         cr.execute('SELECT retention_id '
                    'FROM account_wh_fiscalseal_line '
                    'WHERE invoice_id={invoice_id}'.format(
@@ -102,8 +130,12 @@ class FiscalSealLine(osv.osv):
                 "The invoice has already assigned in withholding"
                 " Fiscal Seal code: '%s' !" % (ret.code,))
 
-        result.update({'name': res.name,
-                       'supplier_invoice_number': res.supplier_invoice_number})
+            result.update(
+                {'name': ai_brw.name,
+                 'supplier_invoice_number': ai_brw.supplier_invoice_number,
+                 'invoice_total': ai_brw.amount_total,
+                 'wh_rate': 0.1,
+                 })
 
         return {'value': result, 'domain': domain}
 
@@ -237,17 +269,21 @@ class FiscalSeal(osv.osv):
         # 'amount_base_ret': fields.function(
         #     _amount_ret_all,
         #     method=True,
-        #     digits_compute=dp.get_precision('Withhold'),
+        #     digits_compute=dp.get_precision('Account'),
         #     string='Compute amount',
         #     multi='all',
         #     help="Compute amount without tax"),
         # 'total_tax_ret': fields.function(
         #     _amount_ret_all,
         #     method=True,
-        #     digits_compute=dp.get_precision('Withhold'),
+        #     digits_compute=dp.get_precision('Account'),
         #     string='Compute amount wh. tax Fiscal Seal',
         #     multi='all',
         #     help="compute amount withholding tax Fiscal Seal"),
+        'payment_amount': fields.float(
+            string='Payment Amount',
+            digits_compute=dp.get_precision('Account'),
+            ),
     }
 
     _defaults = {
@@ -359,7 +395,10 @@ class FiscalSeal(osv.osv):
             values_data['wh_lines'] = \
                 [{'invoice_id': inv_brw.id,
                   'name': inv_brw.name or _('N/A'),
-                  'wh_rate': 0.0}
+                  'invoice_total': inv_brw.amount_total,
+                  'invoice_tax': inv_brw.amount_tax,
+                  'supplier_invoice_number': inv_brw.supplier_invoice_number,
+                  'wh_rate': 0.1}
                  for inv_brw in ai_obj.browse(cr, uid, ai_ids, context=context)
                  ]
         return {'value': values_data}

@@ -13,18 +13,21 @@
             <field name="model">account.wh.fiscalseal.line</field>
             <field name="arch" type="xml">
                 <tree string="Withholding Lines">
-                    <button name="load_taxes" string="Load Taxes" type="object" icon="gtk-ok" colspan="2" help="Click on this button to ensure the invoice related compute correctly taxes for this line of withholding, it is necesary looking to allow manually force if your are not agreed with automatic computation."/>
                     <field name="name"/>
                     <field
                         name="invoice_id"
                         on_change="invoice_id_change(invoice_id)"
                         domain="[('state', '=', 'open'),('type', '=', parent.type), '|', ('partner_id','=',parent.partner_id), ('partner_id','child_of',parent.partner_id)]"
                         />
-                    <field name="supplier_invoice_number"/>
+                    <field name="supplier_invoice_number" string="Invoice Number"/>
 <!--                    <field name="retention_rate" />-->
                     <!-- <field name="amount_tax_ret" sum="Wh total"/> -->
-                    <field name="wh_rate"/>
-                    <field name="move_id"/>
+                    <field name="invoice_total" readonly="1"/>
+                    <field name="invoice_tax" string="Tax"/>
+                    <field name="wh_base_amount" readonly="0"/>
+                    <field name="wh_rate" string="Wh Rate"/>
+                    <field name="wh_tax_amount" readonly="0"/>
+                    <field name="move_id" readonly="1"/>
                 </tree>
             </field>
         </record>
@@ -45,9 +48,12 @@
                                 <field name="supplier_invoice_number"/>
                                 <field name="name"/>
                                 <field name="move_id"/>
+                                <field name="invoice_total"/>
+                                <field name="invoice_tax"/>
+                                <field name="payment_amount"/>
+                                <field name="wh_rate" colspan="2" invisible="0"/>
                             </group>
                             <separator colspan="4"/>
-                            <field name="wh_rate" colspan="2" invisible="True"/>
                                 <group col="2" colspan="2">
                                     <!-- <field name="amount_tax_ret"/> -->
                                     <!-- <field name="base_ret"/> -->
@@ -151,6 +157,7 @@
                         <field name="period_id" widget='selection' required="1" domain="[('special','=',False)]"/>
                         <field name="number" attrs="{'readonly':[('type','=','in_invoice')],'required':[('type','in',['out_invoice','out_refund'])]}"/>
                         <field name="date"/>
+                        <field name="payment_amount"/>
                     </group>
                     <notebook colspan="4">
                         <page string="Withholding">
