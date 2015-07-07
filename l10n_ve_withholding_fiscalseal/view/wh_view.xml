@@ -1,0 +1,238 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<openerp>
+    <data>
+
+    <!--
+    =====================================================
+    Fiscal Seal Withholding line
+    =====================================================
+    -->
+
+        <record id="view_wh_fiscalseal_line_tree" model="ir.ui.view">
+            <field name="name">account.wh.fiscalseal.line.tree</field>
+            <field name="model">account.wh.fiscalseal.line</field>
+            <field name="arch" type="xml">
+                <tree string="Withholding Lines">
+                    <button name="load_taxes" string="Load Taxes" type="object" icon="gtk-ok" colspan="2" help="Click on this button to ensure the invoice related compute correctly taxes for this line of withholding, it is necesary looking to allow manually force if your are not agreed with automatic computation."/>
+                    <field name="name"/>
+                    <field
+                        name="invoice_id"
+                        on_change="invoice_id_change(invoice_id)"
+                        domain="[('state', '=', 'open'), ('wh_iva', '=', False), ('type', '=', parent.type), '|', ('partner_id','=',parent.partner_id), ('partner_id','child_of',parent.partner_id)]"
+                        />
+                    <field name="supplier_invoice_number"/>
+<!--                    <field name="retention_rate" />-->
+                    <!-- <field name="amount_tax_ret" sum="Wh total"/> -->
+                    <field name="wh_rate"/>
+                    <field name="move_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_wh_fiscalseal_line_form" model="ir.ui.view">
+            <field name="name">account.wh.fiscalseal.line.form</field>
+            <field name="model">account.wh.fiscalseal.line</field>
+            <field name="arch" type="xml">
+                <form string="Withholding Lines" version="7.0">
+                    <notebook>
+                        <page string="Withheld Invoice">
+                            <group colspan="4">
+                            <field
+                                name="invoice_id"
+                                on_change="invoice_id_change(invoice_id)"
+                                domain="[('state', '=', 'open'), ('wh_iva', '=', False), ('type', '=', parent.type), '|', ('partner_id','=',parent.partner_id), ('partner_id','child_of',parent.partner_id)]"
+                                />
+                                <field name="supplier_invoice_number"/>
+                                <field name="name"/>
+                                <field name="move_id"/>
+                            </group>
+                            <separator colspan="4"/>
+                            <field name="wh_rate" colspan="2" invisible="True"/>
+                                <group col="2" colspan="2">
+                                    <!-- <field name="amount_tax_ret"/> -->
+                                    <!-- <field name="base_ret"/> -->
+                                </group>
+                                <group col="4" colspan="4">
+                                    <separator string="Please, if there are not taxes loaded, Click on Load Taxes" colspan="4"/>
+                                    <button name="load_taxes" string="Load Taxes" type="object" icon="gtk-ok" colspan="2" help="Click on this button to ensure the invoice related compute correctly taxes for this line of withholding, it is necesary looking to allow manually force if your are not agreed with automatic computation."/>
+                                </group>
+                        </page>
+                    </notebook>
+                </form>
+            </field>
+        </record>
+
+
+    <!--
+    =====================================================
+    Fiscal Seal Withholding
+    =====================================================
+    -->
+
+
+        <record id="view_wh_fiscalseal_filter" model="ir.ui.view">
+            <field name="name">account.wh.fiscalseal.search</field>
+            <field name="model">account.wh.fiscalseal</field>
+            <field name="arch" type="xml">
+                <search string="Search Withholding Fiscal Seal">
+                   <group col="10" colspan="4">
+                        <filter name="draft" icon="terp-gtk-media-pause" string="Draft" domain="[('state','=','draft')]" help="Draft Withholding Fiscal Seal"/>
+                        <filter name="done" icon="terp-check" string="Done" domain="[('state','=','done')]" help="Done Withholding Fiscal Seal"/>
+                        <filter name="cancel" icon="terp-dialog-close" string="Cancel" domain="[('state','=','cancel')]" help="Cancel Withholding Fiscal Seal"/>
+                        <separator orientation="vertical"/>
+                        <field name="code"/>
+                        <field name="name"/>
+                        <field name="number"/>
+                        <field name="partner_id"/>
+                        <field name="journal_id" widget="selection" string="Journal"/>
+                        <field name="date_ret"/>
+                    </group>
+                    <newline/>
+                    <group expand="1" string="Group By...">
+                        <filter string="Partner" icon="terp-partner" domain="[]" context="{'group_by':'partner_id'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="State" icon="terp-stock_effects-object-colorize" domain="[]" context="{'group_by':'state'}"/>
+                        <separator orientation="vertical"/>
+                        <filter string="Accounting Date of Withhold" icon="terp-go-month" domain="[]" context="{'group_by':'date_ret'}"/>
+                    </group>
+               </search>
+            </field>
+        </record>
+
+
+        <record id="view_wh_fiscalseal_tree" model="ir.ui.view">
+            <field name="name">account.wh.fiscalseal.tree</field>
+            <field name="model">account.wh.fiscalseal</field>
+            <field name="arch" type="xml">
+                <tree colors="blue:state=='draft'" string="Withholding Fiscal Seal">
+                    <field name="name"/>
+                    <field name="type"/>
+                    <field name="code"/>
+                    <field name="number"/>
+                    <field name="partner_id"/>
+                    <!-- <field name="amount_base_ret"/> -->
+                    <!-- <field name="total_tax_ret"/> -->
+                    <field name="date_ret"/>
+                    <field name="currency_id"/>
+                    <field name="period_id"/>
+                    <field name="state"/>
+
+                </tree>
+            </field>
+        </record>
+
+
+                        <!-- <button name="%(print_withholding_fiscalseal)d" type="action" colspan="2" states="done" string="Print Fiscal Seal Withholding" icon="gtk-execute"/> -->
+        <record id="view_wh_fiscalseal_form" model="ir.ui.view">
+            <field name="name">account.wh.fiscalseal.form</field>
+            <field name="model">account.wh.fiscalseal</field>
+            <field name="arch" type="xml">
+                <form string="Supplier Withholding Fiscal Seal" version="7.0">
+                    <header>
+                        <button colspan="2" name="compute_amount_wh" states="draft" string="Compute Withholding Fiscal Seal" type="object" icon="terp-stock_format-scientific"/>
+                        <button name="wh_fiscalseal_confirmed" states="draft" string="Confirm" icon="gtk-go-forward"/>
+                        <button name="wh_fiscalseal_done" states="confirmed" string="Done" icon="gtk-execute"/>
+                        <button name="cancel" colspan="2" states="confirmed,draft,done" string="Cancel" icon="gtk-cancel"/>
+                        <button name="set_to_draft" colspan="2" states="cancel" string="Set to draft" icon="terp-stock_effects-object-colorize"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done" statusbar_colors="{&quot;confirmed&quot;:&quot;blue&quot;}"/>
+                    </header>
+                    <group colspan="4" col="6">
+                        <field name="journal_id" select="2" domain="[('type','=','iva_purchase')]"/>
+                        <field name="type"/>
+                        <field name="code"/>
+                        <field
+                            name="partner_id"
+                            on_change="onchange_partner_id(type, partner_id, period_id)"
+                            domain="[('supplier','=',True),('parent_id','=',False)]"/>
+                        <field name="currency_id"/>
+                        <field name="date_ret" readonly="1"/>
+                        <field name="account_id" domain="[('type','=', type == 'in_invoice' and 'payable' or 'receivable'), ('company_id', '=', company_id)]"/>
+                        <field name="name"/>
+                        <field name="period_id" widget='selection' required="1" on_change="onchange_partner_id(type, partner_id, period_id)" domain="[('special','=',False)]"/>
+                        <field name="number" attrs="{'readonly':[('type','=','in_invoice')],'required':[('type','in',['out_invoice','out_refund'])]}"/>
+                        <field name="date"/>
+                    </group>
+                    <notebook colspan="4">
+                        <page string="Withholding">
+                            <field colspan="4" name="wh_lines" nolabel="1" widget="one2many_list"/>
+                            <group col="2" colspan="2">
+                                <!-- <field name="amount_base_ret"/> -->
+                                <!-- <field name="total_tax_ret"/> -->
+<!--
+                                <field name="tot_amount_base_wh" groups='l10n_ve_withholding_iva.group_account_wh_fiscalseal_manager'/>
+-->
+<!--
+                                <field name="tot_amount_tax_wh" groups='l10n_ve_withholding_iva.group_account_wh_fiscalseal_manager'/>
+-->
+                            </group>
+                        </page>
+                        <page string="Other Information">
+                            <field name="company_id"/>
+                        </page>
+                    </notebook>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_account_wh_fiscalseal_customer">
+            <field name="name">Customer Fiscal Seal Withholding</field>
+            <field name="res_model">account.wh.fiscalseal</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('type','=','out_invoice')]</field>
+            <field name="context">{'type':'out_invoice'}</field>
+            <field name="search_view_id" ref="view_wh_fiscalseal_filter"/>
+            <field name="help">With Customer Withholding Fiscal Seal you can create and manage document withholding issued to your customers. OpenERP can also generate document withholding automatically from invoices. For retention must add the invoices, process them and then validate the document.</field>
+        </record>
+        <record model="ir.actions.act_window.view" id="act_wv_account_wh_fiscalseal_customer_tree">
+            <field name="sequence" eval="10"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_wh_fiscalseal_tree"/>
+            <field name="act_window_id" ref="action_account_wh_fiscalseal_customer"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="act_wv_account_wh_fiscalseal_customer_form">
+            <field name="sequence" eval="20"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_wh_fiscalseal_form"/>
+            <field name="act_window_id" ref="action_account_wh_fiscalseal_customer"/>
+        </record>
+
+        <menuitem
+            id="menu_action_account_wh_fiscalseal_customer"
+            name="Customer Fiscal Seal Withholding "
+            parent="account.menu_finance_receivables"
+            action="action_account_wh_fiscalseal_customer"/>
+
+        <record model="ir.actions.act_window" id="action_account_wh_fiscalseal_supplier">
+            <field name="name">Supplier Fiscal Seal Withholding</field>
+            <field name="res_model">account.wh.fiscalseal</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="domain">[('type','=','in_invoice')]</field>
+            <field name="context">{'type':'in_invoice'}</field>
+            <field name="search_view_id" ref="view_wh_fiscalseal_filter"/>
+            <field name="help">With Supplier Withholding Fiscal Seal you can create and manage document withholding issued to your customers. OpenERP can also generate document withholding automatically from invoices. For retention must add the invoices, process them and then validate the document.</field>
+        </record>
+        <record model="ir.actions.act_window.view" id="act_wv_account_wh_fiscalseal_supplier_tree">
+            <field name="sequence" eval="10"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_wh_fiscalseal_tree"/>
+            <field name="act_window_id" ref="action_account_wh_fiscalseal_supplier"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="act_wv_account_wh_fiscalseal_supplier_form">
+            <field name="sequence" eval="20"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_wh_fiscalseal_form"/>
+            <field name="act_window_id" ref="action_account_wh_fiscalseal_supplier"/>
+        </record>
+
+        <menuitem
+            id="menu_action_account_wh_fiscalseal_supplier"
+            name="Supplier Fiscal Seal Withholding "
+            parent="account.menu_finance_payables"
+            action="action_account_wh_fiscalseal_supplier"/>
+
+    </data>
+</openerp>
