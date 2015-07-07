@@ -300,7 +300,7 @@ class FiscalSeal(osv.osv):
         return True
 
     def onchange_partner_id(self, cr, uid, ids, inv_type, partner_id,
-                            period_id=False, context=None):
+                            context=None):
         """ Update the withholding document accounts and the withholding lines
         depending on the partner and another parameters that depend of the type
         of withholding. If the type is sale will only take into account the
@@ -311,7 +311,6 @@ class FiscalSeal(osv.osv):
         withholding document to the related invoices.
         @param type: invoice type
         @param partner_id: partner_id at current view
-        @param period_id: period_id at current view
         """
         context = context or {}
         ai_obj = self.pool.get('account.invoice')
