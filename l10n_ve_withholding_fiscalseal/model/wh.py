@@ -22,7 +22,7 @@ class FiscalSealLine(osv.osv):
             'account.wh.fiscalseal',
             'Fiscal Seal Withholding',
             ondelete='cascade',
-            help="Vat Withholding"),
+            help="Fiscal Seal Withholding"),
         'invoice_id': fields.many2one(
             'account.invoice',
             'Invoice',
@@ -57,9 +57,9 @@ class FiscalSealLine(osv.osv):
             help="Account entry",
             ondelete='restrict'),
         'wh_rate': fields.float(
-            string='Withholding Vat Rate',
+            string='Withholding Fiscal Seal Rate',
             digits_compute=dp.get_precision('Withhold'),
-            help="Vat Withholding rate"),
+            help="Fiscal Seal Withholding rate"),
         'date': fields.related(
             'retention_id',
             'date',
@@ -75,6 +75,37 @@ class FiscalSealLine(osv.osv):
             string='Accounting Date',
             help='Accouting date. Date Withholding')
     }
+
+    def invoice_id_change(self, cr, uid, ids, invoice, context=None):
+        """ Return invoice data to assign to withholding Fiscal Seal
+        @param invoice: invoice for assign a withholding Fiscal Seal
+        """
+        context = context or {}
+        if not invoice:
+            return {}
+        result = {}
+        domain = []
+        ok = True
+        ai_obj = self.pool.get('account.invoice')
+        awfs_obj = self.pool.get('account.wh.fiscalseal')
+        res = ai_obj.browse(cr, uid, invoice, context=context)
+        cr.execute('SELECT retention_id '
+                   'FROM account_wh_fiscalseal_line '
+                   'WHERE invoice_id={invoice_id}'.format(
+                       invoice_id=invoice))
+        ret_ids = cr.fetchone()
+        ok = ok and bool(ret_ids)
+        if ok:
+            ret = awfs_obj.browse(cr, uid, ret_ids[0], context)
+            raise osv.except_osv(
+                'Assigned Invoice !',
+                "The invoice has already assigned in withholding"
+                " Fiscal Seal code: '%s' !" % (ret.code,))
+
+        result.update({'name': res.name,
+                       'supplier_invoice_number': res.supplier_invoice_number})
+
+        return {'value': result, 'domain': domain}
 
 
 class FiscalSeal(osv.osv):
@@ -199,10 +230,10 @@ class FiscalSeal(osv.osv):
         'wh_lines': fields.one2many(
             'account.wh.fiscalseal.line',
             'retention_id',
-            'Vat Withholding lines',
+            'Fiscal Seal Withholding lines',
             readonly=True,
             states={'draft': [('readonly', False)]},
-            help="Vat Withholding lines"),
+            help="Fiscal Seal Withholding lines"),
         # 'amount_base_ret': fields.function(
         #     _amount_ret_all,
         #     method=True,
@@ -214,9 +245,9 @@ class FiscalSeal(osv.osv):
         #     _amount_ret_all,
         #     method=True,
         #     digits_compute=dp.get_precision('Withhold'),
-        #     string='Compute amount wh. tax vat',
+        #     string='Compute amount wh. tax Fiscal Seal',
         #     multi='all',
-        #     help="compute amount withholding tax vat"),
+        #     help="compute amount withholding tax Fiscal Seal"),
     }
 
     _defaults = {
@@ -246,4 +277,3 @@ class FiscalSeal(osv.osv):
                 return pool_seq._process(res['prefix']) + pool_seq._process(
                     res['suffix'])
         return False
-
