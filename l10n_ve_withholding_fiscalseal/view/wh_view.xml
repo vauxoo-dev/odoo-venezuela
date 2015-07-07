@@ -18,7 +18,7 @@
                     <field
                         name="invoice_id"
                         on_change="invoice_id_change(invoice_id)"
-                        domain="[('state', '=', 'open'), ('wh_iva', '=', False), ('type', '=', parent.type), '|', ('partner_id','=',parent.partner_id), ('partner_id','child_of',parent.partner_id)]"
+                        domain="[('state', '=', 'open'), ('wh_fiscalyear', '=', False), ('type', '=', parent.type), '|', ('partner_id','=',parent.partner_id), ('partner_id','child_of',parent.partner_id)]"
                         />
                     <field name="supplier_invoice_number"/>
 <!--                    <field name="retention_rate" />-->
@@ -40,7 +40,7 @@
                             <field
                                 name="invoice_id"
                                 on_change="invoice_id_change(invoice_id)"
-                                domain="[('state', '=', 'open'), ('wh_iva', '=', False), ('type', '=', parent.type), '|', ('partner_id','=',parent.partner_id), ('partner_id','child_of',parent.partner_id)]"
+                                domain="[('state', '=', 'open'), ('wh_fiscalyear', '=', False), ('type', '=', parent.type), '|', ('partner_id','=',parent.partner_id), ('partner_id','child_of',parent.partner_id)]"
                                 />
                                 <field name="supplier_invoice_number"/>
                                 <field name="name"/>
@@ -137,7 +137,7 @@
                         <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done" statusbar_colors="{&quot;confirmed&quot;:&quot;blue&quot;}"/>
                     </header>
                     <group colspan="4" col="6">
-                        <field name="journal_id" select="2" domain="[('type','=','iva_purchase')]"/>
+                        <field name="journal_id" select="2" domain="[('type','=','fiscalseal_purchase')]"/>
                         <field name="type"/>
                         <field name="code"/>
                         <field
@@ -159,10 +159,10 @@
                                 <!-- <field name="amount_base_ret"/> -->
                                 <!-- <field name="total_tax_ret"/> -->
 <!--
-                                <field name="tot_amount_base_wh" groups='l10n_ve_withholding_iva.group_account_wh_fiscalseal_manager'/>
+                                <field name="tot_amount_base_wh" groups='l10n_ve_withholding_fiscalseal.group_account_wh_fiscalseal_manager'/>
 -->
 <!--
-                                <field name="tot_amount_tax_wh" groups='l10n_ve_withholding_iva.group_account_wh_fiscalseal_manager'/>
+                                <field name="tot_amount_tax_wh" groups='l10n_ve_withholding_fiscalseal.group_account_wh_fiscalseal_manager'/>
 -->
                             </group>
                         </page>

@@ -79,6 +79,40 @@ class FiscalSealLine(osv.osv):
 
 class FiscalSeal(osv.osv):
 
+    def _get_type(self, cr, uid, context=None):
+        """ Return invoice type
+        """
+        if context is None:
+            context = {}
+        inv_type = context.get('type', 'in_invoice')
+        return inv_type
+
+    def _get_journal(self, cr, uid, context):
+        """ Return a fiscalseal journal depending of invoice type
+        """
+        if context is None:
+            context = {}
+        type_inv = context.get('type', 'in_invoice')
+        type2journal = {'out_invoice': 'fiscalseal_sale',
+                        'in_invoice': 'fiscalseal_purchase'}
+        journal_obj = self.pool.get('account.journal')
+        res = journal_obj.search(
+            cr, uid,
+            [('type', '=', type2journal.get(type_inv, 'fiscalseal_purchase'))],
+            limit=1)
+        if res:
+            return res[0]
+        return False
+
+    def _get_currency(self, cr, uid, context):
+        """ Return currency to use
+        """
+        user = self.pool.get('res.users').browse(cr, uid, [uid])[0]
+        if user.company_id:
+            return user.company_id.currency_id.id
+        return self.pool.get('res.currency').search(
+            cr, uid, [('rate', '=', 1.0)])[0]
+
     _name = "account.wh.fiscalseal"
     _columns = {
         'name': fields.char(
@@ -184,3 +218,32 @@ class FiscalSeal(osv.osv):
         #     multi='all',
         #     help="compute amount withholding tax vat"),
     }
+
+    _defaults = {
+        'code': lambda self, cr, uid, c: self.wh_fiscalseal_seq_get(cr, uid),
+        'type': _get_type,
+        'state': lambda *a: 'draft',
+        'journal_id': _get_journal,
+        'currency_id': _get_currency,
+        'company_id': lambda self, cr, uid, context:
+        self.pool.get('res.users').browse(cr, uid, uid,
+                                          context=context).company_id.id,
+    }
+
+    def wh_fiscalseal_seq_get(self, cr, uid, context=None):
+        """ Generate sequences for records of withholding fiscalseal
+        """
+        pool_seq = self.pool.get('ir.sequence')
+        cr.execute(
+            "select id,number_next,number_increment,prefix,suffix,padding "
+            "from ir_sequence "
+            "where code='account.wh.fiscalseal' and active=True")
+        res = cr.dictfetchone()
+        if res:
+            if res['number_next']:
+                return pool_seq._next(cr, uid, [res['id']])
+            else:
+                return pool_seq._process(res['prefix']) + pool_seq._process(
+                    res['suffix'])
+        return False
+
