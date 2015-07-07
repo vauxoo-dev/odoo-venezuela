@@ -277,3 +277,90 @@ class FiscalSeal(osv.osv):
                 return pool_seq._process(res['prefix']) + pool_seq._process(
                     res['suffix'])
         return False
+
+    def clear_wh_lines(self, cr, uid, ids, context=None):
+        """ Clear lines of current withholding document and delete wh document
+        information from the invoice.
+        """
+        context = context or {}
+        awfl_obj = self.pool.get('account.wh.fiscalseal.line')
+        ai_obj = self.pool.get('account.invoice')
+        if ids:
+            awfl_ids = awfl_obj.search(cr, uid, [
+                ('retention_id', 'in', ids)], context=context)
+            ai_ids = awfl_ids and [
+                wil.invoice_id.id
+                for wil in awfl_obj.browse(cr, uid, awfl_ids, context=context)]
+            if ai_ids:
+                ai_obj.write(cr, uid, ai_ids,
+                             {'wh_iva_id': False}, context=context)
+            if awfl_ids:
+                awfl_obj.unlink(cr, uid, awfl_ids, context=context)
+
+        return True
+
+    def onchange_partner_id(self, cr, uid, ids, inv_type, partner_id,
+                            period_id=False, context=None):
+        """ Update the withholding document accounts and the withholding lines
+        depending on the partner and another parameters that depend of the type
+        of withholding. If the type is sale will only take into account the
+        partner, but if the type is purchase would take into account the period
+        changes.
+
+        This method delete lines at right moment and unlink/link the
+        withholding document to the related invoices.
+        @param type: invoice type
+        @param partner_id: partner_id at current view
+        @param period_id: period_id at current view
+        """
+        context = context or {}
+        ai_obj = self.pool.get('account.invoice')
+        rp_obj = self.pool.get('res.partner')
+        values_data = dict()
+        acc_id = False
+        wh_type = ((inv_type in ('out_invoice', 'out_refund'))
+                   and 'sale' or 'purchase')
+
+        # pull account info
+        if partner_id:
+            acc_part_id = rp_obj._find_accounting_partner(rp_obj.browse(
+                cr, uid, partner_id))
+            if wh_type == 'sale':
+                acc_id = (acc_part_id.property_account_receivable and
+                          acc_part_id.property_account_receivable.id or False)
+            else:
+                acc_id = (acc_part_id.property_account_payable and
+                          acc_part_id.property_account_payable.id or False)
+            values_data['account_id'] = acc_id
+
+        # clear lines
+        self.clear_wh_lines(cr, uid, ids, context=context)
+
+        if not partner_id:
+            values_data['wh_lines'] = []
+            return {'value': values_data}
+
+        # add lines
+        ttype = wh_type == 'sale' and ['out_invoice', 'out_refund'] \
+            or ['in_invoice', 'in_refund']
+
+        args = [
+            # ('state', '=', 'open'), ('wh_fiscalseal', '=', False),
+            ('state', '=', 'open'),
+            # ('wh_fiscalseal_id', '=', False), ('type', 'in', ttype),
+            ('type', 'in', ttype),
+            '|',
+            ('partner_id', '=', acc_part_id.id),
+            ('partner_id', 'child_of', acc_part_id.id),
+            ]
+
+        ai_ids = ai_obj.search(cr, uid, args, context=context)
+
+        if ai_ids:
+            values_data['wh_lines'] = \
+                [{'invoice_id': inv_brw.id,
+                  'name': inv_brw.name or _('N/A'),
+                  'wh_rate': 0.0}
+                 for inv_brw in ai_obj.browse(cr, uid, ai_ids, context=context)
+                 ]
+        return {'value': values_data}
