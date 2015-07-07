@@ -42,6 +42,8 @@ __TYPES__ = [
     ('purchase_debit', 'Purchase Debit'),
     ('iva_sale', 'Sale Wh VAT'),
     ('iva_purchase', 'Purchase Wh VAT'),
+    ('fiscalseal_sale', 'Sale Wh FiscalSeal'),
+    ('fiscalseal_purchase', 'Purchase Wh FiscalSeal'),
     ('islr_purchase', 'Purchase Wh Income'),
     ('islr_sale', 'Sale Wh Income'),
     ('mun_sale', 'Sale Wh County'),
