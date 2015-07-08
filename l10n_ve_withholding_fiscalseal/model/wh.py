@@ -130,12 +130,14 @@ class FiscalSealLine(osv.osv):
                 "The invoice has already assigned in withholding"
                 " Fiscal Seal code: '%s' !" % (ret.code,))
 
-            result.update(
-                {'name': ai_brw.name,
-                 'supplier_invoice_number': ai_brw.supplier_invoice_number,
-                 'invoice_total': ai_brw.amount_total,
-                 'wh_rate': 0.1,
-                 })
+        result.update(
+            {'name': ai_brw.name,
+             'supplier_invoice_number': ai_brw.supplier_invoice_number,
+             'invoice_total': ai_brw.amount_total,
+             'wh_rate': 0.1,
+             'invoice_tax': ai_brw.amount_tax,
+             'payment_amount': ai_brw.residual,
+             })
 
         return {'value': result, 'domain': domain}
 
@@ -429,10 +431,12 @@ class FiscalSeal(osv.osv):
             values_data['wh_lines'] = \
                 [{'invoice_id': inv_brw.id,
                   'name': inv_brw.name or _('N/A'),
-                  'invoice_total': inv_brw.amount_total,
-                  'invoice_tax': inv_brw.amount_tax,
                   'supplier_invoice_number': inv_brw.supplier_invoice_number,
-                  'wh_rate': 0.1}
+                  'invoice_total': inv_brw.amount_total,
+                  'wh_rate': 0.1,
+                  'invoice_tax': inv_brw.amount_tax,
+                  'payment_amount': inv_brw.residual,
+                  }
                  for inv_brw in ai_obj.browse(cr, uid, ai_ids, context=context)
                  ]
         return {'value': values_data}

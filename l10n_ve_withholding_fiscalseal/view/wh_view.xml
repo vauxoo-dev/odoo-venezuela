@@ -24,6 +24,7 @@
                     <!-- <field name="amount_tax_ret" sum="Wh total"/> -->
                     <field name="invoice_total" readonly="1"/>
                     <field name="invoice_tax" string="Tax"/>
+                    <field name="payment_amount"/>
                     <field name="wh_base_amount" readonly="0"/>
                     <field name="wh_rate" string="Wh Rate"/>
                     <field name="wh_tax_amount" readonly="0"/>
