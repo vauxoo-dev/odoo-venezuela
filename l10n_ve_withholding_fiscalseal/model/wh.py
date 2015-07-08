@@ -139,6 +139,25 @@ class FiscalSealLine(osv.osv):
 
         return {'value': result, 'domain': domain}
 
+    def load_taxes(self, cr, uid, ids, context=None):
+        """ Clean and load again tax lines of the withholding
+        """
+        if context is None:
+            context = {}
+
+        for ret_line in self.browse(cr, uid, ids, context):
+            if ret_line.invoice_id:
+                pay = ret_line.payment_amount
+                tax = ret_line.invoice_tax
+                wh = ret_line.wh_rate
+                self.write(
+                    cr, uid, ret_line.id, {
+                        'wh_base_amount': (pay - tax),
+                        'wh_tax_amount': (pay - tax) * wh,
+                        })
+
+        return True
+
 
 class FiscalSeal(osv.osv):
 
@@ -280,9 +299,24 @@ class FiscalSeal(osv.osv):
         #     string='Compute amount wh. tax Fiscal Seal',
         #     multi='all',
         #     help="compute amount withholding tax Fiscal Seal"),
+        'invoice_tax': fields.float(
+            string='Invoice Tax',
+            digits_compute=dp.get_precision('Account'),
+            readonly=True,
+            ),
         'payment_amount': fields.float(
             string='Payment Amount',
             digits_compute=dp.get_precision('Account'),
+            ),
+        'wh_base_amount': fields.float(
+            string='Taxable Amount',
+            digits_compute=dp.get_precision('Account'),
+            help='Amount to be Withheld'
+            ),
+        'wh_tax_amount': fields.float(
+            string='Withheld Tax',
+            digits_compute=dp.get_precision('Account'),
+            help='Withheld Amount'
             ),
     }
 
@@ -402,3 +436,15 @@ class FiscalSeal(osv.osv):
                  for inv_brw in ai_obj.browse(cr, uid, ai_ids, context=context)
                  ]
         return {'value': values_data}
+
+    def compute_amount_wh(self, cr, uid, ids, context=None):
+        """ Calculate withholding amount each line
+        """
+        context = context or {}
+        awfl_obj = self.pool.get('account.wh.fiscalseal.line')
+
+        for awf_brw in self.browse(cr, uid, ids, context=context):
+            awfl_ids = [line.id for line in awf_brw.wh_lines]
+            if awfl_ids:
+                awfl_obj.load_taxes(cr, uid, awfl_ids, context=context)
+        return True
