@@ -85,7 +85,7 @@ class FiscalSealLine(osv.osv):
             help="Account entry",
             ondelete='restrict'),
         'wh_rate': fields.float(
-            string='Withholding Fiscal Seal Rate',
+            string='Withholding Fiscal Seal Rate (%)',
             digits_compute=dp.get_precision('Account'),
             help="Fiscal Seal Withholding rate"),
         'date': fields.related(
@@ -155,7 +155,7 @@ class FiscalSealLine(osv.osv):
                 self.write(
                     cr, uid, ret_line.id, {
                         'wh_base_amount': (pay - tax),
-                        'wh_tax_amount': (pay - tax) * wh,
+                        'wh_tax_amount': (pay - tax) * wh / 100,
                         })
 
         return True
