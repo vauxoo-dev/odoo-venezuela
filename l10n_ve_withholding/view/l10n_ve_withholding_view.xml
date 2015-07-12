@@ -26,6 +26,7 @@
                         <separator colspan="4" string="isep"/>
                         <separator colspan="4" string="rsep"/>
                         <separator colspan="4" string="msep" invisible='1'/>
+                        <separator colspan="4" string="fsep" invisible='1'/>
                     </page> 
                 </xpath>
             </field>
