@@ -101,7 +101,17 @@ class FiscalSealLine(osv.osv):
             type='date',
             relation='account.wh.fiscalyear',
             string='Accounting Date',
-            help='Accouting date. Date Withholding')
+            help='Accouting date. Date Withholding'),
+        'ut_value': fields.float(
+            string='Tax Unit Value',
+            digits_compute=dp.get_precision('Account'),
+            required=True,
+            ),
+        'ut_qty': fields.float(
+            string='Tax Unit Quantity',
+            digits=(16, 2),
+            required=True,
+            ),
     }
 
     def invoice_id_change(self, cr, uid, ids, invoice, context=None):
@@ -130,6 +140,11 @@ class FiscalSealLine(osv.osv):
                 "The invoice has already assigned in withholding"
                 " Fiscal Seal code: '%s' !" % (ret.code,))
 
+        ut_obj = self.pool.get('l10n.ut')
+        ut2money = ut_obj.compute_ut_to_money
+        ut_qty = 50
+        date_ret = time.strftime('%Y-%m-%d')
+        ut_value = ut2money(cr, uid, ut_qty, date_ret, context=context)
         result.update(
             {'name': ai_brw.name,
              'supplier_invoice_number': ai_brw.supplier_invoice_number,
@@ -137,6 +152,8 @@ class FiscalSealLine(osv.osv):
              'wh_rate': 0.1,
              'invoice_tax': ai_brw.amount_tax,
              'payment_amount': ai_brw.residual,
+             'ut_value': ut_value,
+             'ut_qty': ut_qty,
              })
 
         return {'value': result, 'domain': domain}
@@ -152,10 +169,16 @@ class FiscalSealLine(osv.osv):
                 pay = ret_line.payment_amount
                 tax = ret_line.invoice_tax
                 wh = ret_line.wh_rate
+                ut_value = ret_line.ut_value
+                if pay >= ut_value:
+                    wh_base_amount = (pay - tax)
+                else:
+                    wh_base_amount = 0.0
+
                 self.write(
                     cr, uid, ret_line.id, {
-                        'wh_base_amount': (pay - tax),
-                        'wh_tax_amount': (pay - tax) * wh / 100,
+                        'wh_base_amount': wh_base_amount,
+                        'wh_tax_amount': wh_base_amount * wh / 100,
                         })
 
         return True
@@ -433,6 +456,11 @@ class FiscalSeal(osv.osv):
         ai_ids = ai_obj.search(cr, uid, args, context=context)
 
         if ai_ids:
+            ut_obj = self.pool.get('l10n.ut')
+            ut2money = ut_obj.compute_ut_to_money
+            ut_qty = 50
+            date_ret = time.strftime('%Y-%m-%d')
+            ut_value = ut2money(cr, uid, ut_qty, date_ret, context=context)
             values_data['wh_lines'] = \
                 [{'invoice_id': inv_brw.id,
                   'name': inv_brw.name or _('N/A'),
@@ -441,6 +469,8 @@ class FiscalSeal(osv.osv):
                   'wh_rate': 0.1,
                   'invoice_tax': inv_brw.amount_tax,
                   'payment_amount': inv_brw.residual,
+                  'ut_value': ut_value,
+                  'ut_qty': ut_qty,
                   }
                  for inv_brw in ai_obj.browse(cr, uid, ai_ids, context=context)
                  ]

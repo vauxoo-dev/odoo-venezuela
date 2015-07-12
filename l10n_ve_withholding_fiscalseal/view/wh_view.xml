@@ -51,6 +51,8 @@
                                 <field name="invoice_total"/>
                                 <field name="invoice_tax"/>
                                 <field name="payment_amount"/>
+                                <field name="ut_qty"/>
+                                <field name="ut_value"/>
                                 <field name="wh_base_amount" readonly="0"/>
                                 <field name="wh_rate" colspan="2" invisible="0"/>
                                 <field name="wh_tax_amount" readonly="0"/>
