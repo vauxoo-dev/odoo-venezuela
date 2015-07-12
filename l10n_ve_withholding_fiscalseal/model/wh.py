@@ -310,6 +310,11 @@ class FiscalSeal(osv.osv):
             string='Payment Amount',
             digits_compute=dp.get_precision('Account'),
             ),
+        'payment_description': fields.char(
+            'Payment Order',
+            size=256,
+            required=True,
+            help="Payment Order Description"),
         'wh_base_amount': fields.float(
             string='Taxable Amount',
             digits_compute=dp.get_precision('Account'),

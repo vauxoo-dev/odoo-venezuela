@@ -160,6 +160,7 @@
                         <field name="number" attrs="{'readonly':[('type','=','in_invoice')],'required':[('type','in',['out_invoice','out_refund'])]}"/>
                         <field name="date"/>
                         <field name="payment_amount"/>
+                        <field name="payment_description"/>
                         <field name="invoice_tax"/>
                         <field name="wh_base_amount" readonly="0"/>
                         <field name="wh_tax_amount" readonly="0"/>
