@@ -440,12 +440,13 @@ class FiscalSeal(osv.osv):
             return {'value': values_data}
 
         # add lines
-        ttype = wh_type == 'sale' and ['out_invoice', 'out_refund'] \
-            or ['in_invoice', 'in_refund']
+        ttype = wh_type == 'sale' and ['out_invoice'] \
+            or ['in_invoice']
 
         args = [
             # ('state', '=', 'open'), ('wh_fiscalseal', '=', False),
             ('state', '=', 'open'),
+            ('fiscalseal_apply', '=', False),
             # ('wh_fiscalseal_id', '=', False), ('type', 'in', ttype),
             ('type', 'in', ttype),
             '|',

@@ -16,7 +16,7 @@
                     <field
                         name="invoice_id"
                         on_change="invoice_id_change(invoice_id)"
-                        domain="[('state', '=', 'open'),('type', '=', parent.type), '|', ('partner_id','=',parent.partner_id), ('partner_id','child_of',parent.partner_id)]"
+                        domain="[('state', '=', 'open'),('fiscalseal_apply', '=', False),('type', '=', parent.type), '|', ('partner_id','=',parent.partner_id), ('partner_id','child_of',parent.partner_id)]"
                         />
                     <field name="supplier_invoice_number" string="Invoice Number"/>
 <!--                    <field name="retention_rate" />-->
@@ -43,7 +43,7 @@
                             <field
                                 name="invoice_id"
                                 on_change="invoice_id_change(invoice_id)"
-                                domain="[('state', '=', 'open'),('type', '=', parent.type), '|', ('partner_id','=',parent.partner_id), ('partner_id','child_of',parent.partner_id)]"
+                                domain="[('state', '=', 'open'),('fiscalseal_apply', '=', False),('type', '=', parent.type), '|', ('partner_id','=',parent.partner_id), ('partner_id','child_of',parent.partner_id)]"
                                 />
                                 <field name="supplier_invoice_number"/>
                                 <field name="name"/>
