@@ -7,7 +7,7 @@
             name="account.wh.fiscalseal"
             rml="addons/l10n_ve_withholding_fiscalseal/report/wh_fiscalseal_report.rml"
             string="Fiscal Seal Report"
-            auto="True"
+            auto="False"
             header="True"
             menu="False"
             />
