@@ -19,14 +19,12 @@
                         domain="[('state', '=', 'open'),('fiscalseal_apply', '=', False),('type', '=', parent.type), '|', ('partner_id','=',parent.partner_id), ('partner_id','child_of',parent.partner_id)]"
                         />
                     <field name="supplier_invoice_number" string="Invoice Number"/>
-<!--                    <field name="retention_rate" />-->
-                    <!-- <field name="amount_tax_ret" sum="Wh total"/> -->
-                    <field name="invoice_total" readonly="1"/>
-                    <field name="invoice_tax" string="Tax"/>
-                    <field name="payment_amount"/>
-                    <field name="wh_base_amount" readonly="0"/>
+                    <field name="invoice_total" readonly="1" sum=""/>
+                    <field name="invoice_tax" string="Tax" sum=""/>
+                    <field name="payment_amount" sum=""/>
+                    <field name="wh_base_amount" readonly="0" sum=""/>
                     <field name="wh_rate" string="Wh Rate (‰)"/>
-                    <field name="wh_tax_amount" readonly="0"/>
+                    <field name="wh_tax_amount" readonly="0" sum=""/>
                     <field name="move_id" readonly="1"/>
                 </tree>
             </field>
