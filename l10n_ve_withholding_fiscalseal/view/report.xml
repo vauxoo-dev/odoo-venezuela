@@ -1,0 +1,15 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<openerp>
+    <data>
+        <report
+            id="wh_fiscalseal_report"
+            model="account.wh.fiscalseal"
+            name="account.wh.fiscalseal"
+            rml="addons/l10n_ve_withholding_fiscalseal/report/wh_fiscalseal_report.rml"
+            string="Fiscal Seal Report"
+            auto="True"
+            header="True"
+            menu="False"
+            />
+    </data>
+</openerp>

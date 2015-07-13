@@ -1,0 +1,102 @@
+<?xml version="1.0"?>
+<document filename="test.pdf">
+  <template pageSize="(280.0mm,210.0mm)" title="Test" author="Martin Simon" allowSplitting="20" showBoundary="0">
+    <pageTemplate id="first">
+        <pageGraphics>
+            <image x="7.0mm" y="175.0mm" height="25mm" width="96mm">[[o.company_id.logo and o.company_id.logo or removeParentNode('image')]]</image>
+            <drawString x="7.0mm" y="175.0mm">[[o.company_id.logo and removeParentNode('para') or o.company_id.name]]</drawString>
+
+    <place x="7.0mm" y="-37.0mm"    width="270.0mm"  height="50.0mm">
+        <blockTable>
+            <tr>
+                <td>
+                </td>
+            </tr>
+        </blockTable>
+    </place>
+
+
+</pageGraphics>
+<frame id="first" x1="20.0" y1="85.0" width="753" height="500"/>
+</pageTemplate>
+</template>
+
+  <stylesheet>
+    <blockTableStyle id="TITLE">
+        <lineStyle kind="GRID" colorName="black" start="1,0" stop="-1,-1" thickness="0.5"/>
+        <blockValign value="TOP"/>
+    </blockTableStyle>
+    <blockTableStyle id="ITEMSWHITE">
+        <lineStyle kind="GRID" colorName="black" start="0,0" stop="-1,-1" thickness="0.5"/>
+        <blockValign value="MIDDLE"/>
+    </blockTableStyle>
+    <blockTableStyle id="TITLECENTER">
+        <lineStyle kind="GRID" colorName="black" start="0,0" stop="-1,-1" thickness="0.5"/>
+        <blockValign value="TOP"/>
+    </blockTableStyle>
+    <blockTableStyle id="TITLEGRISCLARO">
+        <lineStyle kind="GRID" colorName="black" start="1,0" stop="-1,-1" thickness="0.5"/>
+        <blockValign value="MIDDLE"/>
+    </blockTableStyle>
+    <blockTableStyle id="TITLEGRISCLAROCOMPLETO">
+        <blockBackground colorName="#e5e2e5" start="0,0" stop="-1,0"/>
+        <lineStyle kind="GRID" colorName="black" start="0,0" stop="-1,-1" thickness="0.5"/>
+        <blockValign value="MIDDLE"/>
+    </blockTableStyle>
+    <blockTableStyle id="TITLEGRISCLAROARRIBA">
+        <blockBackground colorName="#e5e2e5" start="1,0" stop="-1,-1"/>
+        <lineStyle kind="GRID" colorName="black" start="1,0" stop="-1,-1" thickness="0.5"/>
+        <blockValign value="MIDDLE"/>
+    </blockTableStyle>
+    <blockTableStyle id="TITLEGRISWHITE">
+        <lineStyle kind="GRID" colorName="black" start="1,0" stop="-1,-1" thickness="0.5"/>
+        <blockValign value="MIDDLE"/>
+    </blockTableStyle>
+    <blockTableStyle id="Tabla3">
+    <blockBackground colorName="#e5e2e5" start="0,0" stop="-1,0"/>
+      <blockAlignment value="LEFT"/>
+      <blockValign value="TOP"/>
+      <lineStyle kind="GRID" colorName="black" start="0,0" stop="-1,-1" thickness="0.5"/>
+      <blockValign value="MIDDLE"/>
+    </blockTableStyle>
+    <blockTableStyle id="Tablatotales">
+      <blockAlignment value="LEFT"/>
+      <blockValign value="TOP"/>
+      <lineStyle kind="GRID" colorName="black" start="6,0" stop="-1,-1" thickness="0.5"/>
+      <blockValign value="MIDDLE"/>
+    </blockTableStyle>
+    <blockTableStyle id="Tablatotalgeneral">
+      <blockAlignment value="LEFT"/>
+      <blockValign value="TOP"/>
+      <lineStyle kind="GRID" colorName="black" start="9,0" stop="-1,-1" thickness="0.5"/>
+      <blockValign value="MIDDLE"/>
+    </blockTableStyle>
+    <initialize>
+      <paraStyle name="all" alignment="justify"/>
+    </initialize>
+    <paraStyle name="P1" fontName="Helvetica-Bold" fontSize="16.0" leading="20" alignment="CENTER"/>
+    <paraStyle name="P2" fontName="Helvetica"/>
+    <paraStyle name="P5" fontName="Helvetica" fontSize="2.0" leading="3"/>
+    <paraStyle name="P8" fontName="Helvetica" fontSize="2.0" leading="3" alignment="LEFT" spaceBefore="0.0" spaceAfter="0.0"/>
+    <paraStyle name="P12" fontName="Helvetica" fontSize="9.0" leading="11" alignment="CENTER"/>
+    <paraStyle name="P13" fontName="Helvetica" fontSize="9.0" leading="11" alignment="RIGHT"/>
+    <paraStyle name="P14" fontName="Helvetica" fontSize="9.0" leading="11" alignment="RIGHT"/>
+    <paraStyle name="P15" fontName="Helvetica-Bold" fontSize="8.0" leading="10" spaceBefore="3.0" alignment="CENTER"/>
+    <paraStyle name="P20" fontName="Helvetica" fontSize="10.0" leading="13" spaceBefore="0.0" spaceAfter="6.0"/>
+    <paraStyle name="P21" fontName="Helvetica" fontSize="8.0" leading="10" alignment="CENTER" spaceBefore="0.0" spaceAfter="6.0"/>
+    <paraStyle name="P22" fontName="Helvetica" fontSize="9.0" leading="11" spaceBefore="0.0" spaceAfter="6.0" alignment="RIGHT"/>
+    <paraStyle name="P27" fontName="Helvetica" fontSize="2.0" leading="3" alignment="LEFT" spaceBefore="0.0" spaceAfter="0.0"/>
+    <paraStyle name="Heading" fontName="Helvetica" fontSize="14.0" leading="17" spaceBefore="12.0" spaceAfter="6.0"/>
+    <paraStyle name="TITLE" alignment="CENTER" fontName="Helvetica" fontSize="12.0" leading="20" spaceBefore="-3.0" textColor="black"/>
+    <paraStyle name="TITLE2" alignment="CENTER" fontName="Helvetica" fontSize="11.0" leading="12" spaceBefore="-2.0" spaceAfter="2,0" textColor="black"/>
+    <paraStyle name="TITLECENTER" alignment="CENTER" fontName="Helvetica-Bold" fontSize="10.0" leading="10" spaceBefore="-3.0" spaceAfter="-3,0" textColor="black"/>
+    <paraStyle name="ITEMSCENTER" alignment="CENTER" fontName="Helvetica-Bold" fontSize="8.0" leading="9" spaceBefore="3.0" textColor="black"/>
+    <paraStyle name="ITEMSRIF" alignment="CENTER" fontName="Helvetica-Bold" fontSize="12.0" leading="11" spaceBefore="3.0" textColor="black"/>
+    <paraStyle name="ITEMSLEFT" alignment="LEFT" fontName="Helvetica-Bold" fontSize="8.0" leading="10" spaceBefore="3.0" textColor="black"/>
+    <paraStyle name="P22BOLD" fontName="Helvetica-Bold" fontSize="9.0" leading="11" spaceBefore="0.0" spaceAfter="6.0" alignment="RIGHT"/>
+    <paraStyle name="PFIRMA1" fontName="Helvetica-Bold" fontSize="8.0" leading="10" alignment="CENTER" spaceBefore="-4.0" spaceAfter="6.0"/>
+  </stylesheet>
+  <images/>
+  <story>
+  </story>
+</document>

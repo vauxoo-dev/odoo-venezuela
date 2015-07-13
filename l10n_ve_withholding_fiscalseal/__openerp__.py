@@ -15,7 +15,7 @@ Management withholding vat based in the Venezuelan tax laws.
     'data': [
         # 'security/wh_iva_security.xml',
         # 'security/ir.model.access.csv',
-        # 'report/withholding_vat_report.xml',
+        'view/report.xml',
         'view/wizard_retention_view.xml',
         # 'wizard/wizard_wh_nro_view.xml',
         # 'view/generate_txt_view.xml',
