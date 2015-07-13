@@ -547,7 +547,9 @@ class FiscalSeal(osv.osv):
             raise osv.except_osv(
                 _('Wrong Procedure !'),
                 _("Nothing to Withhold!"))
-        context.update({'company_id': ret.company_id.id})
+        context.update({
+            'wh_fiscalseal': True,
+            'company_id': ret.company_id.id})
         for line in ret.wh_lines:
             if line.move_id:  # or line.invoice_id.wh_fiscalseal:
                 raise osv.except_osv(
