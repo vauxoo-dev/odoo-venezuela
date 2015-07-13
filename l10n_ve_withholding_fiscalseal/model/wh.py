@@ -8,6 +8,13 @@ from openerp.addons import decimal_precision as dp
 from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
+STATES = [
+    ('draft', 'Draft'),
+    ('confirmed', 'Confirmed'),
+    ('done', 'Done'),
+    ('cancel', 'Cancelled'),
+]
+
 
 class FiscalSealLine(osv.osv):
 
@@ -18,6 +25,14 @@ class FiscalSealLine(osv.osv):
             size=64,
             required=True,
             help="Withholding line Description"),
+        'parent_state': fields.related(
+            'retention_id',
+            'state',
+            type='selection',
+            selection=STATES,
+            string='Withholding State',
+            store=True,
+            readonly=True),
         'retention_id': fields.many2one(
             'account.wh.fiscalseal',
             'Fiscal Seal Withholding',
@@ -255,11 +270,8 @@ class FiscalSeal(osv.osv):
             'Type',
             readonly=True,
             help="Withholding type"),
-        'state': fields.selection([
-            ('draft', 'Draft'),
-            ('confirmed', 'Confirmed'),
-            ('done', 'Done'),
-            ('cancel', 'Cancelled')],
+        'state': fields.selection(
+            STATES,
             'State',
             readonly=True,
             help="Withholding State"),
