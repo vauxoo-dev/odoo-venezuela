@@ -55,6 +55,14 @@ class FiscalSealLine(osv.osv):
             string='Payment Amount',
             digits_compute=dp.get_precision('Account'),
             ),
+        'payment_description': fields.related(
+            'retention_id',
+            'payment_description',
+            type='char',
+            string='Payment Order',
+            size=256,
+            store=True,
+            readonly=True),
         'wh_base_amount': fields.float(
             string='Taxable Amount',
             digits_compute=dp.get_precision('Account'),

@@ -199,7 +199,7 @@
         </tr>
         <tr>[[repeatIn( o.wh_lines,'l')]][[ setLang(company.partner_id.lang) ]]
           <td><para style="P12">[[ l.invoice_id.period_id and l.invoice_id.period_id.name or '' ]]</para></td>
-          <td><para style="P12">[[ l.retention_id.payment_description ]]</para></td>
+          <td><para style="P12">[[ l.payment_description ]]</para></td>
           <td><para style="P12">[[ formatLang(l.invoice_id.date_document, date=True) ]]</para></td>
           <td><para style="P12">[[ l.invoice_id.supplier_invoice_number and l.invoice_id.supplier_invoice_number or l.invoice_id.invoice_number ]]</para></td>
           <td><para style="P12">[[ l.invoice_id.nro_ctrl and l.invoice_id.nro_ctrl or '' ]]</para></td>
