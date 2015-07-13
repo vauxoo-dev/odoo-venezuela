@@ -138,7 +138,7 @@
                     <header>
                         <button colspan="2" name="compute_amount_wh" states="draft" string="Compute Withholding Fiscal Seal" type="object" icon="terp-stock_format-scientific"/>
                         <button name="action_confirm" type="object" states="draft" string="Confirm" icon="gtk-go-forward"/>
-                        <button name="wh_fiscalseal_done" states="confirmed" string="Done" icon="gtk-execute"/>
+                        <button name="action_done" type="object" states="confirmed" string="Done" icon="gtk-execute"/>
                         <button name="cancel" colspan="2" states="confirmed,draft,done" string="Cancel" icon="gtk-cancel"/>
                         <button name="set_to_draft" colspan="2" states="cancel" string="Set to draft" icon="terp-stock_effects-object-colorize"/>
                         <button

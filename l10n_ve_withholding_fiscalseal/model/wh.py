@@ -533,4 +533,150 @@ class FiscalSeal(osv.osv):
         return self.write(cr, uid, ids, {'state': 'confirmed'},
                           context=context)
 
+    def action_move_create(self, cr, uid, ids, context=None):
+        """ Create movements associated with retention and reconcile
+        """
+        inv_obj = self.pool.get('account.invoice')
+        user_obj = self.pool.get('res.users')
+        per_obj = self.pool.get('account.period')
+        if context is None:
+            context = {}
+        ids = isinstance(ids, (int, long)) and [ids] or ids
+        ret = self.browse(cr, uid, ids[0], context)
+        if not ret.wh_lines:
+            raise osv.except_osv(
+                _('Wrong Procedure !'),
+                _("Nothing to Withhold!"))
+        context.update({'company_id': ret.company_id.id})
+        for line in ret.wh_lines:
+            if line.move_id:  # or line.invoice_id.wh_fiscalseal:
+                raise osv.except_osv(
+                    _('Invoice already withhold !'),
+                    _("You must omit the follow invoice '%s' !") %
+                    (line.invoice_id.name,))
+
+        # TODO: Get rid of field in future versions?
+        # We rather use the account in the invoice
+        # acc_id = ret.account_id.id
+
+        period_id = ret.period_id and ret.period_id.id or False
+        journal_id = ret.journal_id.id
+
+        if not period_id:
+            period_id = per_obj.find(
+                cr, uid, ret.date_ret or time.strftime('%Y-%m-%d'),
+                context=context)
+            if not period_id:
+                message = _("There are not Periods available for the pointed"
+                            " day, verify following"
+                            " 1.- The period is closed, 2.- The period is not"
+                            " yet created for your company")
+                raise osv.except_osv(_('Missing Periods!'), message)
+            period_id = period_id[0]
+
+        for line in ret.wh_lines:
+            writeoff_account_id, writeoff_journal_id = False, False
+            amount = line.wh_tax_amount
+            if line.invoice_id.type in ['in_invoice', 'in_refund']:
+                name = ('COMP. RET. TMB FSCL ' + ret.number + ' Doc. ' +
+                        (line.invoice_id.supplier_invoice_number
+                         or ''))
+            else:
+                name = ('COMP. RET. TMB FSCL ' + ret.number + ' Doc. ' +
+                        (line.invoice_id.number or ''))
+            acc_id = line.invoice_id.account_id.id
+            ret_move = inv_obj.ret_and_reconcile(
+                cr, uid, [line.invoice_id.id], abs(amount), acc_id,
+                period_id, journal_id, writeoff_account_id, period_id,
+                writeoff_journal_id, ret.date_ret, name, [line],
+                context=context)
+
+            if (line.invoice_id.currency_id.id !=
+                    line.invoice_id.company_id.currency_id.id):
+                f_xc = self.pool.get('l10n.ut').sxc(
+                    cr, uid,
+                    line.invoice_id.currency_id.id,
+                    line.invoice_id.company_id.currency_id.id,
+                    line.retention_id.date)
+                move_obj = self.pool.get('account.move')
+                move_line_obj = self.pool.get('account.move.line')
+                move_brw = move_obj.browse(cr, uid,
+                                           ret_move['move_id'])
+                for ml in move_brw.line_id:
+                    move_line_obj.write(cr, uid, ml.id, {
+                        'currency_id': line.invoice_id.currency_id.id})
+
+                    if ml.credit:
+                        move_line_obj.write(cr, uid, ml.id, {
+                            'amount_currency': f_xc(ml.credit) * -1})
+
+                    elif ml.debit:
+                        move_line_obj.write(cr, uid, ml.id, {
+                            'amount_currency': f_xc(ml.debit)})
+
+            # make the withholding line point to that move
+            rl = {
+                'move_id': ret_move['move_id'],
+            }
+            lines = [(1, line.id, rl)]
+            self.write(cr, uid, [ret.id], {'wh_lines': lines,
+                                           'period_id': period_id})
+
+            if (rl and line.invoice_id.type
+                    in ['out_invoice', 'out_refund']):
+                inv_obj.write(cr, uid, [line.invoice_id.id],
+                              {'wh_iva_id': ret.id})
+        return True
+
+    def action_date_ret(self, cr, uid, ids, context=None):
+        """ Undated records will be assigned the current date
+        """
+        context = context or {}
+        values = {}
+        for wh in self.browse(cr, uid, ids, context=context):
+            if wh.type in ['in_invoice']:
+                values['date_ret'] = time.strftime('%Y-%m-%d')
+                values['date'] = values['date_ret']
+            elif wh.type in ['out_invoice']:
+                values['date_ret'] = wh.date_ret or time.strftime('%Y-%m-%d')
+
+            self.write(cr, uid, [wh.id], values, context=context)
+        return True
+
+    def action_number(self, cr, uid, ids, context=None):
+        """ Is responsible for generating a number for the document
+        if it does not have one
+        """
+        context = context or {}
+        obj_ret = self.browse(cr, uid, ids)[0]
+        cr.execute(
+            'SELECT id, number '
+            'FROM account_wh_fiscalseal '
+            'WHERE id IN (' + ','.join([str(item) for item in ids]) + ')')
+
+        for (iwd_id, number) in cr.fetchall():
+            if not number:
+                number = self.pool.get('ir.sequence').get(
+                    cr, uid, 'account.wh.fiscalseal.%s' % obj_ret.type)
+            if not number:
+                raise osv.except_osv(
+                    _("Missing Configuration !"),
+                    _('No Sequence configured for Supplier Fiscal Seal'
+                      ' Withholding'))
+            cr.execute('UPDATE account_wh_fiscalseal SET number=%s '
+                       'WHERE id=%s', (number, iwd_id))
+        return True
+
+    def action_done(self, cr, uid, ids, context=None):
+        """ Call the functions in charge of preparing the document
+        to pass the state done
+        """
+        context = context or {}
+        ids = isinstance(ids, (int, long)) and [ids] or ids
+        self.action_number(cr, uid, ids, context=context)
+        self.action_date_ret(cr, uid, ids, context=context)
+        self.action_move_create(cr, uid, ids, context=context)
+        self.write(cr, uid, ids, {'state': 'done'}, context=context)
+        return True
+
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
