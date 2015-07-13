@@ -57,8 +57,7 @@
                             </group>
                             <separator colspan="4"/>
                                 <group col="2" colspan="2">
-                                    <!-- <field name="amount_tax_ret"/> -->
-                                    <!-- <field name="base_ret"/> -->
+                                    <field name="move_id" readonly="1"/>
                                 </group>
                                 <group col="4" colspan="4">
                                     <separator string="Please, if there are not taxes loaded, Click on Load Taxes" colspan="4"/>

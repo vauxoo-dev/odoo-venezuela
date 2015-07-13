@@ -85,11 +85,11 @@ class AccountInvoice(osv.osv):
                           tax_brw.retention_id.company_id.name,))
             res.append((0, 0, {
                 'debit':
-                direction * tax_brw.wh_amount < 0 and
-                - direction * tax_brw.wh_amount,
+                direction * tax_brw.wh_tax_amount < 0 and
+                - direction * tax_brw.wh_tax_amount,
                 'credit':
-                direction * tax_brw.wh_amount > 0 and
-                direction * tax_brw.wh_amount,
+                direction * tax_brw.wh_tax_amount > 0 and
+                direction * tax_brw.wh_tax_amount,
                 'account_id': acc,
                 'partner_id': acc_part_brw.id,
                 'ref': invoice.number,

@@ -22,7 +22,7 @@ Management withholding vat based in the Venezuelan tax laws.
         'view/invoice_view.xml',
         # 'view/account_view.xml',
         # 'view/partner_view.xml',
-        # 'view/res_company_view.xml',
+        'view/company_view.xml',
         'view/wh_view.xml',
         # "data/l10n_ve_withholding_data.xml",
         # 'report/txt_wh_report.xml',
