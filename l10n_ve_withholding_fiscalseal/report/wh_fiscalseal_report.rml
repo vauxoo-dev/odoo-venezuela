@@ -116,7 +116,7 @@
                             <b>COMPROBANTE DE RETENCION DE TIMBRE FISCAL DEL ESTADO ANZOATEGUI</b>
                         </para>
                         <para style="TITLE">
-                            <b>IMPUESTO 1 X 1000</b>
+                            <b>IMPUESTO 1 X 1000 (1‰)</b>
                         </para>
                     </td>
                 </tr>
@@ -194,7 +194,7 @@
             <td><para style="P15">IVA</para></td>
             <td><para style="P15">Monto de Orden de Pago</para></td>
             <td><para style="P15">Monto Gravable de Orden de Pago</para></td>
-            <td><para style="P15">Tasa</para></td>
+            <td><para style="P15">Tasa (‰)</para></td>
             <td><para style="P15">Monto Impuesto Retenido</para></td>
         </tr>
         <tr>[[repeatIn( o.wh_lines,'l')]][[ setLang(company.partner_id.lang) ]]
@@ -207,7 +207,7 @@
           <td><para style="P14">[[ l.invoice_tax ]]</para></td>
           <td><para style="P14">[[ l.payment_amount ]]</para></td>
           <td><para style="P13">[[ l.wh_base_amount ]]</para></td>
-          <td><para style="P14">[[ l.wh_rate * 10 ]]‰</para></td>
+          <td><para style="P14">[[ l.wh_rate ]]‰</para></td>
           <td><para style="P13">[[ l.wh_tax_amount ]]</para></td>
         </tr>
     </blockTable>

@@ -85,7 +85,7 @@ class FiscalSealLine(osv.osv):
             help="Account entry",
             ondelete='restrict'),
         'wh_rate': fields.float(
-            string='Withholding Fiscal Seal Rate (%)',
+            string='Withholding Fiscal Seal Rate (‰)',
             digits_compute=dp.get_precision('Account'),
             help="Fiscal Seal Withholding rate"),
         'date': fields.related(
@@ -149,7 +149,7 @@ class FiscalSealLine(osv.osv):
             {'name': ai_brw.name,
              'supplier_invoice_number': ai_brw.supplier_invoice_number,
              'invoice_total': ai_brw.amount_total,
-             'wh_rate': 0.1,
+             'wh_rate': 1.0,
              'invoice_tax': ai_brw.amount_tax,
              'payment_amount': ai_brw.residual,
              'ut_value': ut_value,
@@ -178,7 +178,7 @@ class FiscalSealLine(osv.osv):
                 self.write(
                     cr, uid, ret_line.id, {
                         'wh_base_amount': wh_base_amount,
-                        'wh_tax_amount': wh_base_amount * wh / 100,
+                        'wh_tax_amount': wh_base_amount * wh / 1000,
                         })
 
         return True
@@ -467,7 +467,7 @@ class FiscalSeal(osv.osv):
                   'name': inv_brw.name or _('N/A'),
                   'supplier_invoice_number': inv_brw.supplier_invoice_number,
                   'invoice_total': inv_brw.amount_total,
-                  'wh_rate': 0.1,
+                  'wh_rate': 1.0,
                   'invoice_tax': inv_brw.amount_tax,
                   'payment_amount': inv_brw.residual,
                   'ut_value': ut_value,
