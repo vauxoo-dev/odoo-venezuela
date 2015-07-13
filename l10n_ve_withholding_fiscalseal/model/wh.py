@@ -88,19 +88,6 @@ class FiscalSealLine(osv.osv):
             digits_compute=dp.get_precision('Account'),
             help='Withheld Amount'
             ),
-        # 'amount_tax_ret': fields.function(
-        #     _amount_all,
-        #     method=True,
-        #     digits=(16, 4),
-        #     string='Wh. tax amount',
-        #     multi='all', help="Withholding tax amount"),
-        # 'base_ret': fields.function(
-        #     _amount_all,
-        #     method=True,
-        #     digits=(16, 4),
-        #     string='Wh. amount',
-        #     multi='all',
-        #     help="Withholding without tax amount"),
         'move_id': fields.many2one(
             'account.move',
             'Account Entry',
@@ -243,6 +230,23 @@ class FiscalSeal(osv.osv):
         return self.pool.get('res.currency').search(
             cr, uid, [('rate', '=', 1.0)])[0]
 
+    def _amount_all(self, cr, uid, ids, fieldname, args, context=None):
+        """ Return all amount relating to the invoices lines
+        """
+        res = {}
+        for awfs_brw in self.browse(cr, uid, ids, context):
+            res[awfs_brw.id] = {
+                'wh_tax_amount': 0.0,
+                'wh_base_amount': 0.0,
+                'invoice_tax': 0.0,
+            }
+            for wh_brw in awfs_brw.wh_lines:
+                res[awfs_brw.id]['wh_tax_amount'] += wh_brw.wh_tax_amount
+                res[awfs_brw.id]['wh_base_amount'] += wh_brw.wh_base_amount
+                res[awfs_brw.id]['invoice_tax'] += wh_brw.invoice_tax
+
+        return res
+
     _name = "account.wh.fiscalseal"
     _columns = {
         'name': fields.char(
@@ -330,25 +334,13 @@ class FiscalSeal(osv.osv):
             readonly=True,
             states={'draft': [('readonly', False)]},
             help="Fiscal Seal Withholding lines"),
-        # 'amount_base_ret': fields.function(
-        #     _amount_ret_all,
-        #     method=True,
-        #     digits_compute=dp.get_precision('Account'),
-        #     string='Compute amount',
-        #     multi='all',
-        #     help="Compute amount without tax"),
-        # 'total_tax_ret': fields.function(
-        #     _amount_ret_all,
-        #     method=True,
-        #     digits_compute=dp.get_precision('Account'),
-        #     string='Compute amount wh. tax Fiscal Seal',
-        #     multi='all',
-        #     help="compute amount withholding tax Fiscal Seal"),
-        'invoice_tax': fields.float(
-            string='Invoice Tax',
+        'invoice_tax': fields.function(
+            _amount_all,
+            method=True,
             digits_compute=dp.get_precision('Account'),
-            readonly=True,
-            ),
+            string='Invoice Tax',
+            multi='all',
+            help='Taxes in Invoices'),
         'payment_amount': fields.float(
             string='Payment Amount',
             digits_compute=dp.get_precision('Account'),
@@ -358,16 +350,20 @@ class FiscalSeal(osv.osv):
             size=256,
             required=True,
             help="Payment Order Description"),
-        'wh_base_amount': fields.float(
+        'wh_base_amount': fields.function(
+            _amount_all,
+            method=True,
+            digits_compute=dp.get_precision('Account'),
             string='Taxable Amount',
+            multi='all',
+            help='Amount to be Withheld'),
+        'wh_tax_amount': fields.function(
+            _amount_all,
+            method=True,
             digits_compute=dp.get_precision('Account'),
-            help='Amount to be Withheld'
-            ),
-        'wh_tax_amount': fields.float(
             string='Withheld Tax',
-            digits_compute=dp.get_precision('Account'),
-            help='Withheld Amount'
-            ),
+            multi='all',
+            help="Amount withheld from the Taxable Amount"),
     }
 
     _defaults = {
