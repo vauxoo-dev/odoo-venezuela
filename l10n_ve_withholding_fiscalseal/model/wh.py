@@ -504,3 +504,33 @@ class FiscalSeal(osv.osv):
             if awfl_ids:
                 awfl_obj.load_taxes(cr, uid, awfl_ids, context=context)
         return True
+
+    def check_confirm(self, cr, uid, ids, context=None):
+        """
+        Check if sum in Withholding matches the sum of the values in all lines
+        """
+        context = dict(context or {})
+        ids = isinstance(ids, (int, long)) and [ids] or ids
+        awfs_brw = self.browse(cr, uid, ids[0], context=context)
+        payment_amount = 0.0
+        for wh_brw in awfs_brw.wh_lines:
+            payment_amount += wh_brw.payment_amount
+
+        if awfs_brw.payment_amount != payment_amount:
+            raise osv.except_osv(
+                _('Wrong Value on Payment !'),
+                _('Grand Total Does not Match with Sum'),
+            )
+        return True
+
+    def action_confirm(self, cr, uid, ids, context=None):
+        """
+        Writes Document on Next State
+        """
+        context = dict(context or {})
+        ids = isinstance(ids, (int, long)) and [ids] or ids
+        self.check_confirm(cr, uid, ids, context=context)
+        return self.write(cr, uid, ids, {'state': 'confirmed'},
+                          context=context)
+
+# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
