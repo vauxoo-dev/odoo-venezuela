@@ -69,11 +69,9 @@
                                 <field name="currency_wh_tax_amount" readonly="0"/>
                                 <field name="wh_tax_amount" readonly="0"/>
                                 <separator orientation="vertical" colspan="4"/>
+                                <field name="move_id" readonly="1"/>
                             </group>
                             <separator colspan="4"/>
-                                <group col="2" colspan="2">
-                                    <field name="move_id" readonly="1"/>
-                                </group>
                                 <group col="4" colspan="4">
                                     <separator string="Please, if there are not taxes loaded, Click on Load Taxes" colspan="4"/>
                                     <button name="load_taxes" string="Load Taxes" type="object" icon="gtk-ok" colspan="2" help="Click on this button to ensure the invoice related compute correctly taxes for this line of withholding, it is necesary looking to allow manually force if your are not agreed with automatic computation."/>

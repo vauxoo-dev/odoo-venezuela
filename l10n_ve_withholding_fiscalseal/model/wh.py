@@ -587,7 +587,7 @@ class FiscalSeal(osv.osv):
         for wh_brw in awfs_brw.wh_lines:
             payment_amount += wh_brw.payment_amount
 
-        if awfs_brw.payment_amount != payment_amount:
+        if abs(awfs_brw.payment_amount - payment_amount) >= 0.01:
             raise osv.except_osv(
                 _('Wrong Value on Payment !'),
                 _('Grand Total Does not Match with Sum'),
@@ -668,8 +668,8 @@ class FiscalSeal(osv.osv):
                     line.invoice_id.company_id.currency_id.id):
                 f_xc = self.pool.get('l10n.ut').sxc(
                     cr, uid,
-                    line.invoice_id.currency_id.id,
                     line.invoice_id.company_id.currency_id.id,
+                    line.invoice_id.currency_id.id,
                     line.retention_id.date)
                 move_obj = self.pool.get('account.move')
                 move_line_obj = self.pool.get('account.move.line')
