@@ -35,6 +35,14 @@
             <field name="model">account.wh.fiscalseal.line</field>
             <field name="arch" type="xml">
                 <form string="Withholding Lines" version="7.0">
+                    <header>
+                        <field
+                            name="parent_state"
+                            widget="statusbar"
+                            statusbar_visible="draft,confirmed,done,cancel"
+                            statusbar_colors='{"draft":"blue"}'
+                            />
+                    </header>
                     <notebook>
                         <page string="Withheld Invoice">
                             <group colspan="4" col="4">
@@ -71,13 +79,25 @@
                                 <separator orientation="vertical" colspan="4"/>
                                 <field name="move_id" readonly="1"/>
                             </group>
-                            <separator colspan="4"/>
-                                <group col="4" colspan="4">
-                                    <separator string="Please, if there are not taxes loaded, Click on Load Taxes" colspan="4"/>
-                                    <button name="load_taxes" string="Load Taxes" type="object" icon="gtk-ok" colspan="2" help="Click on this button to ensure the invoice related compute correctly taxes for this line of withholding, it is necesary looking to allow manually force if your are not agreed with automatic computation."/>
-                                </group>
+                            <group
+                                col="4"
+                                colspan="4"
+                                attrs="{'invisible': [('parent_state','!=','draft')]}"
+                                >
+                                <separator string="Please, if there are not taxes loaded, Click on Load Taxes" colspan="4"/>
+                            </group>
                         </page>
                     </notebook>
+                    <header>
+                        <button
+                            name="load_taxes"
+                            string="Load Taxes"
+                            type="object"
+                            icon="gtk-ok"
+                            colspan="2"
+                            attrs="{'invisible': [('parent_state','!=','draft')]}"
+                            help="Click on this button to ensure the invoice related compute correctly taxes for this line of withholding, it is necesary looking to allow manually force if your are not agreed with automatic computation."/>
+                    </header>
                 </form>
             </field>
         </record>
