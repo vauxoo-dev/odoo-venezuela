@@ -16,6 +16,13 @@ class AccountInvoice(osv.osv):
             states={'draft': [('readonly', False)]},
             help="This selection indicates whether allow invoice to be"
                  "included in a withholding document"),
+        'wh_fiscalseal': fields.boolean(
+            string='Withheld',
+            help="This Document has already been withheld"),
+        'wh_fiscalseal_id': fields.many2one(
+            'account.wh.fiscalseal',
+            string='Fiscal Seal Withholding Document',
+            help="This Document has already been withheld"),
     }
 
     _defaults = {'fiscalseal_apply': False}
@@ -28,6 +35,8 @@ class AccountInvoice(osv.osv):
         default = default.copy()
         default.update({
             'fiscalseal_apply': False,
+            'wh_fiscalseal': False,
+            'wh_fiscalseal_id': False,
             })
         return super(AccountInvoice, self).copy(cr, uid, ids, default,
                                                 context=context)

@@ -42,6 +42,10 @@ class FiscalSealLine(osv.osv):
         context = dict(context or {})
         res = {}.fromkeys(ids, 'draft')
         for brw in self.browse(cr, uid, ids, context=context):
+            if brw.retention_id.state == "done":
+                brw.invoice_id.write({'wh_fiscalseal': True})
+            if brw.retention_id.state == "draft":
+                brw.invoice_id.write({'wh_fiscalseal_id': brw.retention_id.id})
             res[brw.id] = brw.retention_id.state
         return res
 

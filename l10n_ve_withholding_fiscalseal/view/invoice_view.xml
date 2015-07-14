@@ -12,15 +12,16 @@
                         <field
                             name="fiscalseal_apply"
                             string="Exclude this document from Fiscal Seal Withholding"/>
-                        <group col="4" colspan="2">
-                            <button
-                                name="%(action_wiz_fiscalseal_apply_wh)d"
-                                string="Change Fiscal Seal Wh. Exclusion"
-                                type="action"
-                                icon="gtk-execute,open"
-                                states="draft,open"
-                                />
-                        </group>
+                        <button
+                            name="%(action_wiz_fiscalseal_apply_wh)d"
+                            string="Change Fiscal Seal Wh. Exclusion"
+                            type="action"
+                            icon="gtk-execute,open"
+                            states="open"
+                            />
+                        <separator orientation="vertical" colspan="4"/>
+                        <field name="wh_fiscalseal" string="Have this invoice been already Fiscal Seal withheld?"/>
+                        <field name="wh_fiscalseal_id"/>
                     </group>
                 </xpath>
                 <xpath expr="//separator[@string=&quot;fsep&quot;]" position="attributes">
