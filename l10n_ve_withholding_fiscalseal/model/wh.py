@@ -38,6 +38,21 @@ class FiscalSealLine(osv.osv):
             res[brw.id]['currency_wh_base_amount'] = g_xc(brw.wh_base_amount)
         return res
 
+    def _get_state(self, cr, uid, ids, fieldname, args, context=None):
+        context = dict(context or {})
+        res = {}.fromkeys(ids, 'draft')
+        for brw in self.browse(cr, uid, ids, context=context):
+            res[brw.id] = brw.retention_id.state
+        return res
+
+    def _get_parent(self, cr, uid, ids, context=None):
+        context = dict(context or {})
+        awfs_obj = self.pool.get('account.wh.fiscalseal')
+        res = []
+        for brw in awfs_obj.browse(cr, uid, ids, context=context):
+            res += [line.id for line in brw.wh_lines]
+        return res
+
     _name = "account.wh.fiscalseal.line"
     _columns = {
         'name': fields.char(
@@ -45,13 +60,15 @@ class FiscalSealLine(osv.osv):
             size=64,
             required=True,
             help="Withholding line Description"),
-        'parent_state': fields.related(
-            'retention_id',
-            'state',
+        'parent_state': fields.function(
+            _get_state,
             type='selection',
             selection=STATES,
             string='Withholding State',
-            store=True,
+            store={
+                _name: (lambda self, cr, uid, ids, ctx: ids, [], 15),
+                'account.wh.fiscalseal': (_get_parent, ['state'], 15),
+            },
             readonly=True),
         'retention_id': fields.many2one(
             'account.wh.fiscalseal',
