@@ -43,9 +43,15 @@ class FiscalSealLine(osv.osv):
         res = {}.fromkeys(ids, 'draft')
         for brw in self.browse(cr, uid, ids, context=context):
             if brw.retention_id.state == "done":
-                brw.invoice_id.write({'wh_fiscalseal': True})
+                brw.invoice_id.write({
+                    'wh_fiscalseal_id': brw.retention_id.id,
+                    'wh_fiscalseal': True,
+                    })
             if brw.retention_id.state == "draft":
-                brw.invoice_id.write({'wh_fiscalseal_id': brw.retention_id.id})
+                brw.invoice_id.write({
+                    'wh_fiscalseal_id': brw.retention_id.id,
+                    'wh_fiscalseal': False,
+                    })
             res[brw.id] = brw.retention_id.state
         return res
 
@@ -285,6 +291,25 @@ class FiscalSealLine(osv.osv):
 
         return True
 
+    def unlink(self, cr, uid, ids, context=None):
+        """ Overwrite the unlink method to throw an exception if the
+        withholding is not in cancel state."""
+        context = context or {}
+        ids = isinstance(ids, (int, long)) and [ids] or ids
+        for awfsl_brw in self.browse(cr, uid, ids, context=context):
+            if awfsl_brw.parent_state not in ('draft', 'cancel'):
+                raise osv.except_osv(
+                    _("Invalid Procedure!!"),
+                    _("Lines cannot be deleted."))
+            else:
+                awfsl_brw.invoice_id.write({
+                    'wh_fiscalseal_id': False,
+                    'wh_fiscalseal': False,
+                    })
+                super(FiscalSealLine, self).unlink(
+                    cr, uid, [awfsl_brw.id], context=context)
+        return True
+
 
 class FiscalSeal(osv.osv):
 
@@ -501,7 +526,7 @@ class FiscalSeal(osv.osv):
                 for wil in awfl_obj.browse(cr, uid, awfl_ids, context=context)]
             if ai_ids:
                 ai_obj.write(cr, uid, ai_ids,
-                             {'wh_iva_id': False}, context=context)
+                             {'wh_fiscalseal_id': False}, context=context)
             if awfl_ids:
                 awfl_obj.unlink(cr, uid, awfl_ids, context=context)
 
@@ -552,11 +577,9 @@ class FiscalSeal(osv.osv):
             or ['in_invoice']
 
         args = [
-            # ('state', '=', 'open'), ('wh_fiscalseal', '=', False),
-            ('state', '=', 'open'),
+            ('state', '=', 'open'), ('wh_fiscalseal', '=', False),
             ('fiscalseal_apply', '=', False),
-            # ('wh_fiscalseal_id', '=', False), ('type', 'in', ttype),
-            ('type', 'in', ttype),
+            ('wh_fiscalseal_id', '=', False), ('type', 'in', ttype),
             '|',
             ('partner_id', '=', acc_part_id.id),
             ('partner_id', 'child_of', acc_part_id.id),
@@ -716,10 +739,8 @@ class FiscalSeal(osv.osv):
             self.write(cr, uid, [ret.id], {'wh_lines': lines,
                                            'period_id': period_id})
 
-            if (rl and line.invoice_id.type
-                    in ['out_invoice', 'out_refund']):
-                inv_obj.write(cr, uid, [line.invoice_id.id],
-                              {'wh_iva_id': ret.id})
+            # if (rl and line.invoice_id.type in ['out_invoice', 'out_refund']):
+            #     line.invoice_id.write({'wh_fiscalseal_id': ret.id})
         return True
 
     def action_date_ret(self, cr, uid, ids, context=None):
@@ -771,6 +792,24 @@ class FiscalSeal(osv.osv):
         self.action_date_ret(cr, uid, ids, context=context)
         self.action_move_create(cr, uid, ids, context=context)
         self.write(cr, uid, ids, {'state': 'done'}, context=context)
+        return True
+
+    def unlink(self, cr, uid, ids, context=None):
+        """ Overwrite the unlink method to throw an exception if the
+        withholding is not in cancel state."""
+        context = context or {}
+        ids = isinstance(ids, (int, long)) and [ids] or ids
+        for awfs_brw in self.browse(cr, uid, ids, context=context):
+            if awfs_brw.state != 'cancel':
+                raise osv.except_osv(
+                    _("Invalid Procedure!!"),
+                    _("The withholding document needs to be in cancel state"
+                      " to be deleted."))
+            else:
+                self.clear_wh_lines(
+                    cr, uid, [awfs_brw.id], context=context)
+                super(FiscalSeal, self).unlink(
+                    cr, uid, [awfs_brw.id], context=context)
         return True
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
