@@ -37,23 +37,38 @@
                 <form string="Withholding Lines" version="7.0">
                     <notebook>
                         <page string="Withheld Invoice">
-                            <group colspan="4">
-                            <field
-                                name="invoice_id"
-                                on_change="invoice_id_change(invoice_id)"
-                                domain="[('state', '=', 'open'),('fiscalseal_apply', '=', False),('type', '=', parent.type), '|', ('partner_id','=',parent.partner_id), ('partner_id','child_of',parent.partner_id)]"
-                                />
+                            <group colspan="4" col="4">
+                                <field
+                                    name="invoice_id"
+                                    on_change="invoice_id_change(invoice_id)"
+                                    domain="[('state', '=', 'open'),('fiscalseal_apply', '=', False),('type', '=', parent.type), '|', ('partner_id','=',parent.partner_id), ('partner_id','child_of',parent.partner_id)]"
+                                    />
+                                <separator orientation="vertical" colspan="2"/>
                                 <field name="supplier_invoice_number"/>
+                                <separator orientation="vertical" colspan="2"/>
                                 <field name="name"/>
-                                <field name="move_id"/>
+                                <separator orientation="vertical" colspan="4"/>
+                                <separator orientation="vertical" colspan="2" string="Values in Invoice Currency"/>
+                                <separator orientation="vertical" colspan="2" string="Values in Company Currency"/>
+                                <field name="invoice_currency_id"/>
+                                <field name="company_currency_id"/>
+                                <field name="currency_invoice_total"/>
                                 <field name="invoice_total"/>
+                                <field name="currency_invoice_tax"/>
                                 <field name="invoice_tax"/>
+                                <field name="currency_payment_amount"/>
                                 <field name="payment_amount"/>
+                                <separator orientation="vertical" colspan="2"/>
                                 <field name="ut_qty"/>
+                                <separator orientation="vertical" colspan="2"/>
                                 <field name="ut_value"/>
+                                <field name="currency_wh_base_amount" readonly="0"/>
                                 <field name="wh_base_amount" readonly="0"/>
+                                <separator orientation="vertical" colspan="2"/>
                                 <field name="wh_rate" colspan="2" invisible="0"/>
+                                <field name="currency_wh_tax_amount" readonly="0"/>
                                 <field name="wh_tax_amount" readonly="0"/>
+                                <separator orientation="vertical" colspan="4"/>
                             </group>
                             <separator colspan="4"/>
                                 <group col="2" colspan="2">

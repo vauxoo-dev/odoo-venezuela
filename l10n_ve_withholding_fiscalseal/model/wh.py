@@ -18,6 +18,26 @@ STATES = [
 
 class FiscalSealLine(osv.osv):
 
+    def _amount_all(self, cr, uid, ids, fieldname, args, context=None):
+        """ Return all amount related to the invoice
+        """
+        res = {}
+        ut_obj = self.pool.get('l10n.ut')
+        for brw in self.browse(cr, uid, ids, context):
+            f_xc = ut_obj.sxc(
+                cr, uid, brw.invoice_currency_id.id,
+                brw.company_currency_id.id, brw.retention_id.date_ret)
+            g_xc = ut_obj.sxc(
+                cr, uid, brw.company_currency_id.id,
+                brw.invoice_currency_id.id, brw.retention_id.date_ret)
+            res[brw.id] = {}
+            res[brw.id]['invoice_total'] = f_xc(brw.currency_invoice_total)
+            res[brw.id]['invoice_tax'] = f_xc(brw.currency_invoice_tax)
+            res[brw.id]['payment_amount'] = f_xc(brw.currency_payment_amount)
+            res[brw.id]['currency_wh_tax_amount'] = g_xc(brw.wh_tax_amount)
+            res[brw.id]['currency_wh_base_amount'] = g_xc(brw.wh_base_amount)
+        return res
+
     _name = "account.wh.fiscalseal.line"
     _columns = {
         'name': fields.char(
@@ -52,24 +72,46 @@ class FiscalSealLine(osv.osv):
             size=64,
             store=True,
             readonly=True),
-        'invoice_total': fields.related(
+        'currency_invoice_total': fields.related(
             'invoice_id',
             'amount_total',
             type='float',
+            digits_compute=dp.get_precision('Account'),
             string='Invoice Total',
             store=True,
             readonly=True),
-        'invoice_tax': fields.related(
+        'invoice_total': fields.function(
+            _amount_all,
+            method=True,
+            digits_compute=dp.get_precision('Account'),
+            string='Invoice Total',
+            multi='all',
+            help="Invoice Total"),
+        'currency_invoice_tax': fields.related(
             'invoice_id',
             'amount_tax',
             type='float',
             string='Invoice Tax',
             store=True,
             readonly=True),
-        'payment_amount': fields.float(
+        'invoice_tax': fields.function(
+            _amount_all,
+            method=True,
+            digits_compute=dp.get_precision('Account'),
+            string='Invoice Tax',
+            multi='all',
+            help="Invoice Tax"),
+        'currency_payment_amount': fields.float(
             string='Payment Amount',
             digits_compute=dp.get_precision('Account'),
             ),
+        'payment_amount': fields.function(
+            _amount_all,
+            method=True,
+            digits_compute=dp.get_precision('Account'),
+            string='Payment Amount',
+            multi='all',
+            help="Payment Amount"),
         'payment_description': fields.related(
             'retention_id',
             'payment_description',
@@ -83,11 +125,25 @@ class FiscalSealLine(osv.osv):
             digits_compute=dp.get_precision('Account'),
             help='Amount to be Withheld'
             ),
+        'currency_wh_base_amount': fields.function(
+            _amount_all,
+            method=True,
+            digits_compute=dp.get_precision('Account'),
+            string='Taxable Amount',
+            multi='all',
+            help="Taxable Amount"),
         'wh_tax_amount': fields.float(
             string='Withheld Tax',
             digits_compute=dp.get_precision('Account'),
             help='Withheld Amount'
             ),
+        'currency_wh_tax_amount': fields.function(
+            _amount_all,
+            method=True,
+            digits_compute=dp.get_precision('Account'),
+            string='Withheld Amount',
+            multi='all',
+            help="Withheld Amount"),
         'move_id': fields.many2one(
             'account.move',
             'Account Entry',
@@ -122,6 +178,21 @@ class FiscalSealLine(osv.osv):
             digits=(16, 2),
             required=True,
             ),
+        'invoice_currency_id': fields.related(
+            'invoice_id',
+            'currency_id',
+            type='many2one',
+            relation='res.currency',
+            string='Invoice Currency',
+            help='Currency in Invoice Transaction'),
+        'company_currency_id': fields.related(
+            'retention_id',
+            'company_id',
+            'currency_id',
+            type='many2one',
+            relation='res.currency',
+            string='Company Currency',
+            help='Currency to use for posting Journal Entries'),
     }
 
     def invoice_id_change(self, cr, uid, ids, invoice, context=None):
@@ -158,10 +229,10 @@ class FiscalSealLine(osv.osv):
         result.update(
             {'name': ai_brw.name,
              'supplier_invoice_number': ai_brw.supplier_invoice_number,
-             'invoice_total': ai_brw.amount_total,
+             'currency_invoice_total': ai_brw.amount_total,
              'wh_rate': 1.0,
-             'invoice_tax': ai_brw.amount_tax,
-             'payment_amount': ai_brw.residual,
+             'currency_invoice_tax': ai_brw.amount_tax,
+             'currency_payment_amount': ai_brw.residual,
              'ut_value': ut_value,
              'ut_qty': ut_qty,
              })
@@ -482,10 +553,10 @@ class FiscalSeal(osv.osv):
                 [{'invoice_id': inv_brw.id,
                   'name': inv_brw.name or _('N/A'),
                   'supplier_invoice_number': inv_brw.supplier_invoice_number,
-                  'invoice_total': inv_brw.amount_total,
+                  'currency_invoice_total': inv_brw.amount_total,
                   'wh_rate': 1.0,
-                  'invoice_tax': inv_brw.amount_tax,
-                  'payment_amount': inv_brw.residual,
+                  'currency_invoice_tax': inv_brw.amount_tax,
+                  'currency_payment_amount': inv_brw.residual,
                   'ut_value': ut_value,
                   'ut_qty': ut_qty,
                   }
