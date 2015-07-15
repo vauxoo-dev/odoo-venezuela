@@ -1,0 +1,109 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<openerp>
+    <data>
+        <record id="view_xml_islr_tree" model="ir.ui.view">
+            <field name="name">account.fiscalseal.summary_tree</field>
+            <field name="model">account.fiscalseal.summary</field>
+            <field name="arch" type="xml">
+                <tree string="Lines Withholding for XML">
+                    <field name="name"/>
+                    <field name="company_id"/>
+                    <field name="period_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="view_xml_islr_form" model="ir.ui.view">
+            <field name="name">account.fiscalseal.summary_form</field>
+            <field name="model">account.fiscalseal.summary</field>
+            <field name="arch" type="xml">
+                <form string="Lines Withholding for Fiscal Seal" version="7.0">
+                    <header>
+                        <button name="action_confirm" string="Confirm" states="draft" type="object" icon="gtk-go-forward" colspan="4"/>
+                        <button name="action_done" string="Validate" states="confirmed" type="object" icon="gtk-ok"/>
+                        <button name="action_cancel" string="Cancel" states="confirmed,done" type="object" icon="gtk-cancel"/>
+                        <button name="action_draft" string="Set To Draft" states="cancel" type="object" icon="gtk-ok"/>
+                        <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done" statusbar_colors="{&quot;confirmed&quot;:&quot;blue&quot;}"/>
+                    </header>
+                    <field name="name"/>
+                    <field name="period_id" widget="selection"/>
+                    <notebook colspan="4">
+                        <page string="Invoice Withholding Lines">
+                            <field
+                                name="wh_lines"
+                                nolabel="1"
+                                colspan='4'
+                                widget="many2many"
+                                domain="[('period_id','=',period_id),('afss_id','=',False),('parent_state','=','done')]">
+                            </field>
+                            <group col="2" colspan="2">
+                                <field name="wh_tax_amount"/>
+                                <field name="wh_base_amount"/>
+                             </group>
+                         </page>
+                         <page string="Other information">
+                             <field name="company_id"/>
+                         </page>
+                    </notebook>
+                </form>
+            </field>
+        </record>
+
+        <record id="view_generate_xml_filter" model="ir.ui.view">
+            <field name="name">account.fiscalseal.summary.search</field>
+            <field name="model">account.fiscalseal.summary</field>
+            <field name="arch" type="xml">
+                <search string="Search File XML">
+                   <group col="10" colspan="4">
+                        <filter name="draft" string="Draft" domain="[('state','=','draft')]"/>
+                        <filter name="confirmed" string="Confirmed" domain="[('state','=','confirmed')]"/>
+                        <filter name="done" string="Done" domain="[('state','=','done')]"/>
+                        <filter name="cancel" string="Cancel" domain="[('state','=','cancel')]"/>
+                        <separator orientation="vertical"/>
+                        <field name="company_id"/>
+                        <field name="user_id" select="1" widget="selection" string="Salesman">
+                        <filter domain="[('user_id','=',uid)]" help="My Fiscal Seal Summary" icon="terp-personal" separator="1"/>
+                        </field>
+                    </group>
+                    <newline/>
+                    <group expand="1" string="Group By...">
+                        <filter string="Period" domain="[]"/>
+                        <separator orientation="vertical"/>
+                        <filter string="State" domain="[]" context="{'group_by':'state'}"/>
+                    </group>
+               </search>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="action_fiscalseal_summary_action">
+            <field name="name">Fiscal Seal Summary</field>
+            <field name="res_model">account.fiscalseal.summary</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="view_type">form</field>
+            <field name="view_mode">tree,form</field>
+            <field name="search_view_id" ref="view_generate_xml_filter"/>
+            <field name="help">With this option you can create and manage the generation of a Summary for Fiscal Seal, required monthly by SATEA for special agent of Fiscal Seal Withhold</field>
+        </record>
+
+        <record model="ir.actions.act_window.view" id="action_fiscalseal_summary_action_tree_1">
+            <field name="sequence" eval="10"/>
+            <field name="view_mode">tree</field>
+            <field name="view_id" ref="view_xml_islr_tree"/>
+            <field name="act_window_id" ref="action_fiscalseal_summary_action"/>
+        </record>
+        <record model="ir.actions.act_window.view" id="action_fiscalseal_summary_action_form_1">
+            <field name="sequence" eval="20"/>
+            <field name="view_mode">form</field>
+            <field name="view_id" ref="view_xml_islr_form"/>
+            <field name="act_window_id" ref="action_fiscalseal_summary_action"/>
+        </record>
+
+        <menuitem
+            name="Fiscal Seal Summary"
+            id="menu_fiscalseal_summary"
+            parent="l10n_ve_fiscal_requirements.menu_venezuela_reporting"
+            action="action_fiscalseal_summary_action"
+            />
+
+    </data>
+</openerp>

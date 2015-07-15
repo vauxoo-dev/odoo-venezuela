@@ -220,6 +220,13 @@ class FiscalSealLine(osv.osv):
             relation='res.currency',
             string='Company Currency',
             help='Currency to use for posting Journal Entries'),
+        'period_id': fields.related(
+            'retention_id',
+            'period_id',
+            type='many2one',
+            relation='account.period',
+            string='Fiscal Period',
+            help="Fiscal Period"),
     }
 
     def invoice_id_change(self, cr, uid, ids, invoice, context=None):

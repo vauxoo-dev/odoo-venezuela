@@ -5,5 +5,6 @@
 from . import invoice
 from . import wh
 from . import res_company
+from . import summary
 
 # vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
