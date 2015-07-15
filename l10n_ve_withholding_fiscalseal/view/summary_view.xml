@@ -19,6 +19,7 @@
             <field name="arch" type="xml">
                 <form string="Lines Withholding for Fiscal Seal" version="7.0">
                     <header>
+                        <button name="action_load" string="Load Items" states="draft" type="object" class="oe_highlight" colspan="4"/>
                         <button name="action_confirm" string="Confirm" states="draft" type="object" icon="gtk-go-forward" colspan="4"/>
                         <button name="action_done" string="Validate" states="confirmed" type="object" icon="gtk-ok"/>
                         <button name="action_cancel" string="Cancel" states="confirmed,done" type="object" icon="gtk-cancel"/>
@@ -26,9 +27,11 @@
                         <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done" statusbar_colors="{&quot;confirmed&quot;:&quot;blue&quot;}"/>
                     </header>
                     <group col="4" colspan="4">
-                        <field name="name" colspan="4"/>
-                        <field name="period_id" widget="selection"/>
+                        <field name="name" colspan="4" attrs="{'readonly': [('state','!=', 'draft')]}" />
+                        <field name="period_id" widget="selection" attrs="{'readonly': [('state','!=', 'draft')]}" />
                         <button name="show_items" string="Show Items" type="object"/>
+                        <newline/>
+                        <field name='wh_zero' attrs="{'readonly': [('state','!=', 'draft')]}" />
                      </group>
                     <notebook colspan="4">
                         <page string="Invoice Withholding Lines">
@@ -37,7 +40,9 @@
                                 nolabel="1"
                                 colspan='4'
                                 widget="many2many"
-                                domain="[('period_id','=',period_id),('afss_id','=',False),('parent_state','=','done')]">
+                                domain="[('period_id','=',period_id),('afss_id','=',False),('parent_state','=','done')]"
+                                attrs="{'readonly': [('state','!=', 'draft')]}"
+                                >
                             </field>
                             <group col="2" colspan="2">
                                 <field name="wh_tax_amount"/>

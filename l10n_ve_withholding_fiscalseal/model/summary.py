@@ -36,6 +36,9 @@ class AccountFiscalSealSummary(osv.osv):
         'name': fields.char(
             'Description', 128, required=True, select=True,
             help="Description about statement of Fiscal Seal withholding"),
+        'wh_zero': fields.boolean(
+            string='Include Withholdings in Zero',
+            help="Include Withholdings in Zero"),
         'company_id': fields.many2one(
             'res.company', 'Company', required=True, help="Company"),
         'state': fields.selection([
@@ -182,6 +185,29 @@ class AccountFiscalSealSummary(osv.osv):
             'view_id': False,
             'type': 'ir.actions.act_window'
         }
+
+    def action_load(self, cr, uid, ids, context=None):
+        context = dict(context or {})
+        ids = isinstance(ids, (int, long)) and [ids] or ids
+        for brw in self.browse(cr, uid, ids, context=context):
+
+            for wh_brw in brw.wh_lines:
+                wh_brw.write({'afss_id': False})
+
+            args = [
+                ('period_id', '=', brw.period_id.id),
+                ('parent_state', '=', 'done')]
+
+            if not brw.wh_zero:
+                args += [('wh_tax_amount', '>', 0)]
+
+            awfl_obj = self.pool.get('account.wh.fiscalseal.line')
+            awfl_ids = awfl_obj.search(cr, uid, args, context=context)
+            if not awfl_ids:
+                continue
+            values = {'afss_id': brw.id}
+            awfl_obj.write(cr, uid, awfl_ids, values, context=context)
+        return True
 
 
 class FiscalSealLine(osv.osv):
