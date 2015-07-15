@@ -8,6 +8,7 @@
             <field name="arch" type="xml">
                 <xpath expr="//page[@string=&quot;Configuration&quot;]/group/group[@name=&quot;account_grp&quot;]" position="after">
                     <separator string="Fiscal Seal Accounts" colspan="2"/>
+                        <field name="wh_rate" string="Wh Rate (‰)"/>
                         <field name="wh_fiscalseal_collected_account_id" required="1"/>
                         <field name="wh_fiscalseal_paid_account_id" required="1"/>
                     <newline/>
