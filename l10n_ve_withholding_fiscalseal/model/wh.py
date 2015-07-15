@@ -794,6 +794,45 @@ class FiscalSeal(osv.osv):
         self.write(cr, uid, ids, {'state': 'done'}, context=context)
         return True
 
+    def action_cancel(self, cr, uid, ids, context=None):
+        """ Call cancel_move and return True
+        """
+        context = dict(context or {})
+        self.cancel_move(cr, uid, ids, context=context)
+        self.clear_wh_lines(cr, uid, ids, context=context)
+        return True
+
+    def cancel_move(self, cr, uid, ids, context=None):
+        """ Delete move lines related with withholding vat and cancel
+        """
+        context = dict(context or {})
+        ret_brw = self.browse(cr, uid, ids, context=context)
+        account_move_obj = self.pool.get('account.move')
+        for ret in ret_brw:
+            delete = False
+            if ret.state == 'done':
+                for ret_line in ret.wh_lines:
+                    move_id = ret_line.move_id.id
+                    account_move_obj.button_cancel(
+                        cr, uid, [move_id], context=context)
+                    ret_line.write({'move_id': False})
+                    delete = account_move_obj.unlink(
+                        cr, uid, [move_id], context=context)
+                if delete:
+                    ret.write({'state': 'cancel'})
+            else:
+                ret.write({'state': 'cancel'})
+        return True
+
+    def action_draft(self, cr, uid, ids, context=None):
+        """ Call the functions in charge of preparing the document
+        to pass the state draft
+        """
+        context = context or {}
+        ids = isinstance(ids, (int, long)) and [ids] or ids
+        self.write(cr, uid, ids, {'state': 'draft'}, context=context)
+        return True
+
     def unlink(self, cr, uid, ids, context=None):
         """ Overwrite the unlink method to throw an exception if the
         withholding is not in cancel state."""
