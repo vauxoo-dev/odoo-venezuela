@@ -5,7 +5,7 @@
 import time
 
 from openerp.osv import fields, osv
-# from openerp.tools.translate import _
+from openerp.tools.translate import _
 
 
 class AccountFiscalSealSummary(osv.osv):
@@ -163,6 +163,26 @@ class AccountFiscalSealSummary(osv.osv):
         """
         context = context or {}
         return self.write(cr, uid, ids, {'state': 'cancel'}, context=context)
+
+    def show_items(self, cur, uid, ids, context=None):
+        """
+        This method is used in a button named `Show Items`
+        """
+        context = context or {}
+        ids = isinstance(ids, (int, long)) and [ids] or ids
+        awfl_ids = []
+        for brw in self.browse(cur, uid, ids, context=context):
+            awfl_ids += [awfl_brw.id for awfl_brw in brw.wh_lines]
+
+        return {
+            'domain': str([('id', 'in', awfl_ids)]),
+            'name': _('Show Items'),
+            'view_type': 'form',
+            'view_mode': 'tree,form',
+            'res_model': 'account.wh.fiscalseal.line',
+            'view_id': False,
+            'type': 'ir.actions.act_window'
+        }
 
 
 class FiscalSealLine(osv.osv):

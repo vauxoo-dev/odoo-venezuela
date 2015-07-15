@@ -25,8 +25,11 @@
                         <button name="action_draft" string="Set To Draft" states="cancel" type="object" icon="gtk-ok"/>
                         <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done" statusbar_colors="{&quot;confirmed&quot;:&quot;blue&quot;}"/>
                     </header>
-                    <field name="name"/>
-                    <field name="period_id" widget="selection"/>
+                    <group col="4" colspan="4">
+                        <field name="name" colspan="4"/>
+                        <field name="period_id" widget="selection"/>
+                        <button name="show_items" string="Show Items" type="object"/>
+                     </group>
                     <notebook colspan="4">
                         <page string="Invoice Withholding Lines">
                             <field
