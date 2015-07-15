@@ -82,8 +82,7 @@ class AccountFiscalSealSummary(osv.osv):
         'company_id': lambda self, cr, uid, context:
         self.pool.get('res.users').browse(
             cr, uid, uid, context=context).company_id.id,
-        'user_id': lambda s, cr, u, c: u,
-
+        'user_id': lambda self, cr, uid, context: uid,
         'period_id': lambda self, cr, uid, context: self.period_return(
             cr, uid, context),
         'name': (lambda self, cr, uid, context:
