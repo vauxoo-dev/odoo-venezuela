@@ -149,39 +149,38 @@
 
     <spacer length="5mm"/>
 
-    <blockTable colWidths="68.0,68.0,68.0,68.0,68.0,68.0,68.0,68.0,68.0,68.0,68.0" style="Tabla3">
+    <blockTable colWidths="18.7,56.1,74.8,158.6,65.8,93.5,93.5,74.8,56.1,56.1" style="Tabla3">
         <tr>
-            <td><para style="P15">Periodo</para></td>
+            <td><para style="P15">No.</para></td>
+            <td><para style="P15">Fecha de Orden de Pago</para></td>
             <td><para style="P15">Numero de Orden de Pago</para></td>
-            <td><para style="P15">Fecha Factura</para></td>
-            <td><para style="P15">No. de Factura</para></td>
-            <td><para style="P15">No. Control</para></td>
+            <td><para style="P15">Nombre del Contribuyente</para></td>
+            <td><para style="P15">C.I. / RIF del Contribuyente</para></td>
             <td><para style="P15">Monto de la Obra / Servicio / Suministros Y Bienes</para></td>
-            <td><para style="P15">IVA</para></td>
-            <td><para style="P15">Monto de Orden de Pago</para></td>
             <td><para style="P15">Monto Gravable de Orden de Pago</para></td>
-            <td><para style="P15">Tasa (‰)</para></td>
             <td><para style="P15">Monto Impuesto Retenido</para></td>
+            <td><para style="P15">Tipo de Pago</para></td>
+            <td><para style="P15">Operaciones Anuladas</para></td>
         </tr>
         <tr>[[repeatIn( o.wh_lines,'l')]][[ setLang(company.partner_id.lang) ]]
-          <td><para style="P12">[[ l.invoice_id.period_id and l.invoice_id.period_id.name or '' ]]</para></td>
+          <td><para style="P12"></para></td>
+          <td><para style="P12">[[ formatLang(l.retention_id.date_ret, date=True) ]]</para></td>
           <td><para style="P12">[[ l.payment_description ]]</para></td>
-          <td><para style="P12">[[ formatLang(l.invoice_id.date_document, date=True) ]]</para></td>
-          <td><para style="P12">[[ l.invoice_id.supplier_invoice_number and l.invoice_id.supplier_invoice_number or l.invoice_id.invoice_number ]]</para></td>
-          <td><para style="P12">[[ l.invoice_id.nro_ctrl and l.invoice_id.nro_ctrl or '' ]]</para></td>
-          <td><para style="P13">[[ l.invoice_total ]]</para></td>
-          <td><para style="P14">[[ l.invoice_tax ]]</para></td>
-          <td><para style="P14">[[ l.payment_amount ]]</para></td>
-          <td><para style="P13">[[ l.wh_base_amount ]]</para></td>
-          <td><para style="P14">[[ l.wh_rate ]]‰</para></td>
-          <td><para style="P13">[[ l.wh_tax_amount ]]</para></td>
+          <td><para style="P12">[[ l.retention_id.partner_id.name ]]</para></td>
+          <td><para style="P12">[[ l.retention_id.partner_id.vat  and l.retention_id.partner_id.vat[2:] or '']]</para></td>
+          <td><para style="P13">[[ formatLang(l.invoice_total) ]]</para></td>
+          <td><para style="P13">[[ formatLang(l.wh_base_amount) ]]</para></td>
+          <td><para style="P13">[[ formatLang(l.wh_tax_amount) ]]</para></td>
+          <td><para style="P13"></para></td>
+          <td><para style="P13"></para></td>
         </tr>
     </blockTable>
-    <blockTable colWidths="476.0,204.0,68.0" style="Tabla3">
+    <blockTable colWidths="374.0,187.0,74.8,112.2" style="Tabla3">
         <tr>
             <td><para style="P22"><font color="white"></font></para></td>
             <td><para style="P22BOLD">TOTAL IMPUESTO RETENIDO</para></td>
-            <td><para style="P22BOLD">[[ o.wh_tax_amount ]]</para></td>
+            <td><para style="P22BOLD">[[ formatLang(o.wh_tax_amount) ]]</para></td>
+            <td><para style="P22BOLD"></para></td>
         </tr>
     </blockTable>
     <spacer length="3mm"/>
