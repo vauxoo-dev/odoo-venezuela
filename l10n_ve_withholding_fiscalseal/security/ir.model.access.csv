@@ -1,0 +1,10 @@
+"id","name","model_id:id","group_id:id","perm_read","perm_write","perm_create","perm_unlink"
+"access_account_wh_fiscalseal_user","account.wh.fiscalseal.user","model_account_wh_fiscalseal",,1,0,0,0
+"access_account_wh_fiscalseal_line_user","account.wh.fiscalseal.line.user","model_account_wh_fiscalseal_line",,1,0,0,0
+"access_account_fiscalseal_summary_user","account.fiscalseal.summary.user","model_account_fiscalseal_summary",,1,0,0,0
+"access_account_wh_fiscalseal_user","account.wh.fiscalseal.user","model_account_wh_fiscalseal","l10n_ve_withholding_fiscalseal.group_account_wh_fiscalseal_user",1,1,1,0
+"access_account_wh_fiscalseal_line_user","account.wh.fiscalseal.line.user","model_account_wh_fiscalseal_line","l10n_ve_withholding_fiscalseal.group_account_wh_fiscalseal_user",1,1,1,1
+"access_account_fiscalseal_summary_user","account.fiscalseal.summary.user","model_account_fiscalseal_summary","l10n_ve_withholding_fiscalseal.group_account_wh_fiscalseal_user",1,1,1,0
+"access_account_wh_fiscalseal_manager","account.wh.fiscalseal.manager","model_account_wh_fiscalseal","l10n_ve_withholding_fiscalseal.group_account_wh_fiscalseal_manager",1,1,1,1
+"access_account_wh_fiscalseal_line_manager","account.wh.fiscalseal.line.manager","model_account_wh_fiscalseal_line","l10n_ve_withholding_fiscalseal.group_account_wh_fiscalseal_manager",1,1,1,1
+"access_account_fiscalseal_summary_manager","account.fiscalseal.summary.manager","model_account_fiscalseal_summary","l10n_ve_withholding_fiscalseal.group_account_wh_fiscalseal_manager",1,1,1,1
