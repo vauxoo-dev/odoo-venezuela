@@ -8,7 +8,7 @@ from openerp.report import report_sxw
 from openerp.tools.translate import _
 
 
-class rep_comprobante(report_sxw.rml_parse):
+class Parser(report_sxw.rml_parse):
     # Variables Globales----------------------------------------------------
     ttcompra = 0
     ttcompra_sdcf = 0
@@ -19,7 +19,7 @@ class rep_comprobante(report_sxw.rml_parse):
     # ---------------------------------------------------------------------
 
     def __init__(self, cr, uid, name, context):
-        super(rep_comprobante, self).__init__(cr, uid, name, context)
+        super(Parser, self).__init__(cr, uid, name, context)
         self.localcontext.update({
             'time': time,
             'get_partner_addr': self._get_partner_addr,
@@ -43,9 +43,6 @@ class rep_comprobante(report_sxw.rml_parse):
                 (addr.state_id and ('%s, ' % addr.state_id.name.title()) or '')
                 + (addr.country_id and ('%s ' % addr.country_id.name.title())
                    or '') or _('NO INVOICE ADDRESS DEFINED'))
-            # addr_inv = (addr.street or '')+' '+(addr.street2 or '')+'
-            # '+(addr.zip or '')+ ' '+(addr.city or '')+ ' '+ (addr.country_id
-            # and addr.country_id.name or '')+ ', TELF.:'+(addr.phone or '')
         return addr_inv
 
 
@@ -53,7 +50,15 @@ report_sxw.report_sxw(
     'report.account.wh.fiscalseal',
     'account.wh.fiscalseal',
     'addons/l10n_ve_withholding_fiscalseal/report/wh_fiscalseal_report.rml',
-    parser=rep_comprobante,
+    parser=Parser,
+    header=False
+)
+
+report_sxw.report_sxw(
+    'report.account.fiscalseal.summary',
+    'account.fiscalseal.summary',
+    'addons/l10n_ve_withholding_fiscalseal/report/summary_fs_report.rml',
+    parser=Parser,
     header=False
 )
 

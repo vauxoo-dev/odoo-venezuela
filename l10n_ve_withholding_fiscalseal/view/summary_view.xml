@@ -24,6 +24,13 @@
                         <button name="action_done" string="Validate" states="confirmed" type="object" icon="gtk-ok"/>
                         <button name="action_cancel" string="Cancel" states="confirmed,done" type="object" icon="gtk-cancel"/>
                         <button name="action_draft" string="Set To Draft" states="cancel" type="object" icon="gtk-ok"/>
+                        <button
+                            name="%(summary_fiscalseal_report)d"
+                            type="action" colspan="2"
+                            states="draft,confirmed,done"
+                            string="Print Fiscal Seal Summary"
+                            icon="gtk-execute"
+                            />
                         <field name="state" widget="statusbar" statusbar_visible="draft,confirmed,done" statusbar_colors="{&quot;confirmed&quot;:&quot;blue&quot;}"/>
                     </header>
                     <group col="4" colspan="4">

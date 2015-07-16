@@ -11,5 +11,15 @@
             header="True"
             menu="False"
             />
+        <report
+            id="summary_fiscalseal_report"
+            model="account.fiscalseal.summary"
+            name="account.fiscalseal.summary"
+            rml="addons/l10n_ve_withholding_fiscalseal/report/summary_fs_report.rml"
+            string="Fiscal Seal Summary"
+            auto="False"
+            header="True"
+            menu="False"
+            />
     </data>
 </openerp>
