@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: OpenERP Server 7.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-16 09:49+0000\n"
-"PO-Revision-Date: 2015-07-16 10:40+0000\n"
+"PO-Revision-Date: 2015-07-16 11:04+0000\n"
 "Last-Translator: Humberto Arocha <hbto@vauxoo.com>\n"
 "Language-Team: Spanish "
 "<http://example.com/projects/cicsa/l10n_ve_withholding_fiscalseal/es/>\n"
@@ -574,14 +574,14 @@ msgstr "Líneas de Retención"
 #. module: l10n_ve_withholding_fiscalseal
 #: help:account.wh.fiscalseal,account_id:0
 msgid "The pay account used for this withholding."
-msgstr ""
+msgstr "La cuenta por pagar usada para esta retencion."
 
 #. module: l10n_ve_withholding_fiscalseal
 #: view:account.invoice:0
 #: field:account.invoice,fiscalseal_apply:0
 #: field:wiz.fiscalseal.apply.wh,fiscalseal_apply:0
 msgid "Exclude this document from Fiscal Seal Withholding"
-msgstr ""
+msgstr "Excluir este documento de la Retencion de Timbre Fiscal"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: report:account.fiscalseal.summary:0
@@ -592,20 +592,20 @@ msgstr ""
 #. module: l10n_ve_withholding_fiscalseal
 #: help:account.fiscalseal.summary,wh_lines:0
 msgid "Fiscal Seal Line"
-msgstr ""
+msgstr "Linea de Timbre Fiscal"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: field:account.wh.fiscalseal,wh_tax_amount:0
 #: field:account.wh.fiscalseal.line,wh_tax_amount:0
 msgid "Withheld Tax"
-msgstr ""
+msgstr "Impuesto Retenido"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: view:account.fiscalseal.summary:0
 #: code:addons/l10n_ve_withholding_fiscalseal/model/summary.py:181
 #, python-format
 msgid "Show Items"
-msgstr ""
+msgstr "Mostrar Elementos"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: report:account.wh.fiscalseal:0
@@ -615,12 +615,12 @@ msgstr ""
 #. module: l10n_ve_withholding_fiscalseal
 #: view:account.wh.fiscalseal:0
 msgid "Search Withholding Fiscal Seal"
-msgstr ""
+msgstr "Buscar Retenciones de Timbre Fiscal"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: view:account.fiscalseal.summary:0
 msgid "Salesman"
-msgstr ""
+msgstr "Vendedor"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: field:account.fiscalseal.summary,wh_base_amount:0
@@ -630,18 +630,18 @@ msgstr ""
 #: help:account.wh.fiscalseal.line,currency_wh_base_amount:0
 #: field:account.wh.fiscalseal.line,wh_base_amount:0
 msgid "Taxable Amount"
-msgstr ""
+msgstr "Monto Gravable"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: help:account.wh.fiscalseal,payment_description:0
 msgid "Payment Order Description"
-msgstr ""
+msgstr "Descripcion de Orden de Pago"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: code:addons/l10n_ve_withholding_fiscalseal/report/parser.py:35
 #, python-format
 msgid "NO FISCAL ADDRESS DEFINED"
-msgstr ""
+msgstr "DIRECCION FISCAL SIN DEFINIR"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: field:account.wh.fiscalseal,payment_amount:0
@@ -649,7 +649,7 @@ msgstr ""
 #: field:account.wh.fiscalseal.line,payment_amount:0
 #: help:account.wh.fiscalseal.line,payment_amount:0
 msgid "Payment Amount"
-msgstr ""
+msgstr "Monto de Pago"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: code:addons/l10n_ve_withholding_fiscalseal/wizard/wizard_retention.py:20
