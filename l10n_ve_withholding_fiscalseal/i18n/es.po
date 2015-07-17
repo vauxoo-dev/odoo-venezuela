@@ -7,7 +7,7 @@ msgstr ""
 "Project-Id-Version: OpenERP Server 7.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2015-07-16 09:49+0000\n"
-"PO-Revision-Date: 2015-07-16 11:04+0000\n"
+"PO-Revision-Date: 2015-07-17 19:04+0000\n"
 "Last-Translator: Humberto Arocha <hbto@vauxoo.com>\n"
 "Language-Team: Spanish "
 "<http://example.com/projects/cicsa/l10n_ve_withholding_fiscalseal/es/>\n"
@@ -656,13 +656,13 @@ msgstr "Monto de Pago"
 #: code:addons/l10n_ve_withholding_fiscalseal/wizard/wizard_wh_nro.py:60
 #, python-format
 msgid "Please confirm that you want to do this by checking the option"
-msgstr ""
+msgstr "Por favor, confirme que desea realizar esto marcando la opción"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: code:addons/l10n_ve_withholding_fiscalseal/model/invoice.py:91
 #, python-format
 msgid "Missing Account in Company!"
-msgstr ""
+msgstr "Cuenta faltante en Compañía!"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: view:account.fiscalseal.summary:0
@@ -671,13 +671,13 @@ msgstr ""
 #: selection:account.wh.fiscalseal,state:0
 #: selection:account.wh.fiscalseal.line,parent_state:0
 msgid "Draft"
-msgstr ""
+msgstr "Borrador"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: help:account.wh.fiscalseal,state:0
 #: field:account.wh.fiscalseal.line,parent_state:0
 msgid "Withholding State"
-msgstr ""
+msgstr "Estado de Retención"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: report:account.fiscalseal.summary:0
@@ -687,13 +687,13 @@ msgstr ""
 #. module: l10n_ve_withholding_fiscalseal
 #: field:account.wh.fiscalseal,date_ret:0
 msgid "Accounting date"
-msgstr ""
+msgstr "Fecha Contable"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: field:account.wh.fiscalseal,wh_lines:0
 #: help:account.wh.fiscalseal,wh_lines:0
 msgid "Fiscal Seal Withholding lines"
-msgstr ""
+msgstr "Líneas de Retención de Timbre Fiscal"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: field:account.wh.fiscalseal.line,afss_id:0
@@ -703,12 +703,17 @@ msgstr ""
 #: model:ir.model,name:l10n_ve_withholding_fiscalseal.model_account_fiscalseal_summary
 #: model:ir.ui.menu,name:l10n_ve_withholding_fiscalseal.menu_fiscalseal_summary
 msgid "Fiscal Seal Summary"
-msgstr ""
+msgstr "Sumario de Timbre Fiscal"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: model:ir.actions.act_window,help:l10n_ve_withholding_fiscalseal.action_account_wh_fiscalseal_customer
 msgid "With Customer Withholding Fiscal Seal you can create and manage document withholding issued to your customers. OpenERP can also generate document withholding automatically from invoices. For retention must add the invoices, process them and then validate the document."
 msgstr ""
+"Con las retenciones de Timbre Fsical de Clientes Vd. puede crear y "
+"administrar documentos de retención expedidos a clientes. OpenERP puede "
+"tambien generar documentos de retención automáticamente desde las facturas. "
+"Para retener debe agregar las facturas, procesarlas y luego validar el "
+"documento."
 
 #. module: l10n_ve_withholding_fiscalseal
 #: report:account.wh.fiscalseal:0
@@ -719,7 +724,7 @@ msgstr ""
 #: code:addons/l10n_ve_withholding_fiscalseal/model/wh.py:698
 #, python-format
 msgid "Missing Periods!"
-msgstr ""
+msgstr "Periodos Faltante!"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: report:account.fiscalseal.summary:0
@@ -730,39 +735,39 @@ msgstr ""
 #. module: l10n_ve_withholding_fiscalseal
 #: help:account.wh.fiscalseal.line,invoice_currency_id:0
 msgid "Currency in Invoice Transaction"
-msgstr ""
+msgstr "Moneda en la Transacción de la Factura"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: help:account.wh.fiscalseal,date_ret:0
 msgid "Keep empty to use the current date"
-msgstr ""
+msgstr "Dejar vacío para usar fecha actual"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: code:addons/l10n_ve_withholding_fiscalseal/model/wh.py:678
 #, python-format
 msgid "Invoice already withhold !"
-msgstr ""
+msgstr "Factura ya retenida !"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: view:account.wh.fiscalseal:0
 msgid "Compute Withholding Fiscal Seal"
-msgstr ""
+msgstr "Calcular Retención de Timbre Fiscal"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: field:account.fiscalseal.summary,user_id:0
 msgid "User"
-msgstr ""
+msgstr "Usuario"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: field:account.wh.fiscalseal,payment_description:0
 #: field:account.wh.fiscalseal.line,payment_description:0
 msgid "Payment Order"
-msgstr ""
+msgstr "Orden de Pago"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: model:res.groups,name:l10n_ve_withholding_fiscalseal.group_account_wh_fiscalseal_manager
 msgid "Fiscal Seal Withhold / Manager"
-msgstr ""
+msgstr "Retención de Timbre Fiscal / Administrador"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: report:account.fiscalseal.summary:0
@@ -772,7 +777,7 @@ msgstr ""
 #. module: l10n_ve_withholding_fiscalseal
 #: model:ir.model,name:l10n_ve_withholding_fiscalseal.model_res_company
 msgid "Companies"
-msgstr ""
+msgstr "Compañías"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: code:addons/l10n_ve_withholding_fiscalseal/model/wh.py:605
@@ -785,12 +790,12 @@ msgstr ""
 #: field:account.wh.fiscalseal.line,invoice_total:0
 #: help:account.wh.fiscalseal.line,invoice_total:0
 msgid "Invoice Total"
-msgstr ""
+msgstr "Total Factura"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: help:account.fiscalseal.summary,state:0
 msgid "Voucher state"
-msgstr ""
+msgstr "Estado del Voucher"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: report:account.fiscalseal.summary:0
@@ -800,22 +805,22 @@ msgstr ""
 #. module: l10n_ve_withholding_fiscalseal
 #: help:account.wh.fiscalseal,date:0
 msgid "Emission/Voucher/Document Date"
-msgstr ""
+msgstr "Fecha de Emisión/Voucher/Documento"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: selection:account.wh.fiscalseal,type:0
 msgid "Customer Withholding"
-msgstr ""
+msgstr "Retención de Cliente"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: view:wiz.fiscalseal.apply.wh:0
 msgid "Are you sure you want to do this?"
-msgstr ""
+msgstr "¿Está seguro que desea hacer esto?"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: model:ir.actions.act_window,name:l10n_ve_withholding_fiscalseal.action_account_wh_fiscalseal_supplier
 msgid "Supplier Fiscal Seal Withholding"
-msgstr ""
+msgstr "Retención de Timbre Fiscal a Proveedor"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: report:account.fiscalseal.summary:0
@@ -835,17 +840,17 @@ msgstr ""
 #: field:account.wh.fiscalseal.line,invoice_tax:0
 #: help:account.wh.fiscalseal.line,invoice_tax:0
 msgid "Invoice Tax"
-msgstr ""
+msgstr "Impuesto en Factura"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: field:account.wh.fiscalseal,type:0
 msgid "Type"
-msgstr ""
+msgstr "Tipo"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: field:account.invoice,wh_fiscalseal_id:0
 msgid "Fiscal Seal Withholding Document"
-msgstr ""
+msgstr "Documento de Retención de Timbre Fiscal"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: report:account.wh.fiscalseal:0
@@ -855,7 +860,7 @@ msgstr ""
 #. module: l10n_ve_withholding_fiscalseal
 #: report:account.wh.fiscalseal:0
 msgid "Periodo"
-msgstr ""
+msgstr "Período"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: report:account.wh.fiscalseal:0
@@ -865,13 +870,13 @@ msgstr ""
 #. module: l10n_ve_withholding_fiscalseal
 #: field:account.wh.fiscalseal,number:0
 msgid "Number"
-msgstr ""
+msgstr "Número"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: code:addons/l10n_ve_withholding_fiscalseal/model/wh.py:785
 #, python-format
 msgid "Missing Configuration !"
-msgstr ""
+msgstr "Configuración Faltante !"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: view:account.fiscalseal.summary:0
@@ -880,30 +885,32 @@ msgstr ""
 #: selection:account.wh.fiscalseal,state:0
 #: selection:account.wh.fiscalseal.line,parent_state:0
 msgid "Done"
-msgstr ""
+msgstr "Realizado"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: field:account.wh.fiscalseal.line,invoice_id:0
 #: model:ir.model,name:l10n_ve_withholding_fiscalseal.model_account_invoice
 msgid "Invoice"
-msgstr ""
+msgstr "Factura"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: help:account.invoice,fiscalseal_apply:0
 msgid "This selection indicates whether allow invoice to beincluded in a withholding document"
 msgstr ""
+"Este selección indica si se permite a la factura ser incluida en el "
+"documento de retención"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: view:account.fiscalseal.summary:0
 #: view:account.wh.fiscalseal:0
 #: view:wiz.fiscalseal.apply.wh:0
 msgid "Cancel"
-msgstr ""
+msgstr "Cancelar"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: field:res.company,wh_fiscalseal_collected_account_id:0
 msgid "Collected Withholding Fiscal Seal Account"
-msgstr ""
+msgstr "Cuenta de Cobro para Retención de Timbre Fiscal"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: report:account.fiscalseal.summary:0
@@ -913,17 +920,17 @@ msgstr ""
 #. module: l10n_ve_withholding_fiscalseal
 #: view:account.wh.fiscalseal:0
 msgid "Withholding Fiscal Seal"
-msgstr ""
+msgstr "Retención de Timbre Fiscal"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: field:account.wh.fiscalseal.line,ut_value:0
 msgid "Tax Unit Value"
-msgstr ""
+msgstr "Valor de Unidad Tributaria"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: field:account.wh.fiscalseal,code:0
 msgid "Internal Code"
-msgstr ""
+msgstr "Codigo Interno"
 
 #. module: l10n_ve_withholding_fiscalseal
 #: report:account.wh.fiscalseal:0
