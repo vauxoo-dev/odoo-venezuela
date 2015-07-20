@@ -5,7 +5,7 @@
             <field name="name">account.fiscalseal.summary_tree</field>
             <field name="model">account.fiscalseal.summary</field>
             <field name="arch" type="xml">
-                <tree string="Lines Withholding for XML">
+                <tree string="Lines Withholding for Fiscal Seal">
                     <field name="name"/>
                     <field name="company_id"/>
                     <field name="period_id"/>
