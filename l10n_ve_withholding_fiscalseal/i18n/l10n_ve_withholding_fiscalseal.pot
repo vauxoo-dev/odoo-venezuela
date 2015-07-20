@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenERP Server 7.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-07-16 09:49+0000\n"
-"PO-Revision-Date: 2015-07-16 09:49+0000\n"
+"POT-Creation-Date: 2015-07-20 04:44+0000\n"
+"PO-Revision-Date: 2015-07-20 04:44+0000\n"
 "Last-Translator: <>\n"
 "Language-Team: \n"
 "MIME-Version: 1.0\n"
@@ -165,8 +165,6 @@ msgstr ""
 
 #. module: l10n_ve_withholding_fiscalseal
 #: code:addons/l10n_ve_withholding_fiscalseal/wizard/wizard_retention.py:19
-#: code:addons/l10n_ve_withholding_fiscalseal/wizard/wizard_wh_nro.py:59
-#: code:addons/l10n_ve_withholding_fiscalseal/wizard/wizard_wh_nro.py:68
 #, python-format
 msgid "Error!"
 msgstr ""
@@ -436,12 +434,6 @@ msgid "You must omit the follow invoice '%s' !"
 msgstr ""
 
 #. module: l10n_ve_withholding_fiscalseal
-#: code:addons/l10n_ve_withholding_fiscalseal/model/installer.py:95
-#, python-format
-msgid "Journal VAT Withholding Sale"
-msgstr ""
-
-#. module: l10n_ve_withholding_fiscalseal
 #: view:account.wh.fiscalseal:0
 msgid "Other Information"
 msgstr ""
@@ -467,12 +459,6 @@ msgstr ""
 #. module: l10n_ve_withholding_fiscalseal
 #: report:account.fiscalseal.summary:0
 msgid "CEDULA"
-msgstr ""
-
-#. module: l10n_ve_withholding_fiscalseal
-#: code:addons/l10n_ve_withholding_fiscalseal/wizard/wizard_wh_nro.py:69
-#, python-format
-msgid "You can't change the number when state <> \"Done\""
 msgstr ""
 
 #. module: l10n_ve_withholding_fiscalseal
@@ -635,7 +621,6 @@ msgstr ""
 
 #. module: l10n_ve_withholding_fiscalseal
 #: code:addons/l10n_ve_withholding_fiscalseal/wizard/wizard_retention.py:20
-#: code:addons/l10n_ve_withholding_fiscalseal/wizard/wizard_wh_nro.py:60
 #, python-format
 msgid "Please confirm that you want to do this by checking the option"
 msgstr ""
@@ -659,6 +644,11 @@ msgstr ""
 #: help:account.wh.fiscalseal,state:0
 #: field:account.wh.fiscalseal.line,parent_state:0
 msgid "Withholding State"
+msgstr ""
+
+#. module: l10n_ve_withholding_fiscalseal
+#: view:account.fiscalseal.summary:0
+msgid "Search Fiscal Seal"
 msgstr ""
 
 #. module: l10n_ve_withholding_fiscalseal
@@ -817,11 +807,6 @@ msgstr ""
 #: field:account.wh.fiscalseal.line,invoice_tax:0
 #: help:account.wh.fiscalseal.line,invoice_tax:0
 msgid "Invoice Tax"
-msgstr ""
-
-#. module: l10n_ve_withholding_fiscalseal
-#: field:account.wh.fiscalseal,type:0
-msgid "Type"
 msgstr ""
 
 #. module: l10n_ve_withholding_fiscalseal
@@ -986,8 +971,8 @@ msgid "Currency"
 msgstr ""
 
 #. module: l10n_ve_withholding_fiscalseal
-#: view:account.fiscalseal.summary:0
-msgid "Lines Withholding for XML"
+#: field:account.wh.fiscalseal,type:0
+msgid "Type"
 msgstr ""
 
 #. module: l10n_ve_withholding_fiscalseal
@@ -1004,12 +989,6 @@ msgstr ""
 #. module: l10n_ve_withholding_fiscalseal
 #: field:account.wh.fiscalseal.line,company_currency_id:0
 msgid "Company Currency"
-msgstr ""
-
-#. module: l10n_ve_withholding_fiscalseal
-#: code:addons/l10n_ve_withholding_fiscalseal/model/installer.py:94
-#, python-format
-msgid "Journal VAT Withholding Purchase"
 msgstr ""
 
 #. module: l10n_ve_withholding_fiscalseal
@@ -1030,11 +1009,6 @@ msgstr ""
 #. module: l10n_ve_withholding_fiscalseal
 #: report:account.wh.fiscalseal:0
 msgid "COMPROBANTE DE RETENCION DE TIMBRE FISCAL DEL ESTADO ANZOATEGUI"
-msgstr ""
-
-#. module: l10n_ve_withholding_fiscalseal
-#: view:account.fiscalseal.summary:0
-msgid "Search File XML"
 msgstr ""
 
 #. module: l10n_ve_withholding_fiscalseal
