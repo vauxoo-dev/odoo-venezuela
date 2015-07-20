@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <openerp>
     <data>
-        <record id="view_xml_islr_tree" model="ir.ui.view">
+        <record id="view_fiscalseal_tree" model="ir.ui.view">
             <field name="name">account.fiscalseal.summary_tree</field>
             <field name="model">account.fiscalseal.summary</field>
             <field name="arch" type="xml">
@@ -13,7 +13,7 @@
             </field>
         </record>
 
-        <record id="view_xml_islr_form" model="ir.ui.view">
+        <record id="view_fiscalseal_form" model="ir.ui.view">
             <field name="name">account.fiscalseal.summary_form</field>
             <field name="model">account.fiscalseal.summary</field>
             <field name="arch" type="xml">
@@ -103,13 +103,13 @@
         <record model="ir.actions.act_window.view" id="action_fiscalseal_summary_action_tree_1">
             <field name="sequence" eval="10"/>
             <field name="view_mode">tree</field>
-            <field name="view_id" ref="view_xml_islr_tree"/>
+            <field name="view_id" ref="view_fiscalseal_tree"/>
             <field name="act_window_id" ref="action_fiscalseal_summary_action"/>
         </record>
         <record model="ir.actions.act_window.view" id="action_fiscalseal_summary_action_form_1">
             <field name="sequence" eval="20"/>
             <field name="view_mode">form</field>
-            <field name="view_id" ref="view_xml_islr_form"/>
+            <field name="view_id" ref="view_fiscalseal_form"/>
             <field name="act_window_id" ref="action_fiscalseal_summary_action"/>
         </record>
 
