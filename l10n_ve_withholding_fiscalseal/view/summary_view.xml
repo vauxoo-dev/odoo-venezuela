@@ -68,7 +68,7 @@
             <field name="name">account.fiscalseal.summary.search</field>
             <field name="model">account.fiscalseal.summary</field>
             <field name="arch" type="xml">
-                <search string="Search File XML">
+                <search string="Search Fiscal Seal">
                    <group col="10" colspan="4">
                         <filter name="draft" string="Draft" domain="[('state','=','draft')]"/>
                         <filter name="confirmed" string="Confirmed" domain="[('state','=','confirmed')]"/>
