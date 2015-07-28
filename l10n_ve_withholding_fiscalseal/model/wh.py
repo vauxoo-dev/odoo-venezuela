@@ -31,10 +31,15 @@ class FiscalSealLine(osv.osv):
                 cr, uid, brw.company_currency_id.id,
                 brw.invoice_currency_id.id, brw.retention_id.date_ret)
             res[brw.id] = {}
+            payment_amount = f_xc(brw.currency_payment_amount)
+            wh = brw.wh_tax_amount
+            payment_post_tax = payment_amount - wh
             res[brw.id]['invoice_total'] = f_xc(brw.currency_invoice_total)
             res[brw.id]['invoice_tax'] = f_xc(brw.currency_invoice_tax)
-            res[brw.id]['payment_amount'] = f_xc(brw.currency_payment_amount)
-            res[brw.id]['currency_wh_tax_amount'] = g_xc(brw.wh_tax_amount)
+            res[brw.id]['payment_amount'] = payment_amount
+            res[brw.id]['payment_post_tax'] = payment_post_tax
+            res[brw.id]['currency_payment_post_tax'] = g_xc(payment_post_tax)
+            res[brw.id]['currency_wh_tax_amount'] = g_xc(wh)
             res[brw.id]['currency_wh_base_amount'] = g_xc(brw.wh_base_amount)
         return res
 
@@ -227,6 +232,20 @@ class FiscalSealLine(osv.osv):
             relation='account.period',
             string='Fiscal Period',
             help="Fiscal Period"),
+        'currency_payment_post_tax': fields.function(
+            _amount_all,
+            method=True,
+            digits_compute=dp.get_precision('Account'),
+            string='Post Tax Payment',
+            multi='all',
+            help="Amount to be paid after applied taxes"),
+        'payment_post_tax': fields.function(
+            _amount_all,
+            method=True,
+            digits_compute=dp.get_precision('Account'),
+            string='Post Tax Payment',
+            multi='all',
+            help="Amount to be paid after applied taxes"),
     }
 
     def invoice_id_change(self, cr, uid, ids, invoice, context=None):

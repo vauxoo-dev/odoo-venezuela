@@ -76,6 +76,8 @@
                                 <field name="wh_rate" colspan="2" invisible="0"/>
                                 <field name="currency_wh_tax_amount" readonly="0"/>
                                 <field name="wh_tax_amount" readonly="0"/>
+                                <field name="currency_payment_post_tax" readonly="0"/>
+                                <field name="payment_post_tax" readonly="0"/>
                                 <separator orientation="vertical" colspan="4"/>
                                 <field name="move_id" readonly="1"/>
                                 <field name="period_id" readonly="1"/>
