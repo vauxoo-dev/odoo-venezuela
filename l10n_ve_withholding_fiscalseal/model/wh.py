@@ -281,12 +281,12 @@ class FiscalSealLine(osv.osv):
 
         for ret_line in self.browse(cr, uid, ids, context):
             if ret_line.invoice_id:
-                pay = ret_line.payment_amount
+                total = ret_line.invoice_total
                 tax = ret_line.invoice_tax
                 wh = ret_line.wh_rate
                 ut_value = ret_line.ut_value
-                if pay >= ut_value:
-                    wh_base_amount = (pay - tax)
+                if total >= ut_value:
+                    wh_base_amount = (total - tax)
                 else:
                     wh_base_amount = 0.0
 
