@@ -485,7 +485,7 @@ class FiscalSeal(osv.osv):
             multi='all',
             help='Taxes in Invoices'),
         'payment_amount': fields.float(
-            string='Payment Amount',
+            string='Post Tax Payment Amount',
             digits_compute=dp.get_precision('Account'),
             ),
         'payment_description': fields.char(
@@ -655,7 +655,7 @@ class FiscalSeal(osv.osv):
         awfs_brw = self.browse(cr, uid, ids[0], context=context)
         payment_amount = 0.0
         for wh_brw in awfs_brw.wh_lines:
-            payment_amount += wh_brw.payment_amount
+            payment_amount += wh_brw.payment_post_tax
 
         if abs(awfs_brw.payment_amount - payment_amount) >= 0.01:
             raise osv.except_osv(

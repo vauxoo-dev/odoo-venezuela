@@ -21,10 +21,10 @@
                     <field name="supplier_invoice_number" string="Invoice Number"/>
                     <field name="invoice_total" readonly="1" sum=""/>
                     <field name="invoice_tax" string="Tax" sum=""/>
-                    <field name="payment_amount" sum=""/>
                     <field name="wh_base_amount" readonly="0" sum=""/>
                     <field name="wh_rate" string="Wh Rate (‰)"/>
                     <field name="wh_tax_amount" readonly="0" sum=""/>
+                    <field name="payment_post_tax" sum=""/>
                     <field name="move_id" readonly="1"/>
                 </tree>
             </field>
