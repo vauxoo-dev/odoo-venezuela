@@ -49,7 +49,7 @@ __TYPES__ = [
     ('src_purchase', 'Purchase Wh src')]
 
 
-class account_journal(osv.osv):
+class AccountJournal(osv.osv):
     _inherit = 'account.journal'
 
     _columns = {
@@ -81,10 +81,10 @@ class account_journal(osv.osv):
                  " journals.")
     }
 
-account_journal()
+AccountJournal()
 
 
-class account_period(osv.osv):
+class AccountPeriod(osv.osv):
     _inherit = "account.period"
 
     def _find_fortnight(self, cr, uid, date=None, context=None):

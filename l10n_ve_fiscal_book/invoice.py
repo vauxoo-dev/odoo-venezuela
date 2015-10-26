@@ -26,7 +26,7 @@
 from openerp.osv import fields, osv
 
 
-class inherited_invoice(osv.osv):
+class InheritedInvoice(osv.osv):
     _inherit = "account.invoice"
 
     def _get_date_document(self, cr, uid, ids, name, args, context=None):
@@ -600,4 +600,4 @@ class inherited_invoice(osv.osv):
             type='char', help=""),
     }
 
-inherited_invoice()
+InheritedInvoice()

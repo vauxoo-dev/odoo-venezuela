@@ -30,7 +30,7 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-class account_wh_iva_line_tax(osv.osv):
+class AccountWhIvaLineTax(osv.osv):
 
     _name = 'account.wh.iva.line.tax'
 
@@ -148,7 +148,7 @@ class account_wh_iva_line_tax(osv.osv):
     }
 
 
-class account_wh_iva_line(osv.osv):
+class AccountWhIvaLine(osv.osv):
 
     _name = "account.wh.iva.line"
 
@@ -293,7 +293,7 @@ class account_wh_iva_line(osv.osv):
         return {'value': result, 'domain': domain}
 
 
-class account_wh_iva(osv.osv):
+class AccountWhIva(osv.osv):
 
     _name = "account.wh.iva"
 
@@ -624,15 +624,15 @@ class account_wh_iva(osv.osv):
     def write(self, cr, uid, ids, values, context=None):
         context = context or {}
         ids = isinstance(ids, (int, long)) and [ids] or ids
-        res = super(account_wh_iva, self).write(cr, uid, ids, values,
-                                                context=context)
+        res = super(AccountWhIva, self).write(cr, uid, ids, values,
+                                              context=context)
         self._partner_invoice_check(cr, uid, ids, context=context)
         return res
 
     def create(self, cr, uid, values, context=None):
         context = context or {}
-        new_id = super(account_wh_iva, self).create(cr, uid, values,
-                                                    context=context)
+        new_id = super(AccountWhIva, self).create(cr, uid, values,
+                                                  context=context)
         self._partner_invoice_check(cr, uid, new_id, context=context)
         return new_id
 
@@ -1104,7 +1104,7 @@ class account_wh_iva(osv.osv):
             'period_id': False
         })
 
-        return super(account_wh_iva, self).copy(cr, uid, ids, default, context)
+        return super(AccountWhIva, self).copy(cr, uid, ids, default, context)
 
     def unlink(self, cr, uid, ids, context=None):
         """ Overwrite the unlink method to throw an exception if the
@@ -1119,6 +1119,6 @@ class account_wh_iva(osv.osv):
                       " to be deleted."))
             else:
                 self.clear_wh_lines(cr, uid, [awi_brw.id], context)
-                super(account_wh_iva, self).unlink(cr, uid, [awi_brw.id],
-                                                   context=context)
+                super(AccountWhIva, self).unlink(cr, uid, [awi_brw.id],
+                                                 context=context)
         return True

@@ -30,7 +30,7 @@ from openerp.osv import fields, orm, osv
 from openerp.tools.translate import _
 
 
-class fiscal_book(orm.Model):
+class FiscalBook(orm.Model):
 
     def _get_type(self, cr, uid, context=None):
         context = context or {}
@@ -1878,11 +1878,11 @@ class fiscal_book(orm.Model):
                     "Invalid Procedure!!",
                     "Your book needs to be in cancel state to be deleted.")
             else:
-                super(fiscal_book, self).unlink(cr, uid, ids, context=context)
+                super(FiscalBook, self).unlink(cr, uid, ids, context=context)
         return True
 
 
-class fiscal_book_lines(orm.Model):
+class FiscalBookLines(orm.Model):
 
     def _get_wh_vat(self, cr, uid, ids, field_name, arg, context=None):
         """ For a given book line it returns the vat withholding amount.
@@ -2075,7 +2075,7 @@ class fiscal_book_lines(orm.Model):
     }
 
 
-class fiscal_book_taxes(orm.Model):
+class FiscalBookTaxes(orm.Model):
 
     _description = "Venezuela's Sale & Purchase Fiscal Book Taxes"
     _name = 'fiscal.book.taxes'
@@ -2106,7 +2106,7 @@ class fiscal_book_taxes(orm.Model):
     }
 
 
-class fiscal_book_taxes_summary(orm.Model):
+class FiscalBookTaxesSummary(orm.Model):
 
     _description = "Venezuela's Sale & Purchase Fiscal Book Taxes Summary"
     _name = 'fiscal.book.taxes.summary'
@@ -2135,7 +2135,7 @@ class fiscal_book_taxes_summary(orm.Model):
     }
 
 
-class adjustment_book_line(orm.Model):
+class AdjustmentBookLine(orm.Model):
 
     _name = 'adjustment.book.line'
     _columns = {

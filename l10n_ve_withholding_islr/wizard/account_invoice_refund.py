@@ -23,7 +23,7 @@
 from openerp.osv import osv
 
 
-class account_invoice_refund(osv.osv_memory):
+class AccountInvoiceRefund(osv.osv_memory):
 
     """Refunds invoice"""
 
@@ -42,10 +42,10 @@ class account_invoice_refund(osv.osv_memory):
         res = []
         inv_obj = self.pool.get('account.invoice')
 
-        res.append(super(account_invoice_refund, self).validate_wh(
+        res.append(super(AccountInvoiceRefund, self).validate_wh(
             cr, uid, ids, context=context))
         res.append(inv_obj.validate_wh_income_done(cr, uid, ids,
                                                    context=context))
         return all(res)
 
-account_invoice_refund()
+AccountInvoiceRefund()

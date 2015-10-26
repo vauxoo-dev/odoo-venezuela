@@ -28,7 +28,7 @@
 from openerp.osv import fields, osv
 
 
-class stock_picking(osv.osv):
+class StockPicking(osv.osv):
     _inherit = 'stock.picking'
 
     def action_invoice_create(self, cursor, user, ids, journal_id=False,
@@ -41,7 +41,7 @@ class stock_picking(osv.osv):
         """
         if context is None:
             context = {}
-        data = super(stock_picking, self).action_invoice_create(
+        data = super(StockPicking, self).action_invoice_create(
             cursor, user, ids, journal_id, group, type, context)
         picking_id = data.keys()[0]
         invoice_id = data[picking_id]

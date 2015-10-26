@@ -31,7 +31,7 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-class fiscal_book_wizard(osv.osv_memory):
+class FiscalBookWizard(osv.osv_memory):
 
     """
     Sales book wizard implemented using the osv_memory wizard system
@@ -161,8 +161,8 @@ class fiscal_book_wizard(osv.osv_memory):
         fiscal_book_o = fiscal_book_obj.search(
             cr, uid, [('id', '=', context['active_id'])])
         fiscal_book_o = fiscal_book_obj.browse(cr, uid, fiscal_book_o[0])
-        res = super(fiscal_book_wizard, self).default_get(cr, uid, field_list,
-                                                          context=context)
+        res = super(FiscalBookWizard, self).default_get(cr, uid, field_list,
+                                                        context=context)
         res.update({'type': fiscal_book_o.type})
         res.update({'date_start':
                     fiscal_book_o.period_id and
@@ -189,7 +189,7 @@ class fiscal_book_wizard(osv.osv_memory):
         data['ids'] = context.get('active_ids', [])
         data['model'] = context.get('active_model', 'ir.ui.menu')
         data['form'] = self.read(cr, uid, ids, ['date_start', 'date_end',
-                                 'control_start', 'control_end', 'type'])[0]
+                                                'control_start', 'control_end', 'type'])[0]
 
         return self._print_report(cr, uid, ids, data, context=context)
 
@@ -220,4 +220,4 @@ class fiscal_book_wizard(osv.osv_memory):
         # 'type': lambda *a: 'sale',
     }
 
-fiscal_book_wizard()
+FiscalBookWizard()

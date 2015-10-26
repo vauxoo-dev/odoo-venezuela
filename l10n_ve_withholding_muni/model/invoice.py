@@ -27,7 +27,7 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-class account_invoice(osv.osv):
+class AccountInvoice(osv.osv):
     _inherit = 'account.invoice'
 
     def copy(self, cr, uid, ids, default=None, context=None):
@@ -39,8 +39,8 @@ class account_invoice(osv.osv):
         default = default or {}
         default = default.copy()
         default.update({'wh_local': False, 'wh_muni_id': False})
-        return super(account_invoice, self).copy(cr, uid, ids, default,
-                                                 context)
+        return super(AccountInvoice, self).copy(cr, uid, ids, default,
+                                                context)
 
     def _get_move_lines(self, cr, uid, ids, to_wh, period_id,
                         pay_journal_id, writeoff_acc_id,
@@ -58,7 +58,7 @@ class account_invoice(osv.osv):
         """
 
         context = context or {}
-        res = super(account_invoice, self)._get_move_lines(
+        res = super(AccountInvoice, self)._get_move_lines(
             cr, uid, ids, to_wh, period_id, pay_journal_id, writeoff_acc_id,
             writeoff_period_id, writeoff_journal_id, date, name,
             context=context)
@@ -174,8 +174,8 @@ class account_invoice(osv.osv):
         context = context or {}
         for inv_brw in self.browse(cr, uid, ids, context=context):
             if not inv_brw.wh_muni_id:
-                super(account_invoice, self).action_cancel(cr, uid, ids,
-                                                           context=context)
+                super(AccountInvoice, self).action_cancel(cr, uid, ids,
+                                                          context=context)
             else:
                 raise osv.except_osv(
                     _("Error!"),

@@ -27,7 +27,7 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-class wiz_updatename(osv.osv_memory):
+class WizUpdatename(osv.osv_memory):
     _name = 'wiz.updatename'
     _description = "Wizard that changes the partner name"
 
@@ -68,4 +68,4 @@ class wiz_updatename(osv.osv_memory):
         'name': _get_name,
     }
 
-wiz_updatename()
+WizUpdatename()

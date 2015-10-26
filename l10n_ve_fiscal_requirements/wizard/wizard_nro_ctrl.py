@@ -27,7 +27,7 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-class wiz_nroctrl(osv.osv_memory):
+class WizNroctrl(osv.osv_memory):
     _name = 'wiz.nroctrl'
     _description = "Wizard that changes the invoice control number"
 
@@ -53,4 +53,4 @@ class wiz_nroctrl(osv.osv_memory):
         'name': fields.char('Control Number', 32, required=True),
         'sure': fields.boolean('Are you sure?'),
     }
-wiz_nroctrl()
+WizNroctrl()

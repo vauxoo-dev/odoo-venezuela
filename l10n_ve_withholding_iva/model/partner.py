@@ -27,7 +27,7 @@ import logging
 from openerp.osv import fields, osv
 
 
-class res_partner(osv.osv):
+class ResPartner(osv.osv):
     _inherit = 'res.partner'
     logger = logging.getLogger('res.partner')
 

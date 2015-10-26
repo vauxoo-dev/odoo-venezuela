@@ -26,7 +26,7 @@
 from openerp.osv import fields, osv
 
 
-class account_tax(osv.osv):
+class AccountTax(osv.osv):
     _inherit = 'account.tax'
     _columns = {
         'ret': fields.boolean('Withholdable',

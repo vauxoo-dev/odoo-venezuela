@@ -29,7 +29,7 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-class product_template(osv.osv):
+class ProductTemplate(osv.osv):
 
     _inherit = "product.template"
 
@@ -41,7 +41,7 @@ class product_template(osv.osv):
     }
 
 
-class product_product(osv.osv):
+class ProductProduct(osv.osv):
     _inherit = "product.product"
 
     def onchange_product_type(self, cr, uid, ids, prd_type, context=None):

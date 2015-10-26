@@ -35,9 +35,10 @@ FIELDNAMES = [
     'PorcentajeRetencion']
 
 
-class test_import_csv_employee_income_wh(TransactionCase):
+class TestImportCsvEmployeeIncomeWh(TransactionCase):
+
     def setUp(self):
-        super(test_import_csv_employee_income_wh, self).setUp()
+        super(TestImportCsvEmployeeIncomeWh, self).setUp()
         ap_obj = self.registry('account.period')
         self.period_id = ap_obj.find(self.cr, self.uid, dt=None,
                                      # exception=False, context=None

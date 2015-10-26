@@ -27,7 +27,7 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-class change_invoice_sin_credwizard(osv.TransientModel):
+class ChangeInvoiceSinCredwizard(osv.TransientModel):
 
     """
     Wizard that changes the invoice sin_cred field.

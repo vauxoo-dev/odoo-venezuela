@@ -27,7 +27,7 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-class account_invoice(osv.osv):
+class AccountInvoice(osv.osv):
 
     def _get_journal(self, cr, uid, context=None):
         """ Return the journal which is
@@ -36,8 +36,8 @@ class account_invoice(osv.osv):
         """
 
         context = context or {}
-        res = super(account_invoice, self)._get_journal(cr, uid,
-                                                        context=context)
+        res = super(AccountInvoice, self)._get_journal(cr, uid,
+                                                       context=context)
         if res:
             return res
         type_inv = context.get('type', 'sale')
@@ -163,19 +163,19 @@ class account_invoice(osv.osv):
             # loc_req':False,
             'z_report': '',
         })
-        return super(account_invoice, self).copy(cr, uid, ids, default,
-                                                 context)
+        return super(AccountInvoice, self).copy(cr, uid, ids, default,
+                                                context)
 
     def write(self, cr, uid, ids, vals, context=None):
         context = context or {}
         if vals.get('type') in ('out_invoice', 'out_refund') and \
                 vals.get('date_invoice') and not vals.get('date_document'):
             vals['date_document'] = vals['date_invoice']
-        return super(account_invoice, self).write(cr, uid, ids, vals,
-                                                  context=context)
+        return super(AccountInvoice, self).write(cr, uid, ids, vals,
+                                                 context=context)
 
 
-class account_invoice_tax(osv.osv):
+class AccountInvoiceTax(osv.osv):
     _inherit = 'account.invoice.tax'
     _columns = {
         'tax_id': fields.many2one(

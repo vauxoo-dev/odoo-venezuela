@@ -27,7 +27,7 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-class partner_income_wh_printwizard(osv.TransientModel):
+class PartnerIncomeWhPrintwizard(osv.TransientModel):
 
     """
     This wizard will print the islr reports for a given partner.

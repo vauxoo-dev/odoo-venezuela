@@ -29,7 +29,7 @@
 from openerp.osv import osv
 
 
-class res_users(osv.osv):
+class ResUsers(osv.osv):
     _inherit = 'res.users'
 
     def create(self, cr, uid, vals, context=None):
@@ -40,7 +40,7 @@ class res_users(osv.osv):
         if context is None:
             context = {}
         context.update({'create_company': True})
-        return super(res_users, self).create(cr, uid, vals, context=context)
+        return super(ResUsers, self).create(cr, uid, vals, context=context)
 
     def write(self, cr, uid, ids, values, context=None):
         """ To write a new record,
@@ -49,7 +49,7 @@ class res_users(osv.osv):
         """
         context = context or {}
         context.update({'create_company': True})
-        return super(res_users, self).write(cr, uid, ids, values,
-                                            context=context)
+        return super(ResUsers, self).write(cr, uid, ids, values,
+                                           context=context)
 
-res_users()
+ResUsers()

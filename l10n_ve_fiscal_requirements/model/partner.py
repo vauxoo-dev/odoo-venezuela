@@ -40,7 +40,7 @@ from openerp.osv.orm import except_orm
 from openerp.tools.translate import _
 
 
-class res_partner(osv.osv):
+class ResPartner(osv.osv):
     _inherit = 'res.partner'
 
     def _get_country_code(self, cr, uid, context=None):
@@ -59,8 +59,8 @@ class res_partner(osv.osv):
         # NOTE: use field_list argument instead of fields for fix the pylint
         # error W0621 Redefining name 'fields' from outer scope
         context = context or {}
-        res = super(res_partner, self).default_get(cr, uid, field_list,
-                                                   context=context)
+        res = super(ResPartner, self).default_get(cr, uid, field_list,
+                                                  context=context)
         res.update({'uid_country': self._get_country_code(cr, uid,
                                                           context=context)})
         return res
@@ -261,8 +261,8 @@ class res_partner(osv.osv):
         if context is None:
             context = {}
         if not value:
-            return super(res_partner, self).vat_change(cr, uid, ids, value,
-                                                       context=context)
+            return super(ResPartner, self).vat_change(cr, uid, ids, value,
+                                                      context=context)
         res = self.search(cr, uid, [('vat', 'ilike', value)])
         if res:
             rp = self.browse(cr, uid, res[0], context=context)
@@ -274,8 +274,8 @@ class res_partner(osv.osv):
             }
             }
         else:
-            return super(res_partner, self).vat_change(cr, uid, ids, value,
-                                                       context=context)
+            return super(ResPartner, self).vat_change(cr, uid, ids, value,
+                                                      context=context)
 
     def check_vat_ve(self, vat, context=None):
         """ Check Venezuelan VAT number, locally called RIF.
@@ -297,10 +297,10 @@ class res_partner(osv.osv):
         Validate against  VAT Information Exchange System (VIES)
         """
         if country_code.upper() != "VE":
-            return super(res_partner, self).vies_vat_check(
+            return super(ResPartner, self).vies_vat_check(
                 cr, uid, country_code, vat_number, context=context)
         else:
-            return super(res_partner, self).simple_vat_check(
+            return super(ResPartner, self).simple_vat_check(
                 cr, uid, country_code, vat_number, context=context)
 
     def update_rif(self, cr, uid, ids, context=None):
@@ -318,7 +318,7 @@ class res_partner(osv.osv):
         if context is None:
             context = {}
         context.update({'update_fiscal_information': True})
-        super(res_partner, self).check_vat(cr, uid, ids, context=context)
+        super(ResPartner, self).check_vat(cr, uid, ids, context=context)
         user_company = self.pool.get('res.users').browse(
             cr, uid, uid).company_id
         if user_company.vat_check_vies:

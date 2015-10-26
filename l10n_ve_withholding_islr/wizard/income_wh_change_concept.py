@@ -14,7 +14,7 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-class islr_wh_change_concept(osv.osv_memory):
+class IslrWhChangeConcept(osv.osv_memory):
 
     _name = 'islr.wh.change.concept'
     _columns = {

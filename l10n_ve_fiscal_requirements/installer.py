@@ -25,7 +25,7 @@
 from openerp.osv import fields, osv
 
 
-class fiscal_requirements_config(osv.osv_memory):
+class FiscalRequirementsConfig(osv.osv_memory):
 
     """
     Fiscal Requirements installer wizard
@@ -76,4 +76,4 @@ class fiscal_requirements_config(osv.osv_memory):
                  ' information on SENIAT', required=True),
         'vat_subjected': fields.boolean("Apply VAT?"),
     }
-fiscal_requirements_config()
+FiscalRequirementsConfig()

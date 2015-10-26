@@ -38,7 +38,7 @@ FIELDNAMES = [
 # ---------------------------------------------------------- employee_income_wh
 
 
-class employee_income_wh(osv.osv_memory):
+class EmployeeIncomeWh(osv.osv_memory):
 
     _name = 'employee.income.wh'
 
@@ -251,4 +251,4 @@ class employee_income_wh(osv.osv_memory):
 
     # ---------------------------------------------------------------- Workflow
 
-employee_income_wh()
+EmployeeIncomeWh()

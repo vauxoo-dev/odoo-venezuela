@@ -22,7 +22,7 @@
 from openerp.osv import fields, osv
 
 
-class wizard_url_seniat(osv.osv_memory):
+class WizardUrlSeniat(osv.osv_memory):
 
     def _get_url(self, cr, uid, ids, context=None):
         """ Get seniat web page
@@ -75,4 +75,4 @@ class wizard_url_seniat(osv.osv_memory):
         'url2': _get_url2,
         'url3': _get_url3,
     }
-wizard_url_seniat()
+WizardUrlSeniat()

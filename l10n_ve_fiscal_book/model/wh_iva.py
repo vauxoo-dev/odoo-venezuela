@@ -25,7 +25,7 @@
 from openerp.osv import fields, orm
 
 
-class account_wh_iva_line(orm.Model):
+class AccountWhIvaLine(orm.Model):
     _inherit = "account.wh.iva.line"
     _columns = {
         'fb_id': fields.many2one(

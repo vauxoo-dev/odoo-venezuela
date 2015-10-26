@@ -29,7 +29,7 @@ from openerp.addons import decimal_precision as dp
 from openerp.osv import fields, osv
 
 
-class l10n_ut(osv.osv):
+class L10nUt(osv.osv):
 
     _name = 'l10n.ut'
     _description = 'Tax Unit'

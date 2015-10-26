@@ -29,7 +29,7 @@ from openerp.addons import decimal_precision as dp
 from openerp.osv import fields, osv
 
 
-class adjustment_book(osv.osv):
+class AdjustmentBook(osv.osv):
 
     def _get_amount_total(self, cr, uid, ids, name, args, context=None):
         res = {}
@@ -251,10 +251,10 @@ class adjustment_book(osv.osv):
     # return True
 
 
-adjustment_book()
+AdjustmentBook()
 
 
-class adjustment_book_line(osv.osv):
+class AdjustmentBookLine(osv.osv):
 
     _name = 'adjustment.book.line'
     _columns = {
@@ -323,4 +323,4 @@ class adjustment_book_line(osv.osv):
     }
     _rec_rame = 'partner'
 
-adjustment_book_line()
+AdjustmentBookLine()

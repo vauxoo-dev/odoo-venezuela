@@ -31,7 +31,7 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-class seniat_url(osv.osv):
+class SeniatUrl(osv.osv):
 
     """ OpenERP Model : seniat_url
     """

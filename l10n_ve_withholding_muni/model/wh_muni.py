@@ -29,7 +29,7 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-class account_wh_munici(osv.osv):
+class AccountWhMunici(osv.osv):
 
     def _get_type(self, cr, uid, context=None):
         """ Return invoice type
@@ -250,7 +250,7 @@ class account_wh_munici(osv.osv):
             acc_id = ret.account_id.id
             if not ret.date_ret:
                 self.write(cr, uid, [ret.id], {'date_ret':
-                           time.strftime('%Y-%m-%d')})
+                                               time.strftime('%Y-%m-%d')})
                 ret = self.browse(cr, uid, ret.id, context=context)
 
             period_id = ret.period_id and ret.period_id.id or False
@@ -344,8 +344,8 @@ class account_wh_munici(osv.osv):
         """
         context = context or {}
         ids = isinstance(ids, (int, long)) and [ids] or ids
-        res = super(account_wh_munici, self).write(cr, uid, ids, vals,
-                                                   context=context)
+        res = super(AccountWhMunici, self).write(cr, uid, ids, vals,
+                                                 context=context)
         self._update_check(cr, uid, ids, context=context)
         return res
 
@@ -353,8 +353,8 @@ class account_wh_munici(osv.osv):
         """ Validate before create record
         """
         context = context or {}
-        new_id = super(account_wh_munici, self).create(cr, uid, vals,
-                                                       context=context)
+        new_id = super(AccountWhMunici, self).create(cr, uid, vals,
+                                                     context=context)
         self._update_check(cr, uid, new_id, context=context)
         return new_id
 
@@ -369,8 +369,8 @@ class account_wh_munici(osv.osv):
                     _("The withholding document needs to be in cancel state"
                       " to be deleted."))
             else:
-                super(account_wh_munici, self).unlink(cr, uid, ids,
-                                                      context=context)
+                super(AccountWhMunici, self).unlink(cr, uid, ids,
+                                                    context=context)
         return True
 
     def confirm_check(self, cr, uid, ids, context=None):
@@ -396,7 +396,7 @@ class account_wh_munici(osv.osv):
         return True
 
 
-class account_wh_munici_line(osv.osv):
+class AccountWhMuniciLine(osv.osv):
 
     def default_get(self, cr, uid, field_list, context=None):
         """ Default for munici_context field
@@ -405,9 +405,9 @@ class account_wh_munici_line(osv.osv):
         # error W0621 Redefining name 'fields' from outer scope
         if context is None:
             context = {}
-        data = super(account_wh_munici_line, self).default_get(cr, uid,
-                                                               field_list,
-                                                               context)
+        data = super(AccountWhMuniciLine, self).default_get(cr, uid,
+                                                            field_list,
+                                                            context)
         self.munici_context = context
         return data
 

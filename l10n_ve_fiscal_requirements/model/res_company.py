@@ -28,7 +28,7 @@
 from openerp.osv import fields, osv
 
 
-class res_company(osv.osv):
+class ResCompany(osv.osv):
     _inherit = 'res.company'
     _columns = {
         'jour_id': fields.many2one(
@@ -51,7 +51,7 @@ class res_company(osv.osv):
         if context is None:
             context = {}
         context.update({'create_company': True})
-        return super(res_company, self).create(cr, uid, vals, context=context)
+        return super(ResCompany, self).create(cr, uid, vals, context=context)
 
     def write(self, cr, uid, ids, values, context=None):
         """ To write a new record,
@@ -60,8 +60,8 @@ class res_company(osv.osv):
         """
         context = context or {}
         context.update({'create_company': True})
-        return super(res_company, self).write(cr, uid, ids, values,
-                                              context=context)
+        return super(ResCompany, self).write(cr, uid, ids, values,
+                                             context=context)
 
 
-res_company()
+ResCompany()

@@ -32,7 +32,7 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-class customs_form(osv.osv):
+class CustomsForm(osv.osv):
 
     _name = 'customs.form'
     _description = ''
@@ -303,7 +303,7 @@ class customs_form(osv.osv):
         return True
 
 
-class customs_form_line(osv.osv):
+class CustomsFormLine(osv.osv):
 
     _name = 'customs.form.line'
     _description = ''

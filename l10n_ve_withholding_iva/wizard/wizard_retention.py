@@ -27,7 +27,7 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-class wiz_retention(osv.osv_memory):
+class WizRetention(osv.osv_memory):
     _name = 'wiz.vat.apply.wh'
     _description = ("Wizard that changes the retention exclusion from an"
                     " invoice")

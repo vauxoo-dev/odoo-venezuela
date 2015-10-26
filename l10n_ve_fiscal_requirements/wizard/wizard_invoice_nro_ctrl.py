@@ -28,7 +28,7 @@ from openerp.osv import fields, osv
 from openerp.tools.translate import _
 
 
-class wizard_invoice_nro_ctrl(osv.osv_memory):
+class WizardInvoiceNroCtrl(osv.osv_memory):
 
     _name = "wizard.invoice.nro.ctrl"
     _columns = {
@@ -137,4 +137,4 @@ class wizard_invoice_nro_ctrl(osv.osv_memory):
         return self.new_open_window(cr, uid, ids, [inv_id],
                                     'action_invoice_tree1', 'account')
 
-wizard_invoice_nro_ctrl()
+WizardInvoiceNroCtrl()

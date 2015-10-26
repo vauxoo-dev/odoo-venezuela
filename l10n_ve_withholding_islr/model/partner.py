@@ -28,7 +28,7 @@
 from openerp.osv import fields, osv
 
 
-class res_partner(osv.osv):
+class ResPartner(osv.osv):
     _inherit = 'res.partner'
 
     _columns = {
@@ -65,4 +65,4 @@ class res_partner(osv.osv):
             'islr_wh_historical_data_ids': [],
         })
 
-        return super(res_partner, self).copy(cr, uid, ids, default, context)
+        return super(ResPartner, self).copy(cr, uid, ids, default, context)

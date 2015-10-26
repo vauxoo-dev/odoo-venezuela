@@ -36,7 +36,7 @@ from openerp.tools.translate import _
 ISLR_XML_WH_LINE_TYPES = [('invoice', 'Invoice'), ('employee', 'Employee')]
 
 
-class islr_xml_wh_doc(osv.osv):
+class IslrXmlWhDoc(osv.osv):
     _name = "islr.xml.wh.doc"
     _description = 'Generate XML'
 
@@ -126,8 +126,8 @@ class islr_xml_wh_doc(osv.osv):
             'employee_xml_ids': [],
         })
 
-        return super(islr_xml_wh_doc, self).copy(cr, uid, ids, default,
-                                                 context)
+        return super(IslrXmlWhDoc, self).copy(cr, uid, ids, default,
+                                              context)
 
     def period_return(self, cr, uid, context=None):
         """ Return current period
@@ -311,10 +311,10 @@ class islr_xml_wh_doc(osv.osv):
         self.indent(root)
         return tostring(root, encoding="ISO-8859-1")
 
-islr_xml_wh_doc()
+IslrXmlWhDoc()
 
 
-class islr_xml_wh_line(osv.osv):
+class IslrXmlWhLine(osv.osv):
     _name = "islr.xml.wh.line"
     _description = 'Generate XML Lines'
 
@@ -408,10 +408,10 @@ class islr_xml_wh_line(osv.osv):
                           'concept_code': rate_brw.code}}
 
 
-islr_xml_wh_line()
+IslrXmlWhLine()
 
 
-class account_invoice_line(osv.osv):
+class AccountInvoiceLine(osv.osv):
     _inherit = "account.invoice.line"
 
     _columns = {
@@ -421,4 +421,4 @@ class account_invoice_line(osv.osv):
     _defaults = {
         'wh_xml_id': lambda *a: 0,
     }
-account_invoice_line()
+AccountInvoiceLine()
