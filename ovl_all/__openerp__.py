@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# coding: utf-8
 ##############################################################################
 #
 #    OpenERP, Open Source Management Solution
@@ -220,16 +220,6 @@
         # End list of all oficial modules
     ],
     "author": "Vauxoo",
-    "description": """
-Install all apps needed to comply with Venezuelan laws plus all oficial modules
-======================================================
-
-This module will install for you:
-
-  -  ovl
-
-  - And all oficial modules (account, stock, mrp...)
-                    """,
     "website": "http://www.vauxoo.com",
     "category": "Localization/Application",
     "init_xml": [],

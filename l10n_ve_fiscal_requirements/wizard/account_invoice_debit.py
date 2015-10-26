@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 ##############################################################################
 #
 #    OpenERP, Open Source Management Solution
@@ -269,5 +269,3 @@ class account_invoice_debit(osv.osv_memory):
 
 
 account_invoice_debit()
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

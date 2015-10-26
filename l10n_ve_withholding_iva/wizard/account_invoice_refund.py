@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# coding: utf-8
 ##############################################################################
 #
 #    OpenERP, Open Source Management Solution
@@ -46,5 +46,3 @@ class account_invoice_refund(osv.osv_memory):
         return all(res)
 
 account_invoice_refund()
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:

@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# coding: utf-8
 ##############################################################################
 #    Company: Tecvemar, c.a.
 #    Author: Juan V. Márquez L.
@@ -252,5 +252,3 @@ class employee_income_wh(osv.osv_memory):
     # ---------------------------------------------------------------- Workflow
 
 employee_income_wh()
-
-# vim:expandtab:smartindent:tabstop=4:softtabstop=4:shiftwidth=4:
