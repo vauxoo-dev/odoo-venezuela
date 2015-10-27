@@ -188,8 +188,10 @@ class FiscalBookWizard(osv.osv_memory):
         data = {}
         data['ids'] = context.get('active_ids', [])
         data['model'] = context.get('active_model', 'ir.ui.menu')
-        data['form'] = self.read(cr, uid, ids, ['date_start', 'date_end',
-                                                'control_start', 'control_end', 'type'])[0]
+        data['form'] = self.read(
+            cr, uid, ids, [
+                'date_start', 'date_end', 'control_start',
+                'control_end', 'type'])[0]
 
         return self._print_report(cr, uid, ids, data, context=context)
 
