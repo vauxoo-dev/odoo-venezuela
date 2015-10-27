@@ -81,7 +81,7 @@ class account_invoice(osv.osv):
                         cont += 1
                     for il in lst:
                         self.pool.get('account.invoice.line').write(
-                            cr, uid, il.id, {'invoice_id': inv_id})
+                            cr, uid, [il.id], {'invoice_id': inv_id})
                     self.button_compute(cr, uid, [inv.id], set_total=True)
             if inv_id:
                 self.button_compute(cr, uid, [inv_id], set_total=True)
