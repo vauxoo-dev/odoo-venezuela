@@ -26,7 +26,7 @@
 {
     "name": "Venezuela - Generic Test",
     "version": "1.0",
-    "author": ['OpenERP SA', "Vauxoo"],
+    "author": "Vauxoo",
     "category": "Localization/Account Charts",
     "depends": ["account", "base_vat", "account_chart"],
     "demo_xml": [],
