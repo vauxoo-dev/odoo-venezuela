@@ -220,6 +220,7 @@
         # End list of all oficial modules
     ],
     "author": "Vauxoo",
+    "license": "AGPL-3",
     "website": "http://www.vauxoo.com",
     "category": "Localization/Application",
     "init_xml": [],

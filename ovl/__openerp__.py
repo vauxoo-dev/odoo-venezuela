@@ -46,6 +46,7 @@
         # "l10n_ve_vat_write_off",
     ],
     "author": "Vauxoo",
+    "license": "AGPL-3",
     "website": "http://www.vauxoo.com",
     "category": "Localization/Application",
     "init_xml": [],

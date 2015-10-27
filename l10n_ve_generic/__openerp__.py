@@ -27,6 +27,7 @@
     "name": "Venezuela - Generic Test",
     "version": "1.0",
     "author": "Vauxoo",
+    "license": "AGPL-3",
     "category": "Localization/Account Charts",
     "depends": ["account", "base_vat", "account_chart"],
     "demo_xml": [],
