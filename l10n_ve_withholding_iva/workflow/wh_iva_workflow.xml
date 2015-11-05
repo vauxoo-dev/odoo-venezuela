@@ -8,12 +8,6 @@
             <field name="on_create">True</field>
         </record>
 
-        <record id="act_draft" model="workflow.activity">
-            <field name="wkf_id" ref="wh_iva_order"/>
-            <field name="flow_start">True</field>
-            <field name="name">draft</field>
-        </record>
-
         <record id="act_confirmed" model="workflow.activity">
             <field name="wkf_id" ref="wh_iva_order"/>
             <field name="action">write({'state':'confirmed'})</field>
@@ -21,15 +15,12 @@
             <field name="name">confirmed</field>
         </record>
 
-
-        <record id="act_draft_duplicated" model="workflow.activity">
+        <record id="act_draft" model="workflow.activity">
             <field name="wkf_id" ref="wh_iva_order"/>
             <field name="action">write({'state':'draft'})</field>
             <field name="kind">function</field>
             <field name="name">draft</field>
         </record>
-
-
 
         <record id="act_cancel" model="workflow.activity">
             <field name="wkf_id" ref="wh_iva_order"/>
