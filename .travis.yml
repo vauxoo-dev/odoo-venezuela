@@ -3,6 +3,17 @@ language: python
 build_image: vauxoo/odoo-80-image-shippable-auto
 commit_container: cowardvassal/vauxoo-dev
 
+sudo: false
+cache:
+  apt: true
+  directories:
+    - $HOME/.cache/pip
+
+addons:
+  apt:
+    packages:
+      - python-lxml
+
 python:
   - "2.7"
 
