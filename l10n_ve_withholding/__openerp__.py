@@ -38,8 +38,8 @@
         # 'workflow/wh_action_server.xml', # Discontinued in v8 migration
     ],
     'test': [
-        'test/account_supplier_invoice.yml',
-        'test/wh_pay_invoice.yml',
+        # 'test/account_supplier_invoice.yml',
+        # 'test/wh_pay_invoice.yml',
     ],
     'installable': True,
 }
