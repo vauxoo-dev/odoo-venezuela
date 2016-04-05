@@ -22,3 +22,4 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #############################################################################
 from . import test_import_employee_income_wh
+from . import test_withholding_islr
