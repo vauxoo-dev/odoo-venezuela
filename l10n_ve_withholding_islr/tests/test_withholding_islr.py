@@ -43,6 +43,8 @@ class TestIslrWithholding(TransactionCase):
             'product.product_product_6_product_template')
         self.concept = self.env.ref(
             'l10n_ve_withholding_islr.islr_wh_concept_pago_contratistas_demo')
+        self.concept_wo_account = self.env.ref(
+            'l10n_ve_withholding_islr.islr_wh_concept_pago_contratistas')
         self.tax_general = self.env.ref(
             'l10n_ve_fiscal_requirements.iva_purchase1')
 
@@ -61,14 +63,14 @@ class TestIslrWithholding(TransactionCase):
         }
         return self.invoice_obj.create(invoice_dict)
 
-    def _create_invoice_line(self, invoice_id=None):
+    def _create_invoice_line(self, invoice_id=None, concept=None):
         '''Create invoice line'''
         line_dict = {
             'product_id': self.product_ipad.id,
             'quantity': 1,
             'price_unit': 100,
             'name': self.product_ipad.name,
-            'concept_id': self.concept.id,
+            'concept_id': concept,
             'invoice_id': invoice_id,
             # 'invoice_line_tax_id': [(6, 0, [self.tax_general.id])],
         }
@@ -84,7 +86,7 @@ class TestIslrWithholding(TransactionCase):
             invoice.state, 'draft', 'Initial state should be in "draft"'
         )
         # invoice_line = self._create_invoice_line(invoice)
-        self._create_invoice_line(invoice.id)
+        self._create_invoice_line(invoice.id, self.concept.id)
         invoice.signal_workflow('invoice_open')
         self.assertEqual(
             invoice.state, 'open', 'State in open'
@@ -134,3 +136,13 @@ class TestIslrWithholding(TransactionCase):
         self.assertEqual(debit, islr_wh.amount_total_ret,
             'Amount total withholding should be equal journal entrie'
         )
+
+    # def test_02_constraint_account_withholding_islr(self):
+    #     '''Test constraint account concept withholding islr'''
+    #     invoice = self._create_invoice('in_invoice')
+    #     # Check initial state
+    #     self._create_invoice_line(invoice.id, self.concept_wo_account.id)
+    #     invoice.signal_workflow('invoice_open')
+    #     islr_wh = invoice.islr_wh_doc_id
+    #     islr_wh.signal_workflow('act_confirm')
+    #     islr_wh.signal_workflow('act_done')
