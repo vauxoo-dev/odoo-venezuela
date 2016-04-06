@@ -23,8 +23,10 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
 import time
+from datetime import datetime, timedelta
 from openerp.tests.common import TransactionCase
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class TestIslrWithholding(TransactionCase):
@@ -37,6 +39,7 @@ class TestIslrWithholding(TransactionCase):
         self.doc_line_obj = self.env['islr.wh.doc.line']
         self.invoice_obj = self.env['account.invoice']
         self.invoice_line_obj = self.env['account.invoice.line']
+        self.rates_obj = self.env['res.currency.rate']
         self.partner_amd = self.env.ref(
             'l10n_ve_fiscal_requirements.f_req_partner_2')
         self.product_ipad = self.env.ref(
@@ -47,8 +50,9 @@ class TestIslrWithholding(TransactionCase):
             'l10n_ve_withholding_islr.islr_wh_concept_pago_contratistas')
         self.tax_general = self.env.ref(
             'l10n_ve_fiscal_requirements.iva_purchase1')
+        self.currency_usd = self.env.ref('base.USD')
 
-    def _create_invoice(self, type_inv='in_invoice'):
+    def _create_invoice(self, type_inv='in_invoice', currency=False):
         '''Function create invoice'''
         date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         invoice_dict = {
@@ -61,6 +65,8 @@ class TestIslrWithholding(TransactionCase):
             'name': 'invoice islr supplier',
             'account_id': self.partner_amd.property_account_payable.id,
         }
+        if currency:
+            invoice_dict['currency_id'] = currency
         return self.invoice_obj.create(invoice_dict)
 
     def _create_invoice_line(self, invoice_id=None, concept=None):
@@ -145,4 +151,38 @@ class TestIslrWithholding(TransactionCase):
     #     invoice.signal_workflow('invoice_open')
     #     islr_wh = invoice.islr_wh_doc_id
     #     islr_wh.signal_workflow('act_confirm')
-    #     islr_wh.signal_workflow('act_done')
+    #     with self.assertRaisesRegexp(
+    #         except_orm,
+    #         "Missing Account in Tax!"
+    #     ):
+    #         islr_wh.signal_workflow('act_done')
+
+    def test_02_withholding_with_currency(self):
+        '''Test withholding with multicurrency'''
+        datetime_now = datetime.now()
+        day = timedelta(days=2)
+        datetime_now = datetime_now - day
+        datetime_now = datetime_now.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+        self.rates_obj.create({'name': datetime_now,
+                                'rate': 1.25,
+                                'currency_id': self.currency_usd.id})
+        invoice = self._create_invoice('in_invoice', self.currency_usd.id)
+        self._create_invoice_line(invoice.id, self.concept.id)
+        invoice.signal_workflow('invoice_open')
+        islr_wh = invoice.islr_wh_doc_id
+
+        for concept_id in islr_wh.concept_ids:
+            currency_c = concept_id.currency_base_amount /\
+                            invoice.currency_id.rate_silent
+            wh_currency = concept_id.currency_amount /\
+                            invoice.currency_id.rate_silent
+            self.assertEqual(concept_id.base_amount,
+                             currency_c,
+                             '''Amount base should be equal to amount invoice
+                             between currency amount
+                             ''')
+            self.assertEqual(concept_id.amount,
+                             wh_currency,
+                             '''Amount base should be equal to amount invoice
+                             between currency amount
+                             ''')
