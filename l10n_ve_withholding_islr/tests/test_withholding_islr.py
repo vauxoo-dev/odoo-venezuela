@@ -87,7 +87,6 @@ class TestIslrWithholding(TransactionCase):
         Test validate invoice with document withholding islr'''
         invoice = self._create_invoice('in_invoice')
         # Check initial state
-        # import pdb; pdb.set_trace()
         self.assertEqual(
             invoice.state, 'draft', 'Initial state should be in "draft"'
         )
@@ -100,6 +99,11 @@ class TestIslrWithholding(TransactionCase):
         self.assertNotEqual(invoice.islr_wh_doc_id, self.doc_obj,
             'Not should be empty the withholding document'
         )
+        invoice_c = invoice.copy()
+        self.assertEqual(invoice_c.status, 'no_pro', 'Status should be no_pro')
+        self.assertEqual(invoice_c.islr_wh_doc_id, self.doc_obj,
+            'Withholding document the invoice copy should be empty')
+
         islr_wh = invoice.islr_wh_doc_id
 
         self.assertEqual(islr_wh.state, 'draft',
