@@ -83,7 +83,7 @@ class TestIslrWithholding(TransactionCase):
         return self.invoice_line_obj.create(line_dict)
 
     def test_01_validate_process_withholding_islr(self):
-        '''Test create invoice with data initial and
+        '''Test create invoice supplier with data initial and
         Test validate invoice with document withholding islr'''
         invoice = self._create_invoice('in_invoice')
         # Check initial state
@@ -97,7 +97,7 @@ class TestIslrWithholding(TransactionCase):
         self.assertEqual(
             invoice.state, 'open', 'State in open'
         )
-        self.assertNotEqual(invoice.islr_wh_doc_id, False,
+        self.assertNotEqual(invoice.islr_wh_doc_id, self.doc_obj,
             'Not should be empty the withholding document'
         )
         islr_wh = invoice.islr_wh_doc_id
@@ -186,3 +186,21 @@ class TestIslrWithholding(TransactionCase):
                              '''Amount base should be equal to amount invoice
                              between currency amount
                              ''')
+
+    def test_03_validate_process_withholding_islr_customer(self):
+        '''Test create invoice customer with data initial and
+        Test validate invoice with document withholding islr'''
+        invoice = self._create_invoice('out_invoice')
+        # Check initial state
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
+        )
+        # invoice_line = self._create_invoice_line(invoice)
+        self._create_invoice_line(invoice.id, self.concept.id)
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(
+            invoice.state, 'open', 'State in open'
+        )
+        self.assertEqual(invoice.islr_wh_doc_id, self.doc_obj,
+            'Not should be empty the withholding document'
+        )
