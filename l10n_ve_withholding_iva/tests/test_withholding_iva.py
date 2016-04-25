@@ -23,7 +23,7 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
 import time
-from datetime import datetime, timedelta
+# from datetime import datetime, timedelta
 from openerp.tests.common import TransactionCase
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
 # from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
@@ -58,7 +58,7 @@ class TestIvaWithholding(TransactionCase):
             'date_document': date_now,
             'type': type_inv,
             'reference_type': 'none',
-            'name': 'invoice islr supplier',
+            'name': 'invoice iva supplier',
             'account_id': self.partner_amd.property_account_payable.id,
         }
         if currency:
@@ -93,57 +93,56 @@ class TestIvaWithholding(TransactionCase):
             invoice.state, 'open', 'State in open'
         )
         self.assertNotEqual(invoice.wh_iva_id, self.doc_obj,
-            'Not should be empty the withholding document'
-        )
+                            'Not should be empty the withholding document')
         invoice_c = invoice.copy()
         self.assertEqual(invoice_c.wh_iva, False, 'WH_IVA should be False')
         self.assertEqual(invoice_c.vat_apply, False,
                          'Vat Apply should be False')
         self.assertEqual(invoice_c.wh_iva_id, self.doc_obj,
-            'Withholding document the invoice copy should be empty')
+                         'Withholding document the invoice copy'
+                         'should be empty')
 
-        islr_wh = invoice.islr_wh_doc_id
+        iva_wh = invoice.wh_iva_id
 
-        self.assertEqual(islr_wh.state, 'draft',
-            'State of withholding should be in draft'
-        )
-        self.assertEqual(len(islr_wh.concept_ids), 1, 'Should exist a record')
-        self.assertEqual(len(islr_wh.invoice_ids), 1, 'Should exist a invoice')
-        self.assertEqual(islr_wh.amount_total_ret, 2.00,
-            'Amount total should be 2.00'
-        )
-        islr_wh.signal_workflow('act_confirm')
-        self.assertEqual(islr_wh.state, 'confirmed',
-            'State of withholding should be in confirmed'
-        )
-        islr_wh.signal_workflow('act_done')
-        self.assertEqual(islr_wh.state, 'done',
-            'State of withholding should be in done'
-        )
+        self.assertEqual(iva_wh.state, 'draft',
+                         'State of withholding should be in draft')
+        self.assertEqual(len(iva_wh.wh_lines), 1, 'Should exist a record')
+        self.assertEqual(iva_wh.amount_base_ret, 100.00,
+                         'Amount total should be 100.00')
+        self.assertEqual(iva_wh.total_tax_ret, 9.00,
+                         'Amount total should be 9.00')
+
+        iva_wh.signal_workflow('wh_iva_confirmed')
+        self.assertEqual(iva_wh.state, 'confirmed',
+                         'State of withholding should be in confirmed')
+        iva_wh.signal_workflow('wh_iva_done')
+        self.assertEqual(iva_wh.state, 'done',
+                         'State of withholding should be in done')
         self.assertEqual(len(invoice.payment_ids), 1, 'Should exits a payment')
         self.assertEqual(invoice.residual,
-            invoice.amount_total - islr_wh.amount_total_ret,
-            'Amount residual invoice should be equal amount total - amount wh'
-        )
+                         invoice.amount_total - iva_wh.total_tax_ret,
+                         'Amount residual invoice should be equal amount '
+                         'total - amount wh')
         debit = 0
         credit = 0
-        for doc_inv in islr_wh.invoice_ids:
+        for doc_inv in iva_wh.wh_lines:
             for line in doc_inv.move_id.line_id:
                 if line.debit > 0:
                     debit += line.debit
                     self.assertEqual(line.account_id.id, invoice.account_id.id,
-                        'Account should be equal to account invoice'
-                    )
+                                     'Account should be equal to account '
+                                     'invoice')
                 else:
                     credit += line.credit
+                    account = self.tax_general.wh_vat_collected_account_id
                     self.assertEqual(line.account_id.id,
-                        self.concept.property_retencion_islr_payable.id,
-                        'Account should be equal to account concept islr'
-                    )
+                                     account.id,
+                                     'Account should be equal to account '
+                                     'tax for withholding')
         self.assertEqual(debit, credit, 'Debit and Credit should be equal')
-        self.assertEqual(debit, islr_wh.amount_total_ret,
-            'Amount total withholding should be equal journal entrie'
-        )
+        self.assertEqual(debit, iva_wh.total_tax_ret,
+                         'Amount total withholding should be equal '
+                         'journal entrie')
 
     # def test_02_withholding_with_currency(self):
     #     '''Test withholding with multicurrency'''
@@ -191,4 +190,3 @@ class TestIvaWithholding(TransactionCase):
     #     )
     #     self.assertEqual(invoice.islr_wh_doc_id, self.doc_obj,
     #         'Not should be empty the withholding document'
-    #     )
