@@ -157,7 +157,7 @@ class TxtIva(models.Model):
         voucher_obj = self.env['account.wh.iva']
         txt_iva_obj = self.env['txt.iva.line']
         vouchers = []
-        txt_brw = self.browse()[0]
+        txt_brw = self.browse(self._ids)[0]
         txt_ids = txt_iva_obj.search([('txt_id', '=', txt_brw.id)])
         if txt_ids:
             txt_iva_obj.unlink(txt_ids)
