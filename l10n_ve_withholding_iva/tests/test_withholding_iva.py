@@ -40,15 +40,21 @@ class TestIvaWithholding(TransactionCase):
         self.invoice_obj = self.env['account.invoice']
         self.invoice_line_obj = self.env['account.invoice.line']
         self.rates_obj = self.env['res.currency.rate']
+        self.txt_iva_obj = self.env['txt.iva']
         self.partner_amd = self.env.ref(
             'l10n_ve_fiscal_requirements.f_req_partner_2')
+        self.partner_nwh = self.env.ref(
+            'l10n_ve_fiscal_requirements.f_req_partner_7')
         self.product_ipad = self.env.ref(
             'product.product_product_6_product_template')
         self.tax_general = self.env.ref(
             'l10n_ve_fiscal_requirements.iva_purchase1')
-        self.currency_usd = self.env.ref('base.USD')
+        self.tax_except = self.env.ref(
+            'l10n_ve_fiscal_requirements.iva_purchase3')
+        self.company = self.env.ref(
+            'base.main_partner')
 
-    def _create_invoice(self, type_inv='in_invoice', currency=False):
+    def _create_invoice(self, type_inv='in_invoice'):
         '''Function create invoice'''
         date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         invoice_dict = {
@@ -61,8 +67,6 @@ class TestIvaWithholding(TransactionCase):
             'name': 'invoice iva supplier',
             'account_id': self.partner_amd.property_account_payable.id,
         }
-        if currency:
-            invoice_dict['currency_id'] = currency
         return self.invoice_obj.create(invoice_dict)
 
     def _create_invoice_line(self, invoice_id=None, tax=None):
@@ -86,12 +90,9 @@ class TestIvaWithholding(TransactionCase):
         self.assertEqual(
             invoice.state, 'draft', 'Initial state should be in "draft"'
         )
-        # invoice_line = self._create_invoice_line(invoice)
         self._create_invoice_line(invoice.id, True)
         invoice.signal_workflow('invoice_open')
-        self.assertEqual(
-            invoice.state, 'open', 'State in open'
-        )
+        self.assertEqual(invoice.state, 'open', 'State in open')
         self.assertNotEqual(invoice.wh_iva_id, self.doc_obj,
                             'Not should be empty the withholding document')
         invoice_c = invoice.copy()
@@ -144,49 +145,132 @@ class TestIvaWithholding(TransactionCase):
                          'Amount total withholding should be equal '
                          'journal entrie')
 
-    # def test_02_withholding_with_currency(self):
-    #     '''Test withholding with multicurrency'''
-    #     datetime_now = datetime.now()
-    #     day = timedelta(days=2)
-    #     datetime_now = datetime_now - day
-    #     datetime_now = datetime_now.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
-    #     self.rates_obj.create({'name': datetime_now,
-    #                             'rate': 1.25,
-    #                             'currency_id': self.currency_usd.id})
-    #     invoice = self._create_invoice('in_invoice', self.currency_usd.id)
-    #     self._create_invoice_line(invoice.id, self.concept.id)
-    #     invoice.signal_workflow('invoice_open')
-    #     islr_wh = invoice.islr_wh_doc_id
+    def test_02_withholding_partner_not_agent(self):
+        '''Test withholding with partner not agent'''
+        date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        invoice_dict = {
+            'partner_id': self.partner_nwh.id,
+            'nro_ctrl': '2000-694351',
+            'date_invoice': date_now,
+            'date_document': date_now,
+            'type': 'in_invoice',
+            'reference_type': 'none',
+            'name': 'invoice iva supplier',
+            'account_id': self.partner_nwh.property_account_payable.id,
+        }
+        invoice = self.invoice_obj.create(invoice_dict)
+        line_dict = {
+            'product_id': self.product_ipad.id,
+            'quantity': 1,
+            'price_unit': 100,
+            'name': self.product_ipad.name,
+            'invoice_id': invoice.id,
+            'invoice_line_tax_id': [(6, 0, [self.tax_general.id])],
+        }
+        self.invoice_line_obj.create(line_dict)
+        invoice.signal_workflow('invoice_open')
+        iva_wh = invoice.wh_iva_id
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        self.assertNotEqual(invoice.wh_iva_id, self.doc_obj,
+                            'Not should be empty the withholding document')
 
-    #     for concept_id in islr_wh.concept_ids:
-    #         currency_c = concept_id.currency_base_amount /\
-    #                         invoice.currency_id.rate_silent
-    #         wh_currency = concept_id.currency_amount /\
-    #                         invoice.currency_id.rate_silent
-    #         self.assertEqual(concept_id.base_amount,
-    #                          currency_c,
-    #                          '''Amount base should be equal to amount invoice
-    #                          between currency amount
-    #                          ''')
-    #         self.assertEqual(concept_id.amount,
-    #                          wh_currency,
-    #                          '''Amount base should be equal to amount invoice
-    #                          between currency amount
-    #                          ''')
+        self.assertEqual(iva_wh.state, 'draft',
+                         'State of withholding should be in draft')
+        self.assertEqual(len(iva_wh.wh_lines), 1, 'Should exist a record')
+        self.assertEqual(iva_wh.amount_base_ret, 100.00,
+                         'Amount total should be 100.00')
+        self.assertEqual(iva_wh.total_tax_ret, 12.00,
+                         'Amount total should be 12.00')
 
-    # def test_03_validate_process_withholding_islr_customer(self):
-    #     '''Test create invoice customer with data initial and
-    #     Test validate invoice with document withholding islr'''
-    #     invoice = self._create_invoice('out_invoice')
-    #     # Check initial state
-    #     self.assertEqual(
-    #         invoice.state, 'draft', 'Initial state should be in "draft"'
-    #     )
-    #     # invoice_line = self._create_invoice_line(invoice)
-    #     self._create_invoice_line(invoice.id, self.concept.id)
-    #     invoice.signal_workflow('invoice_open')
-    #     self.assertEqual(
-    #         invoice.state, 'open', 'State in open'
-    #     )
-    #     self.assertEqual(invoice.islr_wh_doc_id, self.doc_obj,
-    #         'Not should be empty the withholding document'
+    def test_03_not_withholding_partner_not_agent(self):
+        '''Test not withholding with partner not agent'''
+        date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        invoice_dict = {
+            'partner_id': self.partner_nwh.id,
+            'nro_ctrl': '2000-694351',
+            'date_invoice': date_now,
+            'date_document': date_now,
+            'type': 'in_invoice',
+            'reference_type': 'none',
+            'name': 'invoice iva supplier',
+            'account_id': self.partner_nwh.property_account_payable.id,
+        }
+        invoice = self.invoice_obj.create(invoice_dict)
+        line_dict = {
+            'product_id': self.product_ipad.id,
+            'quantity': 1,
+            'price_unit': 100,
+            'name': self.product_ipad.name,
+            'invoice_id': invoice.id,
+            'invoice_line_tax_id': [(6, 0, [self.tax_except.id])],
+        }
+        self.invoice_line_obj.create(line_dict)
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        self.assertEqual(invoice.wh_iva_id, self.doc_obj,
+                         'Should be empty the withholding document')
+
+    def test_04_not_withholding_company_not_agent(self):
+        '''Test not withholding with company not agent, partner not agent'''
+        self.company.write({'wh_iva_agent': False})
+        self.assertEqual(self.company.wh_iva_agent, False, 'Should be False')
+        date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        invoice_dict = {
+            'company_id': self.company.id,
+            'partner_id': self.partner_nwh.id,
+            'nro_ctrl': '2000-694351',
+            'date_invoice': date_now,
+            'date_document': date_now,
+            'type': 'in_invoice',
+            'reference_type': 'none',
+            'name': 'invoice iva supplier',
+            'account_id': self.partner_nwh.property_account_payable.id,
+        }
+        invoice = self.invoice_obj.create(invoice_dict)
+        line_dict = {
+            'product_id': self.product_ipad.id,
+            'quantity': 1,
+            'price_unit': 100,
+            'name': self.product_ipad.name,
+            'invoice_id': invoice.id,
+            'invoice_line_tax_id': [(6, 0, [self.tax_except.id])],
+        }
+        self.invoice_line_obj.create(line_dict)
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        self.assertEqual(invoice.wh_iva_id, self.doc_obj,
+                         'Should be empty the withholding document')
+
+    def test_05_not_withholding_company_not_agent_partner_agent(self):
+        '''Test not withholding with company not agent, partner agent'''
+        self.company.write({'wh_iva_agent': False})
+        self.assertEqual(self.company.wh_iva_agent, False, 'Should be False')
+        date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        invoice_dict = {
+            'company_id': self.company.id,
+            'partner_id': self.partner_amd.id,
+            'nro_ctrl': '2000-694351',
+            'date_invoice': date_now,
+            'date_document': date_now,
+            'type': 'in_invoice',
+            'reference_type': 'none',
+            'name': 'invoice iva supplier',
+            'account_id': self.partner_nwh.property_account_payable.id,
+        }
+        invoice = self.invoice_obj.create(invoice_dict)
+        line_dict = {
+            'product_id': self.product_ipad.id,
+            'quantity': 1,
+            'price_unit': 100,
+            'name': self.product_ipad.name,
+            'invoice_id': invoice.id,
+            'invoice_line_tax_id': [(6, 0, [self.tax_general.id])],
+        }
+        self.invoice_line_obj.create(line_dict)
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        self.assertEqual(invoice.wh_iva_id, self.doc_obj,
+                         'Should be empty the withholding document')
+
+    # def test_06_txt_document_iva(self):
+    #     '''Test create document txt vat'''
