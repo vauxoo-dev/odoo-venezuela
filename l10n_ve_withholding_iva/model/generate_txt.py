@@ -132,7 +132,7 @@ class TxtIva(models.Model):
         return True
 
     @api.multi
-    def check_txt_ids(self, cr, uid, ids, context=None):
+    def check_txt_ids(self):
         """ Check that txt_iva has lines to process."""
         for awi in self:
             if not awi.txt_ids:
