@@ -26,6 +26,7 @@ import time
 # from datetime import datetime, timedelta
 from openerp.tests.common import TransactionCase
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
+from openerp.exceptions import except_orm
 # from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
@@ -41,6 +42,7 @@ class TestIvaWithholding(TransactionCase):
         self.invoice_line_obj = self.env['account.invoice.line']
         self.rates_obj = self.env['res.currency.rate']
         self.txt_iva_obj = self.env['txt.iva']
+        self.txt_line_obj = self.env['txt.iva.line']
         self.partner_amd = self.env.ref(
             'l10n_ve_fiscal_requirements.f_req_partner_2')
         self.partner_nwh = self.env.ref(
@@ -67,6 +69,8 @@ class TestIvaWithholding(TransactionCase):
             'name': 'invoice iva supplier',
             'account_id': self.partner_amd.property_account_payable.id,
         }
+        if type_inv == 'in_invoice':
+            invoice_dict['supplier_invoice_number'] = 'libre-123456'
         return self.invoice_obj.create(invoice_dict)
 
     def _create_invoice_line(self, invoice_id=None, tax=None):
@@ -272,5 +276,87 @@ class TestIvaWithholding(TransactionCase):
         self.assertEqual(invoice.wh_iva_id, self.doc_obj,
                          'Should be empty the withholding document')
 
-    # def test_06_txt_document_iva(self):
-    #     '''Test create document txt vat'''
+    def test_06_txt_document_iva(self):
+        '''Test create document txt vat'''
+        date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        txt_dict = {
+            'date_start': date_now,
+            'date_end': date_now,
+        }
+        txt_iva = self.txt_iva_obj.create(txt_dict)
+        self.assertEqual(txt_iva.state, 'draft', 'State should be draft')
+        self.assertEqual(txt_iva.txt_ids, self.txt_line_obj,
+                         'Txt not should be lines')
+        with self.assertRaisesRegexp(
+            except_orm,
+            "('Missing Values !', 'Missing VAT TXT Lines!!!')"
+        ):
+            txt_iva.action_confirm()
+
+        invoice = self._create_invoice('in_invoice')
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
+        )
+        self._create_invoice_line(invoice.id, True)
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        self.assertNotEqual(invoice.wh_iva_id, self.doc_obj,
+                            'Not should be empty the withholding document')
+        iva_wh = invoice.wh_iva_id
+        self.assertEqual(iva_wh.state, 'draft',
+                         'State of withholding should be in draft')
+        txt_iva.action_generate_lines_txt()
+        for txt_line_brw in txt_iva.txt_ids:
+            self.assertEqual(txt_line_brw.voucher_id.state, 'done',
+                             'Error, only can add withholding documents in '
+                             'done state.')
+        iva_wh.signal_workflow('wh_iva_confirmed')
+        self.assertEqual(iva_wh.state, 'confirmed',
+                         'State of withholding should be in confirmed')
+        txt_iva.action_generate_lines_txt()
+        for txt_line_brw in txt_iva.txt_ids:
+            self.assertEqual(txt_line_brw.voucher_id.state, 'done',
+                             'Error, only can add withholding documents in '
+                             'done state.')
+        iva_wh.signal_workflow('wh_iva_done')
+        self.assertEqual(iva_wh.state, 'done',
+                         'State of withholding should be in done')
+        txt_iva.action_generate_lines_txt()
+        for txt_line_brw in txt_iva.txt_ids:
+            print txt_line_brw.voucher_id.state
+            self.assertEqual(txt_line_brw.voucher_id.state, 'done',
+                             'Error, only can add withholding documents in '
+                             'done state.')
+        self.assertEqual(len(txt_iva.txt_ids), 1,
+                         'Txt not should be lines')
+        self.assertEqual(txt_iva.state, 'draft', 'State should be draft')
+        txt_iva.action_confirm()
+        self.assertEqual(txt_iva.state, 'confirmed',
+                         'State should be confirmed')
+        iva_wh.journal_id.write({'update_posted': True})
+        invoice.journal_id.write({'update_posted': True})
+        with self.assertRaisesRegexp(
+            except_orm,
+            r"\bInvalid Procedure\b"
+        ):
+            iva_wh.cancel_check()
+        # iva_wh.action_cancel()
+        # self.assertEqual(iva_wh.state, 'done',
+        #                  'State of withholding should be in done')
+        txt_iva.action_done()
+        self.assertEqual(txt_iva.state, 'done',
+                         'State of txt iva should be done')
+        with self.assertRaisesRegexp(
+            except_orm,
+            r"\bInvalid Procedure\b"
+        ):
+            iva_wh.cancel_check()
+        self.assertEqual(iva_wh.state, 'done',
+                         'State of withholding should be in done')
+        txt_iva.action_anular()
+        self.assertEqual(txt_iva.state, 'draft',
+                         'State should be in draft')
+        iva_wh.cancel_check()
+        iva_wh.action_cancel()
+        self.assertEqual(iva_wh.state, 'cancel',
+                         'State of withholding should be in cancel')
