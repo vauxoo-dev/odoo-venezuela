@@ -53,6 +53,10 @@ class TestIvaWithholding(TransactionCase):
             'l10n_ve_fiscal_requirements.iva_purchase1')
         self.tax_except = self.env.ref(
             'l10n_ve_fiscal_requirements.iva_purchase3')
+        self.tax_s_12 = self.env.ref(
+            'l10n_ve_fiscal_requirements.iva_sale1')
+        self.tax_s_0 = self.env.ref(
+            'l10n_ve_fiscal_requirements.iva_sale3')
         self.company = self.env.ref(
             'base.main_partner')
 
@@ -67,10 +71,12 @@ class TestIvaWithholding(TransactionCase):
             'type': type_inv,
             'reference_type': 'none',
             'name': 'invoice iva supplier',
-            'account_id': self.partner_amd.property_account_payable.id,
+            'account_id': self.partner_amd.property_account_receivable.id,
         }
         if type_inv == 'in_invoice':
             invoice_dict['supplier_invoice_number'] = 'libre-123456'
+            account = self.partner_amd.property_account_payable.id
+            invoice_dict['account_id'] = account
         return self.invoice_obj.create(invoice_dict)
 
     def _create_invoice_line(self, invoice_id=None, tax=None):
@@ -83,7 +89,7 @@ class TestIvaWithholding(TransactionCase):
             'invoice_id': invoice_id,
         }
         if tax:
-            line_dict['invoice_line_tax_id'] = [(6, 0, [self.tax_general.id])]
+            line_dict['invoice_line_tax_id'] = [(6, 0, [tax.id])]
         return self.invoice_line_obj.create(line_dict)
 
     def test_01_validate_process_withholding_iva(self):
@@ -94,7 +100,7 @@ class TestIvaWithholding(TransactionCase):
         self.assertEqual(
             invoice.state, 'draft', 'Initial state should be in "draft"'
         )
-        self._create_invoice_line(invoice.id, True)
+        self._create_invoice_line(invoice.id, self.tax_general)
         invoice.signal_workflow('invoice_open')
         self.assertEqual(invoice.state, 'open', 'State in open')
         self.assertNotEqual(invoice.wh_iva_id, self.doc_obj,
@@ -297,7 +303,7 @@ class TestIvaWithholding(TransactionCase):
         self.assertEqual(
             invoice.state, 'draft', 'Initial state should be in "draft"'
         )
-        self._create_invoice_line(invoice.id, True)
+        self._create_invoice_line(invoice.id, self.tax_general)
         invoice.signal_workflow('invoice_open')
         self.assertEqual(invoice.state, 'open', 'State in open')
         self.assertNotEqual(invoice.wh_iva_id, self.doc_obj,
@@ -360,3 +366,16 @@ class TestIvaWithholding(TransactionCase):
         iva_wh.action_cancel()
         self.assertEqual(iva_wh.state, 'cancel',
                          'State of withholding should be in cancel')
+
+    def test_07_withholding_iva_customer(self):
+        '''Test process the withholding iva for customer'''
+        # date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        invoice = self._create_invoice('out_invoice')
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
+        )
+        self._create_invoice_line(invoice.id, self.tax_s_12)
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        self.assertEqual(invoice.wh_iva_id, self.doc_obj,
+                         'Should be empty the withholding document')
