@@ -329,12 +329,20 @@ class TestIvaWithholding(TransactionCase):
         self.assertEqual(iva_wh.state, 'done',
                          'State of withholding should be in done')
         txt_iva.action_generate_lines_txt()
+        invoice_b = self._create_invoice('in_invoice')
+        self._create_invoice_line(invoice_b.id, self.tax_general)
+        invoice_b.signal_workflow('invoice_open')
+        self.assertNotEqual(invoice_b.wh_iva_id, self.doc_obj,
+                            'Not should be empty the withholding document')
+        iva_wh_b = invoice_b.wh_iva_id
+        iva_wh_b.signal_workflow('wh_iva_confirmed')
+        iva_wh_b.signal_workflow('wh_iva_done')
+        txt_iva.action_generate_lines_txt()
         for txt_line_brw in txt_iva.txt_ids:
-            print txt_line_brw.voucher_id.state
             self.assertEqual(txt_line_brw.voucher_id.state, 'done',
                              'Error, only can add withholding documents in '
                              'done state.')
-        self.assertEqual(len(txt_iva.txt_ids), 1,
+        self.assertEqual(len(txt_iva.txt_ids), 2,
                          'Txt not should be lines')
         self.assertEqual(txt_iva.state, 'draft', 'State should be draft')
         txt_iva.action_confirm()
@@ -347,9 +355,6 @@ class TestIvaWithholding(TransactionCase):
             r"\bInvalid Procedure\b"
         ):
             iva_wh.cancel_check()
-        # iva_wh.action_cancel()
-        # self.assertEqual(iva_wh.state, 'done',
-        #                  'State of withholding should be in done')
         txt_iva.action_done()
         self.assertEqual(txt_iva.state, 'done',
                          'State of txt iva should be done')
