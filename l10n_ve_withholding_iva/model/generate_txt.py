@@ -160,7 +160,7 @@ class TxtIva(models.Model):
         txt_brw = self.browse(self._ids)[0]
         txt_ids = txt_iva_obj.search([('txt_id', '=', txt_brw.id)])
         if txt_ids:
-            txt_iva_obj.unlink(txt_ids)
+            txt_ids.unlink()
 
         if txt_brw.type:
             vouchers = voucher_obj.search([
