@@ -26,7 +26,7 @@ import time
 # from datetime import datetime, timedelta
 from openerp.tests.common import TransactionCase
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
-from openerp.exceptions import except_orm
+from openerp.exceptions import except_orm, ValidationError
 # from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
@@ -40,6 +40,7 @@ class TestIvaWithholding(TransactionCase):
         self.doc_line_obj = self.env['account.wh.iva.line']
         self.invoice_obj = self.env['account.invoice']
         self.invoice_line_obj = self.env['account.invoice.line']
+        self.period_obj = self.env['account.period']
         self.rates_obj = self.env['res.currency.rate']
         self.txt_iva_obj = self.env['txt.iva']
         self.txt_line_obj = self.env['txt.iva.line']
@@ -367,9 +368,8 @@ class TestIvaWithholding(TransactionCase):
         self.assertEqual(iva_wh.state, 'cancel',
                          'State of withholding should be in cancel')
 
-    def test_07_withholding_iva_customer(self):
-        '''Test process the withholding iva for customer'''
-        # date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+    def test_07_withholding_iva_invoice_customer(self):
+        '''Test process the withholding iva for invoice customer'''
         invoice = self._create_invoice('out_invoice')
         self.assertEqual(
             invoice.state, 'draft', 'Initial state should be in "draft"'
@@ -379,3 +379,93 @@ class TestIvaWithholding(TransactionCase):
         self.assertEqual(invoice.state, 'open', 'State in open')
         self.assertEqual(invoice.wh_iva_id, self.doc_obj,
                          'Should be empty the withholding document')
+
+    def test_08_withholding_iva_wh_customer(self):
+        '''Test process the withholding iva for wh customer'''
+        wh_dict = {
+            'name': 'AWI SALE XX',
+            'partner_id': self.partner_amd.id,
+            'account_id': self.partner_amd.property_account_receivable.id,
+            'number': 'AWI SALE XX',
+            'type': 'out_invoice'
+        }
+        iva_wh = self.doc_obj.create(wh_dict)
+        self.assertEqual(iva_wh.state, 'draft',
+                         'State of withholding should be in draft')
+        with self.assertRaisesRegexp(
+            ValidationError,
+            "('ValidateError', 'The partner must be withholding vat agent .')"
+        ):
+            iva_wh.write({'partner_id': self.partner_nwh.id})
+        iva_wh.write({'partner_id': self.partner_amd.id})
+        invoice = self._create_invoice('out_invoice')
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
+        )
+        self._create_invoice_line(invoice.id, self.tax_s_12)
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        self.assertEqual(invoice.wh_iva_id, self.doc_obj,
+                         'Should be empty the withholding document')
+        res = iva_wh.onchange_partner_id('out_invoice', self.partner_amd.id)
+        values = {}
+        values['wh_lines'] = [
+            (0, 0, {'invoice_id': invoice.id,
+                    'name': 'N/A',
+                    'wh_iva_rate': iva_wh.partner_id.wh_iva_rate})]
+        values['account_id'] = res['value']['account_id']
+        iva_wh.write(values)
+        self.assertEqual(len(iva_wh.wh_lines), 1,
+                         'Should exist at least one record')
+        msj_error = "'Error!', 'Must indicate: Accounting date and"
+        " (or) Voucher Date'"
+        with self.assertRaisesRegexp(
+            except_orm,
+            msj_error
+        ):
+            iva_wh.confirm_check()
+
+        date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        period = self.period_obj.find(date_now)
+        iva_wh.write({'date_ret': date_now, 'date': date_now,
+                      'period_id': period.id})
+        with self.assertRaisesRegexp(
+            except_orm,
+            r"'Invoices with Missing Withheld Taxes!'"
+        ):
+            iva_wh.confirm_check()
+
+        for line in iva_wh.wh_lines:
+            line.load_taxes()
+        # iva_wh.confirm_check()
+        iva_wh.signal_workflow('wh_iva_confirmed')
+        self.assertEqual(iva_wh.state, 'confirmed',
+                         'State of withholding should be in confirmed')
+        iva_wh.signal_workflow('wh_iva_done')
+        self.assertEqual(iva_wh.state, 'done',
+                         'State of withholding should be in done')
+        self.assertEqual(len(invoice.payment_ids), 1, 'Should exits a payment')
+        self.assertEqual(invoice.residual,
+                         invoice.amount_total - iva_wh.total_tax_ret,
+                         'Amount residual invoice should be equal amount '
+                         'total - amount wh')
+        debit = 0
+        credit = 0
+        for doc_inv in iva_wh.wh_lines:
+            for line in doc_inv.move_id.line_id:
+                if line.credit > 0:
+                    credit += line.credit
+                    self.assertEqual(line.account_id.id, invoice.account_id.id,
+                                     'Account should be equal to account '
+                                     'invoice')
+                else:
+                    debit += line.debit
+                    account = self.tax_s_12.wh_vat_collected_account_id
+                    self.assertEqual(line.account_id.id,
+                                     account.id,
+                                     'Account should be equal to account '
+                                     'tax for withholding')
+        self.assertEqual(debit, credit, 'Debit and Credit should be equal')
+        self.assertEqual(debit, iva_wh.total_tax_ret,
+                         'Amount total withholding should be equal '
+                         'journal entrie')
