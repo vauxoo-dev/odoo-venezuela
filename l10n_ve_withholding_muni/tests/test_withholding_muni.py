@@ -110,7 +110,6 @@ class TestMuniWithholding(TransactionCase):
                                                   self.partner_amd.id)
         value = {
             'name': 'Test Account Withholding Municipal',
-            # 'journal_id': ,
             'type': 'in_invoice',
             'partner_id': self.partner_amd.id,
             'account_id': acc_id['value']['account_id']
@@ -130,7 +129,7 @@ class TestMuniWithholding(TransactionCase):
         amount = res['value']['wh_loc_rate']
         wh_loc_rate = res['value']['amount']
         line = {
-            'name': 'Test withholding municipl line',
+            'name': 'Test withholding municipal line',
             'invoice_id': invoice.id,
             'wh_loc_rate': wh_loc_rate,
             'amount': amount,
@@ -178,6 +177,93 @@ class TestMuniWithholding(TransactionCase):
                                      account.id,
                                      'Account should be equal to account '
                                      'tax for withholding')
+        self.assertEqual(debit, credit, 'Debit and Credit should be equal')
+        self.assertEqual(debit, amount,
+                         'Amount total withholding should be equal '
+                         'journal entrie')
+
+    def test_02_validate_process_withholding_municipal_customer(self):
+        """Test create invoice customer with data initial and
+        Test validate invoice with document withholding municipal"""
+        # Create invoice customer
+        invoice = self._create_invoice('out_invoice')
+        # Check initial state
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
+        )
+        # Create invoice line with tax general
+        self._create_invoice_line(invoice.id, self.tax_general)
+        # Set invoice state open
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        self.assertEqual(invoice.wh_muni_id, self.doc_obj,
+                         'Should be empty the withholding document')
+        # Create document withholding municipal
+        acc_id = self.doc_obj.onchange_partner_id('out_invoice',
+                                                  self.partner_amd.id)
+        value = {
+            'name': 'Test Account Withholding Municipal',
+            'type': 'out_invoice',
+            'partner_id': self.partner_amd.id,
+            'account_id': acc_id['value']['account_id'],
+            'number': 'TAWM-123456'
+        }
+        wh_muni = self.doc_obj.create(value)
+        # Test confirm document withholding municipal
+        with self.assertRaisesRegexp(
+            except_orm,
+            "'Missing Values !', 'Missing Withholding Lines!'"
+        ):
+            wh_muni.confirm_check()
+        # Check state withholding municipal
+        self.assertEqual(wh_muni.state, 'draft', 'State should be draft')
+        # Create withholding muncipal line
+        res = self.doc_line_obj.onchange_invoice_id(invoice.id,
+                                                    wh_loc_rate=5.0)
+        amount = res['value']['wh_loc_rate']
+        wh_loc_rate = res['value']['amount']
+        line = {
+            'name': 'Test withholding municipal line',
+            'invoice_id': invoice.id,
+            'wh_loc_rate': wh_loc_rate,
+            'amount': amount,
+            'retention_id': wh_muni.id
+        }
+        self.doc_line_obj.create(line)
+        # Set state confirmed in withholding municipal
+        wh_muni.signal_workflow('wh_muni_confirmed')
+        self.assertEqual(wh_muni.state, 'confirmed',
+                         'State should be confirmed')
+        # Set state done in withholding municipal
+        wh_muni.signal_workflow('wh_muni_done')
+        self.assertEqual(wh_muni.state, 'done',
+                         'State should be done')
+        # Check line in withholding municipal
+        self.assertEqual(len(wh_muni.munici_line_ids), 1,
+                         'Should exist a record')
+
+        # Check payment in invoice related with withholding iva
+        self.assertEqual(len(invoice.payment_ids), 1, 'Should exits a payment')
+        self.assertEqual(invoice.residual,
+                         invoice.amount_total - amount,
+                         'Amount residual invoice should be equal amount '
+                         'total - amount wh')
+        debit = 0
+        credit = 0
+        for doc_inv in wh_muni.munici_line_ids:
+            for line in doc_inv.move_id.line_id:
+                if line.debit > 0:
+                    debit += line.debit
+                    account = self.partner_amd.property_wh_munici_receivable
+                    self.assertEqual(line.account_id.id,
+                                     account.id,
+                                     'Account should be equal to account '
+                                     'tax for withholding')
+                else:
+                    credit += line.credit
+                    self.assertEqual(line.account_id.id, invoice.account_id.id,
+                                     'Account should be equal to account '
+                                     'invoice')
         self.assertEqual(debit, credit, 'Debit and Credit should be equal')
         self.assertEqual(debit, amount,
                          'Amount total withholding should be equal '
