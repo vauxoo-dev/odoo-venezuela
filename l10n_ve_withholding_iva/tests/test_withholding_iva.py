@@ -96,16 +96,21 @@ class TestIvaWithholding(TransactionCase):
     def test_01_validate_process_withholding_iva(self):
         '''Test create invoice supplier with data initial and
         Test validate invoice with document withholding iva'''
+        # Create invoice supplier
         invoice = self._create_invoice('in_invoice')
         # Check initial state
         self.assertEqual(
             invoice.state, 'draft', 'Initial state should be in "draft"'
         )
+        # Create invoice line with tax general
         self._create_invoice_line(invoice.id, self.tax_general)
+        # Set invoice state open
         invoice.signal_workflow('invoice_open')
         self.assertEqual(invoice.state, 'open', 'State in open')
         self.assertNotEqual(invoice.wh_iva_id, self.doc_obj,
                             'Not should be empty the withholding document')
+        # Test invoice copy, check wh_iva is False, vat_apply is False
+        # and not create document withholding vat
         invoice_c = invoice.copy()
         self.assertEqual(invoice_c.wh_iva, False, 'WH_IVA should be False')
         self.assertEqual(invoice_c.vat_apply, False,
@@ -115,7 +120,7 @@ class TestIvaWithholding(TransactionCase):
                          'should be empty')
 
         iva_wh = invoice.wh_iva_id
-
+        # Test document withholding vat, check state, line and amounts
         self.assertEqual(iva_wh.state, 'draft',
                          'State of withholding should be in draft')
         self.assertEqual(len(iva_wh.wh_lines), 1, 'Should exist a record')
@@ -124,12 +129,15 @@ class TestIvaWithholding(TransactionCase):
         self.assertEqual(iva_wh.total_tax_ret, 9.00,
                          'Amount total should be 9.00')
 
+        # Set state document withholding iva confirmed and check state
         iva_wh.signal_workflow('wh_iva_confirmed')
         self.assertEqual(iva_wh.state, 'confirmed',
                          'State of withholding should be in confirmed')
+        # Set state document withholding iva done and check state
         iva_wh.signal_workflow('wh_iva_done')
         self.assertEqual(iva_wh.state, 'done',
                          'State of withholding should be in done')
+        # Check payment in invoice related with withholding iva
         self.assertEqual(len(invoice.payment_ids), 1, 'Should exits a payment')
         self.assertEqual(invoice.residual,
                          invoice.amount_total - iva_wh.total_tax_ret,
@@ -158,6 +166,7 @@ class TestIvaWithholding(TransactionCase):
 
     def test_02_withholding_partner_not_agent(self):
         '''Test withholding with partner not agent'''
+        # Create invoice supplier with partner no agent
         date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         invoice_dict = {
             'partner_id': self.partner_nwh.id,
@@ -170,6 +179,7 @@ class TestIvaWithholding(TransactionCase):
             'account_id': self.partner_nwh.property_account_payable.id,
         }
         invoice = self.invoice_obj.create(invoice_dict)
+        # Create invoice line
         line_dict = {
             'product_id': self.product_ipad.id,
             'quantity': 1,
@@ -179,9 +189,12 @@ class TestIvaWithholding(TransactionCase):
             'invoice_line_tax_id': [(6, 0, [self.tax_general.id])],
         }
         self.invoice_line_obj.create(line_dict)
+        # Set state open in invoice
         invoice.signal_workflow('invoice_open')
+        # Check state invoice
         iva_wh = invoice.wh_iva_id
         self.assertEqual(invoice.state, 'open', 'State in open')
+        # Check document withholding iva created
         self.assertNotEqual(invoice.wh_iva_id, self.doc_obj,
                             'Not should be empty the withholding document')
 
@@ -195,6 +208,7 @@ class TestIvaWithholding(TransactionCase):
 
     def test_03_not_withholding_partner_not_agent(self):
         '''Test not withholding with partner not agent'''
+        # Create invoice supplier with partner no agent
         date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         invoice_dict = {
             'partner_id': self.partner_nwh.id,
@@ -207,6 +221,7 @@ class TestIvaWithholding(TransactionCase):
             'account_id': self.partner_nwh.property_account_payable.id,
         }
         invoice = self.invoice_obj.create(invoice_dict)
+        # Create invoice line
         line_dict = {
             'product_id': self.product_ipad.id,
             'quantity': 1,
@@ -216,15 +231,19 @@ class TestIvaWithholding(TransactionCase):
             'invoice_line_tax_id': [(6, 0, [self.tax_except.id])],
         }
         self.invoice_line_obj.create(line_dict)
+        # Set state open in invoice
         invoice.signal_workflow('invoice_open')
+        # Check that no document has been created
         self.assertEqual(invoice.state, 'open', 'State in open')
         self.assertEqual(invoice.wh_iva_id, self.doc_obj,
                          'Should be empty the withholding document')
 
     def test_04_not_withholding_company_not_agent(self):
         '''Test not withholding with company not agent, partner not agent'''
+        # Set company no agent withholding
         self.company.write({'wh_iva_agent': False})
         self.assertEqual(self.company.wh_iva_agent, False, 'Should be False')
+        # Create invoice supplier with partner no agent
         date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         invoice_dict = {
             'company_id': self.company.id,
@@ -238,6 +257,7 @@ class TestIvaWithholding(TransactionCase):
             'account_id': self.partner_nwh.property_account_payable.id,
         }
         invoice = self.invoice_obj.create(invoice_dict)
+        # Create invoice line
         line_dict = {
             'product_id': self.product_ipad.id,
             'quantity': 1,
@@ -247,15 +267,19 @@ class TestIvaWithholding(TransactionCase):
             'invoice_line_tax_id': [(6, 0, [self.tax_except.id])],
         }
         self.invoice_line_obj.create(line_dict)
+        # Set state open in invoice
         invoice.signal_workflow('invoice_open')
+        # Check that no document has been created
         self.assertEqual(invoice.state, 'open', 'State in open')
         self.assertEqual(invoice.wh_iva_id, self.doc_obj,
                          'Should be empty the withholding document')
 
     def test_05_not_withholding_company_not_agent_partner_agent(self):
         '''Test not withholding with company not agent, partner agent'''
+        # Set company no agent withholding
         self.company.write({'wh_iva_agent': False})
         self.assertEqual(self.company.wh_iva_agent, False, 'Should be False')
+        # Create invoice supplier with partner no agent
         date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         invoice_dict = {
             'company_id': self.company.id,
@@ -266,9 +290,10 @@ class TestIvaWithholding(TransactionCase):
             'type': 'in_invoice',
             'reference_type': 'none',
             'name': 'invoice iva supplier',
-            'account_id': self.partner_nwh.property_account_payable.id,
+            'account_id': self.partner_amd.property_account_payable.id,
         }
         invoice = self.invoice_obj.create(invoice_dict)
+        # Create invoice line
         line_dict = {
             'product_id': self.product_ipad.id,
             'quantity': 1,
@@ -278,78 +303,100 @@ class TestIvaWithholding(TransactionCase):
             'invoice_line_tax_id': [(6, 0, [self.tax_general.id])],
         }
         self.invoice_line_obj.create(line_dict)
+        # Set state open in invoice
         invoice.signal_workflow('invoice_open')
+        # Check that no document has been created
         self.assertEqual(invoice.state, 'open', 'State in open')
         self.assertEqual(invoice.wh_iva_id, self.doc_obj,
                          'Should be empty the withholding document')
 
     def test_06_txt_document_iva(self):
         '''Test create document txt vat'''
+        # Create document txt iva
         date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         txt_dict = {
             'date_start': date_now,
             'date_end': date_now,
         }
         txt_iva = self.txt_iva_obj.create(txt_dict)
+        # Check state draft txt and txt has no line
         self.assertEqual(txt_iva.state, 'draft', 'State should be draft')
         self.assertEqual(txt_iva.txt_ids, self.txt_line_obj,
                          'Txt not should be lines')
+        # Test set state confirm document txt
         with self.assertRaisesRegexp(
             except_orm,
             "('Missing Values !', 'Missing VAT TXT Lines!!!')"
         ):
             txt_iva.action_confirm()
-
+        # Create invoice supplier
         invoice = self._create_invoice('in_invoice')
         self.assertEqual(
             invoice.state, 'draft', 'Initial state should be in "draft"'
         )
+        # Create invoice line
         self._create_invoice_line(invoice.id, self.tax_general)
+        # Set state open in invoice
         invoice.signal_workflow('invoice_open')
         self.assertEqual(invoice.state, 'open', 'State in open')
         self.assertNotEqual(invoice.wh_iva_id, self.doc_obj,
                             'Not should be empty the withholding document')
+        # Check document withholding iva
         iva_wh = invoice.wh_iva_id
         self.assertEqual(iva_wh.state, 'draft',
                          'State of withholding should be in draft')
+        # Test create document txt line
         txt_iva.action_generate_lines_txt()
         for txt_line_brw in txt_iva.txt_ids:
             self.assertEqual(txt_line_brw.voucher_id.state, 'done',
                              'Error, only can add withholding documents in '
                              'done state.')
+        # Set state confirm in document withholding
         iva_wh.signal_workflow('wh_iva_confirmed')
         self.assertEqual(iva_wh.state, 'confirmed',
                          'State of withholding should be in confirmed')
+        # Test create document txt line
         txt_iva.action_generate_lines_txt()
         for txt_line_brw in txt_iva.txt_ids:
             self.assertEqual(txt_line_brw.voucher_id.state, 'done',
                              'Error, only can add withholding documents in '
                              'done state.')
+        # Set state done in document withholding
         iva_wh.signal_workflow('wh_iva_done')
         self.assertEqual(iva_wh.state, 'done',
                          'State of withholding should be in done')
+        # Create txt line with document withholding in state done
         txt_iva.action_generate_lines_txt()
+        # Create second invoice supplier for test txt lines
         invoice_b = self._create_invoice('in_invoice')
         self._create_invoice_line(invoice_b.id, self.tax_general)
+        # Set state open in invoice
         invoice_b.signal_workflow('invoice_open')
         self.assertNotEqual(invoice_b.wh_iva_id, self.doc_obj,
                             'Not should be empty the withholding document')
+        # Set state confirm and done in document withholding
+        # of the second invoice
         iva_wh_b = invoice_b.wh_iva_id
         iva_wh_b.signal_workflow('wh_iva_confirmed')
         iva_wh_b.signal_workflow('wh_iva_done')
+        # Create txt lines with document withholding in state done
         txt_iva.action_generate_lines_txt()
         for txt_line_brw in txt_iva.txt_ids:
             self.assertEqual(txt_line_brw.voucher_id.state, 'done',
                              'Error, only can add withholding documents in '
                              'done state.')
+        # Check quantity line in txt
         self.assertEqual(len(txt_iva.txt_ids), 2,
                          'Txt not should be lines')
         self.assertEqual(txt_iva.state, 'draft', 'State should be draft')
+        # Set state confirm in document txt
         txt_iva.action_confirm()
         self.assertEqual(txt_iva.state, 'confirmed',
                          'State should be confirmed')
+        # Updated journal to allow cancel withholding
         iva_wh.journal_id.write({'update_posted': True})
         invoice.journal_id.write({'update_posted': True})
+        # Test cancel withholding
         with self.assertRaisesRegexp(
             except_orm,
             r"\bInvalid Procedure\b"
@@ -375,18 +422,23 @@ class TestIvaWithholding(TransactionCase):
 
     def test_07_withholding_iva_invoice_customer(self):
         '''Test process the withholding iva for invoice customer'''
+        # Create invoice customer
         invoice = self._create_invoice('out_invoice')
         self.assertEqual(
             invoice.state, 'draft', 'Initial state should be in "draft"'
         )
+        # Create invoice line
         self._create_invoice_line(invoice.id, self.tax_s_12)
+        # Set state open in invoice
         invoice.signal_workflow('invoice_open')
+        # Check that no document has been created
         self.assertEqual(invoice.state, 'open', 'State in open')
         self.assertEqual(invoice.wh_iva_id, self.doc_obj,
                          'Should be empty the withholding document')
 
     def test_08_withholding_iva_wh_customer(self):
         '''Test process the withholding iva for wh customer'''
+        # Create document withholding iva customer
         wh_dict = {
             'name': 'AWI SALE XX',
             'partner_id': self.partner_amd.id,
@@ -397,22 +449,28 @@ class TestIvaWithholding(TransactionCase):
         iva_wh = self.doc_obj.create(wh_dict)
         self.assertEqual(iva_wh.state, 'draft',
                          'State of withholding should be in draft')
+        # Test edit partner to partner not agent withholding
         with self.assertRaisesRegexp(
             ValidationError,
             "('ValidateError', 'The partner must be withholding vat agent .')"
         ):
             iva_wh.write({'partner_id': self.partner_nwh.id})
         iva_wh.write({'partner_id': self.partner_amd.id})
+        # Create invoice customer
         invoice = self._create_invoice('out_invoice')
         self.assertEqual(
             invoice.state, 'draft', 'Initial state should be in "draft"'
         )
+        # Create invoice line
         self._create_invoice_line(invoice.id, self.tax_s_12)
+        # Set state open in invoice
         invoice.signal_workflow('invoice_open')
         self.assertEqual(invoice.state, 'open', 'State in open')
         self.assertEqual(invoice.wh_iva_id, self.doc_obj,
                          'Should be empty the withholding document')
+        # Test on change for account partner
         res = iva_wh.onchange_partner_id('out_invoice', self.partner_amd.id)
+        # Create withholding line
         values = {}
         values['wh_lines'] = [
             (0, 0, {'invoice_id': invoice.id,
@@ -424,6 +482,7 @@ class TestIvaWithholding(TransactionCase):
                          'Should exist at least one record')
         msj_error = "'Error!', 'Must indicate: Accounting date and"
         " (or) Voucher Date'"
+        # Trying to confirm document missing information
         with self.assertRaisesRegexp(
             except_orm,
             msj_error
@@ -443,12 +502,15 @@ class TestIvaWithholding(TransactionCase):
         for line in iva_wh.wh_lines:
             line.load_taxes()
         # iva_wh.confirm_check()
+        # Set state confirm in document withholding
         iva_wh.signal_workflow('wh_iva_confirmed')
         self.assertEqual(iva_wh.state, 'confirmed',
                          'State of withholding should be in confirmed')
+        # Set state done in document withholding
         iva_wh.signal_workflow('wh_iva_done')
         self.assertEqual(iva_wh.state, 'done',
                          'State of withholding should be in done')
+        # Check payment in invoice related with withholding iva
         self.assertEqual(len(invoice.payment_ids), 1, 'Should exits a payment')
         self.assertEqual(invoice.residual,
                          invoice.amount_total - iva_wh.total_tax_ret,
