@@ -192,7 +192,7 @@ class TestMuniWithholding(TransactionCase):
             invoice.state, 'draft', 'Initial state should be in "draft"'
         )
         # Create invoice line with tax general
-        self._create_invoice_line(invoice.id, self.tax_general)
+        self._create_invoice_line(invoice.id, self.tax_s_12)
         # Set invoice state open
         invoice.signal_workflow('invoice_open')
         self.assertEqual(invoice.state, 'open', 'State in open')
@@ -242,7 +242,7 @@ class TestMuniWithholding(TransactionCase):
         self.assertEqual(len(wh_muni.munici_line_ids), 1,
                          'Should exist a record')
 
-        # Check payment in invoice related with withholding iva
+        # Check payment in invoice related with withholding Municipal
         self.assertEqual(len(invoice.payment_ids), 1, 'Should exits a payment')
         self.assertEqual(invoice.residual,
                          invoice.amount_total - amount,
