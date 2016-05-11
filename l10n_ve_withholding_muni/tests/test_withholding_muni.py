@@ -126,8 +126,8 @@ class TestMuniWithholding(TransactionCase):
         # Create withholding muncipal line
         res = self.doc_line_obj.onchange_invoice_id(invoice.id,
                                                     wh_loc_rate=5.0)
-        amount = res['value']['wh_loc_rate']
-        wh_loc_rate = res['value']['amount']
+        wh_loc_rate = res['value']['wh_loc_rate']
+        amount = res['value']['amount']
         line = {
             'name': 'Test withholding municipal line',
             'invoice_id': invoice.id,
@@ -220,8 +220,8 @@ class TestMuniWithholding(TransactionCase):
         # Create withholding muncipal line
         res = self.doc_line_obj.onchange_invoice_id(invoice.id,
                                                     wh_loc_rate=5.0)
-        amount = res['value']['wh_loc_rate']
-        wh_loc_rate = res['value']['amount']
+        amount = res['value']['amount']
+        wh_loc_rate = res['value']['wh_loc_rate']
         line = {
             'name': 'Test withholding municipal line',
             'invoice_id': invoice.id,
