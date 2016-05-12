@@ -41,6 +41,7 @@ class TestFiscalRequirements(TransactionCase):
         self.invoice_obj = self.env['account.invoice']
         self.invoice_line_obj = self.env['account.invoice.line']
         self.period_obj = self.env['account.period']
+        self.move_obj = self.env['account.move']
         self.rates_obj = self.env['res.currency.rate']
         # self.txt_iva_obj = self.env['txt.iva']
         # self.txt_line_obj = self.env['txt.iva.line']
@@ -48,6 +49,10 @@ class TestFiscalRequirements(TransactionCase):
             'l10n_ve_fiscal_requirements.f_req_partner_2')
         self.partner_nwh = self.env.ref(
             'l10n_ve_fiscal_requirements.f_req_partner_7')
+        self.comercial = self.env.ref(
+            'l10n_ve_fiscal_requirements.f_req_partner_10')
+        self.parent_com = self.env.ref(
+            'base.res_partner_23')
         self.product_ipad = self.env.ref(
             'product.product_product_6_product_template')
         self.tax_general = self.env.ref(
@@ -120,3 +125,40 @@ class TestFiscalRequirements(TransactionCase):
         # Set invoice state open
         invoice.signal_workflow('invoice_open')
         self.assertEqual(invoice.state, 'open', 'State in open')
+
+    def test_03_comercial_partner(self):
+        # Create invoice customer
+        date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        invoice_dict = {
+            'partner_id': self.comercial.id,
+            'nro_ctrl': '2000-694351',
+            'date_invoice': date_now,
+            'date_document': date_now,
+            'type': 'out_invoice',
+            'reference_type': 'none',
+            'name': 'invoice customer',
+            'account_id': self.partner_amd.property_account_receivable.id,
+        }
+        invoice = self.invoice_obj.create(invoice_dict)
+        # Check initial state
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
+        )
+        # Create invoice line with tax general
+        self._create_invoice_line(invoice.id, self.tax_s_12)
+        # Set invoice state proforma2
+        invoice.signal_workflow('invoice_proforma2')
+        self.assertEqual(invoice.state, 'proforma2', 'State in proforma2')
+        # Check no created journal entries
+        self.assertEqual(invoice.move_id, self.move_obj,
+                         'There should be no move')
+        # Set invoice state open
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        # Check created journal entries
+        self.assertNotEqual(invoice.move_id, self.move_obj,
+                            'There should be move')
+        partner = invoice.move_id.partner_id
+        self.assertEqual(partner.id, self.parent_com.id,
+                         'Partner move should be equal to parent partner of '
+                         'the comercial')
