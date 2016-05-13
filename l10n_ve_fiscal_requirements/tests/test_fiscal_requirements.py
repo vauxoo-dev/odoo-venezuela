@@ -42,6 +42,7 @@ class TestFiscalRequirements(TransactionCase):
         self.invoice_line_obj = self.env['account.invoice.line']
         self.period_obj = self.env['account.period']
         self.move_obj = self.env['account.move']
+        self.w_ncontrol = self.env['wiz.nroctrl']
         self.rates_obj = self.env['res.currency.rate']
         # self.txt_iva_obj = self.env['txt.iva']
         # self.txt_line_obj = self.env['txt.iva.line']
@@ -127,6 +128,7 @@ class TestFiscalRequirements(TransactionCase):
         self.assertEqual(invoice.state, 'open', 'State in open')
 
     def test_03_comercial_partner(self):
+        """Test comercial partner"""
         # Create invoice customer
         date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         invoice_dict = {
@@ -162,3 +164,27 @@ class TestFiscalRequirements(TransactionCase):
         self.assertEqual(partner.id, self.parent_com.id,
                          'Partner move should be equal to parent partner of '
                          'the comercial')
+
+    def test_04_wizard_number_control(self):
+        """Test wizard change number control in invoice"""
+        # Create invoice supplier
+        invoice = self._create_invoice('in_invoice')
+        # Check initial state
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
+        )
+        # Create invoice line with tax general
+        self._create_invoice_line(invoice.id, self.tax_general)
+        # Set invoice state open
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        # Check number control
+        self.assertEqual(invoice.nro_ctrl, '2000-694351',
+                         'Number control bad')
+        # Test wizard number control
+        context = {'active_id': invoice.id}
+        value = {'name': '987654321',
+                 'sure': True}
+        self.w_ncontrol.with_context(context).create(value).set_noctrl()
+        self.assertEqual(invoice.nro_ctrl, '987654321',
+                         'Number control no chance')
