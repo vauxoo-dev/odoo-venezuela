@@ -43,6 +43,7 @@ class TestFiscalRequirements(TransactionCase):
         self.period_obj = self.env['account.period']
         self.move_obj = self.env['account.move']
         self.w_ncontrol = self.env['wiz.nroctrl']
+        self.winv_numctrl = self.env['wizard.invoice.nro.ctrl']
         self.rates_obj = self.env['res.currency.rate']
         # self.txt_iva_obj = self.env['txt.iva']
         # self.txt_line_obj = self.env['txt.iva.line']
@@ -64,8 +65,12 @@ class TestFiscalRequirements(TransactionCase):
             'l10n_ve_fiscal_requirements.iva_sale1')
         self.tax_s_0 = self.env.ref(
             'l10n_ve_fiscal_requirements.iva_sale3')
-        self.company = self.env.ref(
+        self.a_sale = self.env.ref(
+            'account.a_sale')
+        self.main_partner = self.env.ref(
             'base.main_partner')
+        self.company = self.env.ref(
+            'base.main_company')
 
     def _create_invoice(self, type_inv='in_invoice'):
         """Function create invoice"""
@@ -188,3 +193,44 @@ class TestFiscalRequirements(TransactionCase):
         self.w_ncontrol.with_context(context).create(value).set_noctrl()
         self.assertEqual(invoice.nro_ctrl, '987654321',
                          'Number control no chance')
+
+    def test_05_damaged_paper(self):
+        """Test fiscal requirements damaged paper"""
+        # Create customer invoice
+        invoice = self._create_invoice('out_invoice')
+        # Check initial state
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
+        )
+        # Create invoice line with tax general
+        self._create_invoice_line(invoice.id, self.tax_s_12)
+        # Set invoice state proforma2
+        invoice.signal_workflow('invoice_proforma2')
+        self.assertEqual(invoice.state, 'proforma2', 'State in proforma2')
+        # Check no created journal entries
+        self.assertEqual(invoice.move_id, self.move_obj,
+                         'There should be no move')
+        # Set invoice state open
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        # Check created journal entries
+        self.assertNotEqual(invoice.move_id, self.move_obj,
+                            'There should be move')
+        # Update company account for damaged paper
+        self.company.write({'acc_id': self.a_sale.id})
+        self.assertEqual(self.company.acc_id, self.a_sale,
+                         'Account not update')
+        # Update journal to allow cancellation
+        invoice.journal_id.write({'update_posted': True})
+        self.assertTrue(invoice.journal_id.update_posted,
+                        'Update_posted should be True')
+        # Create a damaged paper
+        winc = self.winv_numctrl.create({
+            'invoice_id': invoice.id,
+            'sure': True
+        })
+        winc.action_invoice_create(None, invoice)
+        self.assertEqual(invoice.move_id.state, 'draft',
+                         'Move of invoice should be draft')
+        self.assertEqual(invoice.state, 'paid',
+                         'State invoice should be paid')
