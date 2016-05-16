@@ -48,6 +48,7 @@ class TestFiscalRequirements(TransactionCase):
         self.inv_refund = self.env['account.invoice.refund']
         self.tax_unit = self.env['l10n.ut']
         self.rates_obj = self.env['res.currency.rate']
+        self.seniat_srch = self.env['search.info.partner.seniat']
         # self.txt_iva_obj = self.env['txt.iva']
         # self.txt_line_obj = self.env['txt.iva.line']
         self.partner_amd = self.env.ref(
@@ -341,3 +342,14 @@ class TestFiscalRequirements(TransactionCase):
                                 self.currency_usd.id,
                                 date_now)
         self.assertEqual(_xc(2000), 2500, 'Change currency incorrect')
+
+    def test_09_seniat_search(self):
+        """Test seniat search wizard"""
+        seniat = self.seniat_srch.create({
+            'vat': 'J317520882'
+        })
+        # Button search RIF
+        seniat.search_partner_seniat()
+        # Check search RIF
+        self.assertEqual(seniat.name, 'VAUXOO, C,A',
+                         'This search should return "VAUXOO, C,A"')
