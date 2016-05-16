@@ -23,11 +23,11 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
 import time
-# from datetime import datetime, timedelta
+from datetime import datetime, timedelta
 from openerp.tests.common import TransactionCase
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
 # from openerp.exceptions import except_orm, ValidationError
-# from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class TestFiscalRequirements(TransactionCase):
@@ -44,6 +44,9 @@ class TestFiscalRequirements(TransactionCase):
         self.move_obj = self.env['account.move']
         self.w_ncontrol = self.env['wiz.nroctrl']
         self.winv_numctrl = self.env['wizard.invoice.nro.ctrl']
+        self.inv_debit = self.env['account.invoice.debit']
+        self.inv_refund = self.env['account.invoice.refund']
+        self.tax_unit = self.env['l10n.ut']
         self.rates_obj = self.env['res.currency.rate']
         # self.txt_iva_obj = self.env['txt.iva']
         # self.txt_line_obj = self.env['txt.iva.line']
@@ -71,6 +74,8 @@ class TestFiscalRequirements(TransactionCase):
             'base.main_partner')
         self.company = self.env.ref(
             'base.main_company')
+        self.currency_usd = self.env.ref('base.USD')
+        self.currency_eur = self.env.ref('base.EUR')
 
     def _create_invoice(self, type_inv='in_invoice'):
         """Function create invoice"""
@@ -234,3 +239,105 @@ class TestFiscalRequirements(TransactionCase):
                          'Move of invoice should be draft')
         self.assertEqual(invoice.state, 'paid',
                          'State invoice should be paid')
+
+    def test_06_debit_note(self):
+        """Test fiscal requirement debit note"""
+        # Create customer invoice
+        invoice = self._create_invoice('out_invoice')
+        # Check initial state
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
+        )
+        # Create invoice line with tax general
+        self._create_invoice_line(invoice.id, self.tax_s_12)
+        # Set invoice state proforma2
+        invoice.signal_workflow('invoice_proforma2')
+        self.assertEqual(invoice.state, 'proforma2', 'State in proforma2')
+        # Check no created journal entries
+        self.assertEqual(invoice.move_id, self.move_obj,
+                         'There should be no move')
+        # Set invoice state open
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        # Check created journal entries
+        self.assertNotEqual(invoice.move_id, self.move_obj,
+                            'There should be move')
+        # Create wizard account invoice debit
+        # date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        # w_debit = self.inv_debit.create({
+        #     'description': 'Test debit note',
+        #     'date': date_now,
+        #     'journal_id': invoice.journal_id.id,
+        #     'comment': 'Debit note for unit test'
+        # })
+        # Create debit note
+        # context = {'active_id': invoice.id, 'active_ids': [invoice.id]}
+        # w_debit.with_context(context).invoice_debit()
+        # Check debit note created
+
+    def test_07_refunds_notes(self):
+        """Test fiscal requirement refunds notes"""
+        # Create customer invoice
+        invoice = self._create_invoice('out_invoice')
+        # Check initial state
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
+        )
+        # Create invoice line with tax general
+        self._create_invoice_line(invoice.id, self.tax_s_12)
+        # Set invoice state proforma2
+        invoice.signal_workflow('invoice_proforma2')
+        self.assertEqual(invoice.state, 'proforma2', 'State in proforma2')
+        # Check no created journal entries
+        self.assertEqual(invoice.move_id, self.move_obj,
+                         'There should be no move')
+        # Set invoice state open
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        # Test refund invoice (modify)
+        # date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        # period_id = self.period_obj.find(date_now)
+        # refund = self.inv_refund.create({
+        #     'description': 'Test Refund',
+        #     'date': date_now,
+        #     'filter_refund': 'modify',
+        #     'period': period_id.id,
+        # })
+        # context = {'active_id': invoice.id, 'active_ids': [invoice.id]}
+        # refund.with_context(context).invoice_refund()
+        # self.assertEqual(invoice.state, 'paid', 'State invoice should be paid')
+
+    def test_08_tax_unit(self):
+        """Test Tax unit"""
+        # Create tax unit
+        date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        self.tax_unit.create({
+            'name': '456123',
+            'date': date_now,
+            'amount': 200.00,
+        })
+        # Check search by date tax unit
+        ut_amount = self.tax_unit.get_amount_ut(date_now)
+        self.assertEqual(ut_amount, 200, 'Amount of tax unit should be 200')
+        # Check qunatity tax units
+        ut_qty = self.tax_unit.compute(400)
+        self.assertEqual(ut_qty, 2, 'Quantity tax unit should be 2')
+        # Check amount of tax unit
+        amount = self.tax_unit.compute_ut_to_money(5)
+        self.assertEqual(amount, 1000, 'Amount should be 1000')
+        # Check exchange currency in tax unit
+        self.company.write({'currency_id': self.currency_eur.id})
+        self.assertEqual(self.company.currency_id,
+                         self.currency_eur,
+                         'Currency company should be EUR')
+        datetime_now = datetime.now()
+        day = timedelta(days=2)
+        datetime_now = datetime_now - day
+        datetime_now = datetime_now.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
+        self.rates_obj.create({'name': datetime_now,
+                               'rate': 1.25,
+                               'currency_id': self.currency_usd.id})
+        _xc = self.tax_unit.sxc(self.company.currency_id.id,
+                                self.currency_usd.id,
+                                date_now)
+        self.assertEqual(_xc(2000), 2500, 'Change currency incorrect')
