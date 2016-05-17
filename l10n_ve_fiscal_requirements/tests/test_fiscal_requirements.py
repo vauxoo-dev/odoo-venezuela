@@ -26,6 +26,7 @@ import time
 from datetime import datetime, timedelta
 from openerp.tests.common import TransactionCase
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
+from openerp.exceptions import ValidationError
 # from openerp.exceptions import except_orm, ValidationError
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
@@ -38,6 +39,7 @@ class TestFiscalRequirements(TransactionCase):
         super(TestFiscalRequirements, self).setUp()
         # self.doc_obj = self.env['account.wh.iva']
         # self.doc_line_obj = self.env['account.wh.iva.line']
+        self.partner_obj = self.env['res.partner']
         self.invoice_obj = self.env['account.invoice']
         self.invoice_line_obj = self.env['account.invoice.line']
         self.period_obj = self.env['account.period']
@@ -353,3 +355,66 @@ class TestFiscalRequirements(TransactionCase):
         # Check search RIF
         self.assertEqual(seniat.name, 'VAUXOO, C,A',
                          'This search should return "VAUXOO, C,A"')
+
+    def test_10_vat(self):
+        """Test vat in create and validation of partner"""
+        # Test Create partner with a wrong formatted var
+        # for Venezuelan Standards
+        with self.assertRaises(ValidationError):
+            self.partner_obj.create({
+                'name': 'Partner test fiscal requirements',
+                'supplier': True,
+                'customer': True,
+                'vat': 'VEJ333',
+                'type': 'invoice',
+                'street': 'Av Siempre Viva',
+                'phone': '(555) 5555555',
+                'fax': '(555) 9999999',
+                'email': 'fakemail@example.com',
+            })
+        # Test Create partner with a right formatted var
+        # for Venezuelan Standards
+        partner = self.partner_obj.create({
+            'name': 'Partner test fiscal requirements',
+            'supplier': True,
+            'customer': True,
+            'vat': 'VEJ333444116',
+            'type': 'invoice',
+            'street': 'Av Siempre Viva',
+            'phone': '(555) 5555555',
+            'fax': '(555) 9999999',
+            'email': 'fakemail@example.com',
+        })
+        self.assertNotEqual(partner, self.partner_obj,
+                            'Partner should be created')
+        # Test Create partner with no VAT number
+        with self.assertRaises(ValidationError):
+            self.partner_obj.create({
+                'name': 'Partner test fiscal requirements',
+                'supplier': True,
+                'customer': True,
+                'type': 'invoice',
+                'street': 'Av Siempre Viva',
+                'phone': '(555) 5555555',
+                'fax': '(555) 9999999',
+                'email': 'fakemail@example.com',
+                'country_id': self.env.ref('base.ve').id
+            })
+        # Set vat_check_vies equal False in main company, will not consult web
+        self.company.vat_check_vies = False
+        # Test Button 'Check Validity' in Partner Form
+        self.partner_amd.button_check_vat()
+        self.assertEqual(self.partner_amd.name,
+                         'Accesorios AMD Computadoras, C.A.',
+                         'Name incorrect')
+        self.assertFalse(self.partner_amd.seniat_updated,
+                         'seniat_updated should be false')
+        # Set vat_check_vies equal True in main company, will consult web
+        self.company.vat_check_vies = True
+        # Test Button 'Check Validity' in Partner Form
+        self.partner_amd.button_check_vat()
+        self.assertEqual(self.partner_amd.name,
+                         'ACCESORIOS A.M.D. COMPUTADORAS, C.A.',
+                         'Name no update')
+        self.assertTrue(self.partner_amd.seniat_updated,
+                        'seniat_updated should be true')
