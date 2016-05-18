@@ -81,8 +81,8 @@ class TestSalePurchase(TransactionCase):
         self.no_concept = self.env.ref(
             'l10n_ve_withholding_islr.islr_wh_concept_no_apply_withholding')
 
-    def test_01_purchase_order(self):
-        """Test Purchase Order"""
+    def test_01_purchase_order_method_order(self):
+        """Test Purchase Order, invoice method order"""
         # Create purchase order
         date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         pur_ord = self.purchase_obj.create({
@@ -131,3 +131,38 @@ class TestSalePurchase(TransactionCase):
         self.assertEqual(pur_ord.invoice_ids.state, 'open',
                          'State invoice should be open')
 
+    def test_02_purchase_order_method_picking(self):
+        """Test Purchase Order, invoice method picking"""
+        # Create purchase order
+        date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        pur_ord = self.purchase_obj.create({
+            'date_order': date_now,
+            'location_id': self.location.id,
+            'partner_id': self.partner_amd.id,
+            'invoice_method': 'picking',
+            'pricelist_id': self.pricelist.id,
+        })
+        self.pur_line_obj.create({
+            'product_id': self.product_pc.id,
+            'product_qty': 3,
+            'price_unit': 10,
+            'name': 'PC3',
+            'date_planned': date_now,
+            'order_id': pur_ord.id,
+            'concept_id': self.no_concept.id,
+        })
+        # Check state purchase order
+        self.assertEqual(pur_ord.state, 'draft', 'State should be draft')
+        # Set purchase order state approved
+        pur_ord.signal_workflow('purchase_confirm')
+        self.assertEqual(pur_ord.state, 'approved', 'State should be confirm')
+        # Check stock picking created
+        picking = self.picking_obj.search([('origin', '=', pur_ord.name)])
+        self.assertEqual(len(picking), 1, 'Picking not created')
+        self.assertEqual(picking.state, 'assigned',
+                         'State picking should be equal to assigned')
+        self.assertEqual(len(picking.move_lines), 1,
+                         'Quantity lines incorrect')
+        # Check invoice not created
+        self.assertEqual(pur_ord.invoice_ids, self.invoice_obj,
+                         'Not should be a created invoice')
