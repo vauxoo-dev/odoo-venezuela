@@ -27,18 +27,15 @@ from datetime import datetime, timedelta
 from openerp.tests.common import TransactionCase
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
 from openerp.exceptions import ValidationError
-# from openerp.exceptions import except_orm, ValidationError
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class TestFiscalRequirements(TransactionCase):
-    """ Test of withholding IVA """
+    """ Test of Fiscal Requirements """
 
     def setUp(self):
         """Seudo-constructor method"""
         super(TestFiscalRequirements, self).setUp()
-        # self.doc_obj = self.env['account.wh.iva']
-        # self.doc_line_obj = self.env['account.wh.iva.line']
         self.partner_obj = self.env['res.partner']
         self.invoice_obj = self.env['account.invoice']
         self.invoice_line_obj = self.env['account.invoice.line']
@@ -51,8 +48,6 @@ class TestFiscalRequirements(TransactionCase):
         self.tax_unit = self.env['l10n.ut']
         self.rates_obj = self.env['res.currency.rate']
         self.seniat_srch = self.env['search.info.partner.seniat']
-        # self.txt_iva_obj = self.env['txt.iva']
-        # self.txt_line_obj = self.env['txt.iva.line']
         self.partner_amd = self.env.ref(
             'l10n_ve_fiscal_requirements.f_req_partner_2')
         self.partner_nwh = self.env.ref(
