@@ -23,12 +23,8 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ###############################################################################
 import time
-# from datetime import datetime, timedelta
 from openerp.tests.common import TransactionCase
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
-# from openerp.exceptions import ValidationError
-# from openerp.exceptions import except_orm, ValidationError
-# from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class TestSalePurchase(TransactionCase):
@@ -42,41 +38,14 @@ class TestSalePurchase(TransactionCase):
         self.sale_obj = self.env['sale.order']
         self.sal_line_obj = self.env['sale.order.line']
         self.picking_obj = self.env['stock.picking']
-        self.partner_obj = self.env['res.partner']
         self.invoice_obj = self.env['account.invoice']
-        self.invoice_line_obj = self.env['account.invoice.line']
-        self.period_obj = self.env['account.period']
-        self.move_obj = self.env['account.move']
-        self.rates_obj = self.env['res.currency.rate']
         self.transfer_obj = self.env['stock.transfer_details']
         self.partner_amd = self.env.ref(
             'l10n_ve_fiscal_requirements.f_req_partner_2')
-        self.partner_nwh = self.env.ref(
-            'l10n_ve_fiscal_requirements.f_req_partner_7')
-        self.comercial = self.env.ref(
-            'l10n_ve_fiscal_requirements.f_req_partner_10')
-        self.parent_com = self.env.ref(
-            'base.res_partner_23')
         self.product_ipad = self.env.ref(
             'product.product_product_6_product_template')
         self.product_pc = self.env.ref(
             'product.product_product_3_product_template')
-        self.tax_general = self.env.ref(
-            'l10n_ve_fiscal_requirements.iva_purchase1')
-        self.tax_except = self.env.ref(
-            'l10n_ve_fiscal_requirements.iva_purchase3')
-        self.tax_s_12 = self.env.ref(
-            'l10n_ve_fiscal_requirements.iva_sale1')
-        self.tax_s_0 = self.env.ref(
-            'l10n_ve_fiscal_requirements.iva_sale3')
-        self.a_sale = self.env.ref(
-            'account.a_sale')
-        self.main_partner = self.env.ref(
-            'base.main_partner')
-        self.company = self.env.ref(
-            'base.main_company')
-        self.currency_usd = self.env.ref('base.USD')
-        self.currency_eur = self.env.ref('base.EUR')
         self.location = self.env.ref('stock.stock_location_stock')
         self.pricelist = self.env.ref('product.list0')
         self.no_concept = self.env.ref(
