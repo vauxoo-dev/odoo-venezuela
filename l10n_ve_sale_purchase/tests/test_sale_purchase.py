@@ -185,3 +185,52 @@ class TestSalePurchase(TransactionCase):
         # Check invoice not created
         self.assertEqual(pur_ord.invoice_ids, self.invoice_obj,
                          'Not should be a created invoice')
+
+    def test_03_sale_order(self):
+        """Test Sale Order"""
+        # Create sale order
+        date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        sal_ord = self.sale_obj.create({
+            'name': 'Sale Order Test',
+            'date_order': date_now,
+            'partner_id': self.partner_amd.id,
+            'pricelist_id': self.pricelist.id,
+        })
+        self.sal_line_obj.create({
+            'product_id': self.product_pc.id,
+            'product_uom_qty': 3,
+            'price_unit': 10,
+            'name': 'PC3',
+            'order_id': sal_ord.id,
+            'concept_id': self.no_concept.id,
+        })
+        self.sal_line_obj.create({
+            'product_id': self.product_ipad.id,
+            'product_uom_qty': 5,
+            'price_unit': 5,
+            'name': 'Ipad',
+            'order_id': sal_ord.id,
+            'concept_id': self.no_concept.id,
+        })
+        # Check state initial
+        self.assertEqual(sal_ord.state, 'draft', 'State should be draft')
+        # Set state manual
+        sal_ord.signal_workflow('order_confirm')
+        self.assertEqual(sal_ord.state, 'manual', 'State should be manual')
+        # Create invoice
+        sal_ord.signal_workflow('manual_invoice')
+        self.assertEqual(sal_ord.state, 'progress', 'State should be progress')
+        # Check invoice created
+        self.assertEqual(len(sal_ord.invoice_ids), 1, 'Invoice not create')
+        self.assertEqual(sal_ord.invoice_ids.state, 'draft',
+                         'Invoice state should be draft')
+        # Set invoice state open
+        sal_ord.invoice_ids.signal_workflow('invoice_open')
+        self.assertEqual(sal_ord.invoice_ids.state, 'open',
+                         'Invoice state should be open')
+        # Check invoice line
+        self.assertEqual(len(sal_ord.invoice_ids.invoice_line), 2,
+                         'Quantity lines incorrect')
+        for line in sal_ord.invoice_ids.invoice_line:
+            self.assertEqual(line.concept_id, self.no_concept,
+                             'ISLR concept not copied')
