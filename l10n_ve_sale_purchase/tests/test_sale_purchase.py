@@ -48,6 +48,7 @@ class TestSalePurchase(TransactionCase):
         self.period_obj = self.env['account.period']
         self.move_obj = self.env['account.move']
         self.rates_obj = self.env['res.currency.rate']
+        self.transfer_obj = self.env['stock.transfer_details']
         self.partner_amd = self.env.ref(
             'l10n_ve_fiscal_requirements.f_req_partner_2')
         self.partner_nwh = self.env.ref(
@@ -122,6 +123,18 @@ class TestSalePurchase(TransactionCase):
                          'State picking should be equal to assigned')
         self.assertEqual(len(picking.move_lines), 2,
                          'Quantity lines incorrect')
+        # Validate stock picking
+        transfer = picking.do_enter_transfer_details()
+        context = transfer.get('context', {})
+        transf = self.transfer_obj.with_context(context).create({
+            'picking_id': picking.id})
+        transf.do_detailed_transfer()
+        # Check stock picking and stock move
+        self.assertEqual(picking.state, 'done', 'Picking should be validated')
+        for sm_id in picking.move_lines:
+            self.assertEqual(sm_id.state, 'done',
+                             'State stock move should be done')
+
         # Check invoice created
         self.assertEqual(len(pur_ord.invoice_ids), 1,
                          'There should be a created invoice')
@@ -130,6 +143,12 @@ class TestSalePurchase(TransactionCase):
         pur_ord.invoice_ids.signal_workflow('invoice_open')
         self.assertEqual(pur_ord.invoice_ids.state, 'open',
                          'State invoice should be open')
+        # Check invoice line
+        self.assertEqual(len(pur_ord.invoice_ids.invoice_line), 2,
+                         'Quantity lines incorrect')
+        for line in pur_ord.invoice_ids.invoice_line:
+            self.assertEqual(line.concept_id, self.no_concept,
+                             'ISLR concept not copied')
 
     def test_02_purchase_order_method_picking(self):
         """Test Purchase Order, invoice method picking"""
