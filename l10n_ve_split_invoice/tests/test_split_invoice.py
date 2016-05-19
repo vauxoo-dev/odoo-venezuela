@@ -28,7 +28,7 @@ from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
 
 
 class TestSplitInvoice(TransactionCase):
-    """ Test of withholding IVA """
+    """ Test of Split Invoice """
 
     def setUp(self):
         """Seudo-constructor method"""
@@ -38,27 +38,21 @@ class TestSplitInvoice(TransactionCase):
         self.invoice_tax_obj = self.env['account.invoice.tax']
         self.period_obj = self.env['account.period']
         self.partner_amd = self.env.ref(
-            'l10n_ve_fiscal_requirements.f_req_partner_2')
+            'base.main_partner')
         self.product_ipad = self.env.ref(
             'product.product_product_6_product_template')
-        self.tax_general = self.env.ref(
-            'l10n_ve_fiscal_requirements.iva_purchase1')
-        self.tax_s_12 = self.env.ref(
-            'l10n_ve_fiscal_requirements.iva_sale1')
         self.company = self.env.ref(
             'base.main_company')
 
     def _create_invoice(self, type_inv='in_invoice'):
-        '''Function create invoice'''
+        """Function create invoice"""
         date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         invoice_dict = {
             'partner_id': self.partner_amd.id,
-            'nro_ctrl': '2000-694351',
             'date_invoice': date_now,
-            'date_document': date_now,
             'type': type_inv,
             'reference_type': 'none',
-            'name': 'invoice iva supplier',
+            'name': 'invoice supplier',
             'account_id': self.partner_amd.property_account_receivable.id,
         }
         if type_inv == 'in_invoice':
@@ -68,7 +62,7 @@ class TestSplitInvoice(TransactionCase):
         return self.invoice_obj.create(invoice_dict)
 
     def _create_invoice_line(self, invoice_id=None, tax=None):
-        '''Create invoice line'''
+        """Create invoice line"""
         line_dict = {
             'product_id': self.product_ipad.id,
             'quantity': 1,
@@ -92,12 +86,12 @@ class TestSplitInvoice(TransactionCase):
             invoice.state, 'draft', 'Initial state should be in "draft"'
         )
         # Create invoice lines
-        self._create_invoice_line(invoice.id, self.tax_s_12)
-        self._create_invoice_line(invoice.id, self.tax_s_12)
-        self._create_invoice_line(invoice.id, self.tax_s_12)
-        self._create_invoice_line(invoice.id, self.tax_s_12)
-        self._create_invoice_line(invoice.id, self.tax_s_12)
-        self._create_invoice_line(invoice.id, self.tax_s_12)
+        self._create_invoice_line(invoice.id)
+        self._create_invoice_line(invoice.id)
+        self._create_invoice_line(invoice.id)
+        self._create_invoice_line(invoice.id)
+        self._create_invoice_line(invoice.id)
+        self._create_invoice_line(invoice.id)
         # Calculate taxes button
         invoice.button_reset_taxes()
         # Set invoice state open
@@ -108,19 +102,11 @@ class TestSplitInvoice(TransactionCase):
                          len(invoice.invoice_line),
                          'Number lines should be equal '
                          'configuration in company')
-        # Check the taxes
-        tax_ids = self.invoice_tax_obj.search(
-            [('invoice_id', '=', invoice.id)])
-        print tax_ids
+        # Check amount
         base = 0
         for line in invoice.invoice_line:
             base += line.price_unit * line.quantity
         self.assertEqual(invoice.amount_untaxed, base,
                          'Amount untaxed should be equal total of the lines')
-        self.assertEqual(tax_ids[0].base, base,
-                         'Base amount should be equal total of the lines')
-        amount_tax = self.tax_s_12.amount*base
-        self.assertEqual(invoice.amount_tax, amount_tax,
-                         'Amount tax incorrect')
-        self.assertEqual(invoice.amount_total, amount_tax+base,
+        self.assertEqual(invoice.amount_total, base,
                          'Amount total incorrect')
