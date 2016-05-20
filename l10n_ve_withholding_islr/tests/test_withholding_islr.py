@@ -30,10 +30,10 @@ from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
 
 
 class TestIslrWithholding(TransactionCase):
-    ''' Test of withholding ISLR'''
+    """ Test of withholding ISLR """
 
     def setUp(self):
-        '''Seudo-constructor method'''
+        """Seudo-constructor method"""
         super(TestIslrWithholding, self).setUp()
         self.doc_obj = self.env['islr.wh.doc']
         self.doc_line_obj = self.env['islr.wh.doc.line']
@@ -42,18 +42,25 @@ class TestIslrWithholding(TransactionCase):
         self.rates_obj = self.env['res.currency.rate']
         self.partner_amd = self.env.ref(
             'l10n_ve_fiscal_requirements.f_req_partner_2')
+        self.partner_child = self.env.ref(
+            'l10n_ve_fiscal_requirements.f_req_partner_9')
         self.product_ipad = self.env.ref(
             'product.product_product_6_product_template')
         self.concept = self.env.ref(
             'l10n_ve_withholding_islr.islr_wh_concept_pago_contratistas_demo')
+        self.concept_no_apply = self.env.ref(
+            'l10n_ve_withholding_islr.islr_wh_concept_no_apply_withholding')
         self.concept_wo_account = self.env.ref(
             'l10n_ve_withholding_islr.islr_wh_concept_pago_contratistas')
-        self.tax_general = self.env.ref(
-            'l10n_ve_fiscal_requirements.iva_purchase1')
+        self.concept_hprof = self.env.ref(
+            'l10n_ve_withholding_islr.islr_wh_concept_hprof_no_mercantiles')
+        # self.tax_general = self.env.ref(
+        #     'l10n_ve_fiscal_requirements.iva_purchase1')
         self.currency_usd = self.env.ref('base.USD')
+        self.company = self.env.ref('base.main_company')
 
     def _create_invoice(self, type_inv='in_invoice', currency=False):
-        '''Function create invoice'''
+        """Function create invoice"""
         date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         invoice_dict = {
             'partner_id': self.partner_amd.id,
@@ -70,7 +77,7 @@ class TestIslrWithholding(TransactionCase):
         return self.invoice_obj.create(invoice_dict)
 
     def _create_invoice_line(self, invoice_id=None, concept=None):
-        '''Create invoice line'''
+        """Create invoice line"""
         line_dict = {
             'product_id': self.product_ipad.id,
             'quantity': 1,
@@ -83,47 +90,58 @@ class TestIslrWithholding(TransactionCase):
         return self.invoice_line_obj.create(line_dict)
 
     def test_01_validate_process_withholding_islr(self):
-        '''Test create invoice supplier with data initial and
-        Test validate invoice with document withholding islr'''
+        """Test create invoice supplier with data initial and
+        Test validate invoice with document withholding islr"""
+        # Create invoice supplier
         invoice = self._create_invoice('in_invoice')
         # Check initial state
         self.assertEqual(
             invoice.state, 'draft', 'Initial state should be in "draft"'
         )
-        # invoice_line = self._create_invoice_line(invoice)
+        # Create invoice lines
         self._create_invoice_line(invoice.id, self.concept.id)
+        self._create_invoice_line(invoice.id, self.concept_no_apply.id)
+        # Set state open in invoice
         invoice.signal_workflow('invoice_open')
         self.assertEqual(
             invoice.state, 'open', 'State in open'
         )
+        # Check document withholding income created
         self.assertNotEqual(invoice.islr_wh_doc_id, self.doc_obj,
-            'Not should be empty the withholding document'
-        )
+                            'Not should be empty the withholding document')
+        # Test invoice copy
         invoice_c = invoice.copy()
         self.assertEqual(invoice_c.status, 'no_pro', 'Status should be no_pro')
-        self.assertEqual(invoice_c.islr_wh_doc_id, self.doc_obj,
+        self.assertEqual(
+            invoice_c.islr_wh_doc_id,
+            self.doc_obj,
             'Withholding document the invoice copy should be empty')
 
+        # Check document withholding income
         islr_wh = invoice.islr_wh_doc_id
-
         self.assertEqual(islr_wh.state, 'draft',
-            'State of withholding should be in draft'
-        )
+                         'State of withholding should be in draft')
         self.assertEqual(len(islr_wh.concept_ids), 1, 'Should exist a record')
         self.assertEqual(len(islr_wh.invoice_ids), 1, 'Should exist a invoice')
         self.assertEqual(islr_wh.amount_total_ret, 2.00,
-            'Amount total should be 2.00'
-        )
+                         'Amount total should be 2.00')
+        # Check xml_id
+        self.assertEqual(len(islr_wh.invoice_ids), 1,
+                         'Invoice not incorporated')
+        self.assertEqual(len(islr_wh.invoice_ids.islr_xml_id), 1,
+                         'xml not created')
+        # Confirm document withholding income
         islr_wh.signal_workflow('act_confirm')
         self.assertEqual(islr_wh.state, 'confirmed',
-            'State of withholding should be in confirmed'
-        )
+                         'State of withholding should be in confirmed')
+        # Done document withholding income
         islr_wh.signal_workflow('act_done')
         self.assertEqual(islr_wh.state, 'done',
-            'State of withholding should be in done'
-        )
+                         'State of withholding should be in done')
+        # Check payments invoice
         self.assertEqual(len(invoice.payment_ids), 1, 'Should exits a payment')
-        self.assertEqual(invoice.residual,
+        self.assertEqual(
+            invoice.residual,
             invoice.amount_total - islr_wh.amount_total_ret,
             'Amount residual invoice should be equal amount total - amount wh'
         )
@@ -133,18 +151,22 @@ class TestIslrWithholding(TransactionCase):
             for line in doc_inv.move_id.line_id:
                 if line.debit > 0:
                     debit += line.debit
-                    self.assertEqual(line.account_id.id, invoice.account_id.id,
+                    self.assertEqual(
+                        line.account_id.id,
+                        invoice.account_id.id,
                         'Account should be equal to account invoice'
                     )
                 else:
                     credit += line.credit
-                    self.assertEqual(line.account_id.id,
+                    self.assertEqual(
+                        line.account_id.id,
                         self.concept.property_retencion_islr_payable.id,
                         'Account should be equal to account concept islr'
                     )
         self.assertEqual(debit, credit, 'Debit and Credit should be equal')
-        self.assertEqual(debit, islr_wh.amount_total_ret,
-            'Amount total withholding should be equal journal entrie'
+        self.assertEqual(
+            debit, islr_wh.amount_total_ret,
+            'Amount total withholding should be equal journal entries'
         )
 
     # def test_02_constraint_account_withholding_islr(self):
@@ -162,49 +184,176 @@ class TestIslrWithholding(TransactionCase):
     #         islr_wh.signal_workflow('act_done')
 
     def test_02_withholding_with_currency(self):
-        '''Test withholding with multicurrency'''
+        """Test withholding with multi currency"""
+        # Create Rate for currency USD
         datetime_now = datetime.now()
         day = timedelta(days=2)
         datetime_now = datetime_now - day
         datetime_now = datetime_now.strftime(DEFAULT_SERVER_DATETIME_FORMAT)
         self.rates_obj.create({'name': datetime_now,
-                                'rate': 1.25,
-                                'currency_id': self.currency_usd.id})
+                               'rate': 1.25,
+                               'currency_id': self.currency_usd.id})
+        # Create invoice
         invoice = self._create_invoice('in_invoice', self.currency_usd.id)
+        # Create invoice line
         self._create_invoice_line(invoice.id, self.concept.id)
+        # Set state open in invoice
         invoice.signal_workflow('invoice_open')
         islr_wh = invoice.islr_wh_doc_id
-
+        #Check currency in document withholding income
         for concept_id in islr_wh.concept_ids:
             currency_c = concept_id.currency_base_amount /\
-                            invoice.currency_id.rate_silent
+                invoice.currency_id.rate_silent
             wh_currency = concept_id.currency_amount /\
-                            invoice.currency_id.rate_silent
+                invoice.currency_id.rate_silent
             self.assertEqual(concept_id.base_amount,
                              currency_c,
-                             '''Amount base should be equal to amount invoice
-                             between currency amount
-                             ''')
+                             """"Amount base should be equal to amount invoice
+                             between currency amount""")
             self.assertEqual(concept_id.amount,
                              wh_currency,
-                             '''Amount base should be equal to amount invoice
-                             between currency amount
-                             ''')
+                             """Amount base should be equal to amount invoice
+                             between currency amount""")
 
     def test_03_validate_process_withholding_islr_customer(self):
-        '''Test create invoice customer with data initial and
-        Test validate invoice with document withholding islr'''
+        """Test create invoice customer with data initial and
+        Test validate invoice with document withholding islr"""
+        # Create invoice supplier
         invoice = self._create_invoice('out_invoice')
         # Check initial state
         self.assertEqual(
             invoice.state, 'draft', 'Initial state should be in "draft"'
         )
-        # invoice_line = self._create_invoice_line(invoice)
+        # Create invoice lines
         self._create_invoice_line(invoice.id, self.concept.id)
+        # Set state open in invoice
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        # Check document withholding income no created
+        self.assertEqual(invoice.islr_wh_doc_id, self.doc_obj,
+                         'Not should be empty the withholding document')
+
+    def test_04_islr_partner_child(self):
+        """Test withholding islr with partner child"""
+        # Create invoice supplier
+        date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        invoice_dict = {
+            'partner_id': self.partner_child.id,
+            'nro_ctrl': '2000-694351',
+            'date_invoice': date_now,
+            'date_document': date_now,
+            'type': 'in_invoice',
+            'reference_type': 'none',
+            'name': 'invoice islr supplier',
+            'account_id': self.partner_child.property_account_payable.id,
+        }
+        invoice = self.invoice_obj.create(invoice_dict)
+        # Check initial state
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"')
+        # Create invoice lines
+        self._create_invoice_line(invoice.id, self.concept.id)
+        self._create_invoice_line(invoice.id, self.concept_no_apply.id)
+        # Set state open in invoice
         invoice.signal_workflow('invoice_open')
         self.assertEqual(
             invoice.state, 'open', 'State in open'
         )
-        self.assertEqual(invoice.islr_wh_doc_id, self.doc_obj,
-            'Not should be empty the withholding document'
+        # Check document withholding income
+        self.assertNotEqual(invoice.islr_wh_doc_id, self.doc_obj,
+                            'Not should be empty the withholding document')
+        islr_wh = invoice.islr_wh_doc_id
+
+        # Check partner assigned in document withholding islr
+        self.assertEqual(invoice.partner_id.parent_id, islr_wh.partner_id,
+                         'Partner islr should be equal to partner invoice')
+
+    def test_05_company_automatic_done_wh(self):
+        """Test withholding document is automatic set to Done"""
+        # Update withholding automatic
+        self.company.automatic_income_wh = True
+        self.assertTrue(self.company.automatic_income_wh,
+                        'Automatic_income_wh is False')
+        # Create invoice supplier
+        invoice = self._create_invoice('in_invoice')
+        # Check initial state
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
         )
+        # Create invoice lines
+        self._create_invoice_line(invoice.id, self.concept.id)
+        self._create_invoice_line(invoice.id, self.concept_no_apply.id)
+        # Set state open in invoice
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        # Check document withholding income created
+        self.assertNotEqual(invoice.islr_wh_doc_id, self.doc_obj,
+                            'Not should be empty the withholding document')
+        # Check state done in document withholding income
+        islr_wh = invoice.islr_wh_doc_id
+        self.assertEqual(islr_wh.state, 'done', 'State should be done')
+        # Check payments invoice
+        self.assertEqual(len(invoice.payment_ids), 1, 'Should exits a payment')
+        self.assertEqual(
+            invoice.residual,
+            invoice.amount_total - islr_wh.amount_total_ret,
+            'Amount residual invoice should be equal amount total - amount wh'
+        )
+        debit = 0
+        credit = 0
+        for doc_inv in islr_wh.invoice_ids:
+            for line in doc_inv.move_id.line_id:
+                if line.debit > 0:
+                    debit += line.debit
+                    self.assertEqual(
+                        line.account_id.id,
+                        invoice.account_id.id,
+                        'Account should be equal to account invoice'
+                    )
+                else:
+                    credit += line.credit
+                    self.assertEqual(
+                        line.account_id.id,
+                        self.concept.property_retencion_islr_payable.id,
+                        'Account should be equal to account concept islr'
+                    )
+        self.assertEqual(debit, credit, 'Debit and Credit should be equal')
+        self.assertEqual(
+            debit, islr_wh.amount_total_ret,
+            'Amount total withholding should be equal journal entries')
+
+    def test_06_withholding_society_of_natural_persons(self):
+        """Test create withholding income with partner is society
+        of natural persons (spn)"""
+        # Update partner for assign spn
+        self.partner_amd.spn = True
+        self.assertTrue(self.partner_amd.spn, 'SPN not is True')
+        # # Update account in concept_hprof_no_mercantiles
+        # s_account = self.concept.property_retencion_islr_payable
+        # c_account = self.concept.property_retencion_islr_receivable
+        # self.concept_hprof.property_retencion_islr_payable = s_account
+        # self.concept_hprof.property_retencion_islr_receivable = c_account
+        # Create invoice supplier
+        invoice = self._create_invoice('in_invoice')
+        # Check initial state
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
+        )
+        # Create invoice lines
+        # self._create_invoice_line(invoice.id, self.concept.id)
+        self._create_invoice_line(invoice.id, self.concept_hprof.id)
+        # Set state open in invoice
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        # Check document withholding income created
+        self.assertNotEqual(invoice.islr_wh_doc_id, self.doc_obj,
+                            'Not should be empty the withholding document')
+        # Obtain correct rate to compare
+        correct_rate = False
+        for rate in self.concept_hprof.rate_ids:
+            if rate.residence and rate.nature:
+                correct_rate = rate
+        # Check rate
+        islr_wh = invoice.islr_wh_doc_id
+        self.assertEqual(islr_wh.concept_ids.islr_rates_id, correct_rate,
+                         'Rate concept is incorrect')
