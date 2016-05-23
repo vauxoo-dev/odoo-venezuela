@@ -27,6 +27,7 @@ from datetime import datetime, timedelta
 from openerp.tests.common import TransactionCase
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
+from openerp.exceptions import ValidationError
 
 
 class TestIslrWithholding(TransactionCase):
@@ -58,6 +59,7 @@ class TestIslrWithholding(TransactionCase):
         #     'l10n_ve_fiscal_requirements.iva_purchase1')
         self.currency_usd = self.env.ref('base.USD')
         self.company = self.env.ref('base.main_company')
+        self.partner = self.env.ref('base.main_partner')
 
     def _create_invoice(self, type_inv='in_invoice', currency=False):
         """Function create invoice"""
@@ -207,7 +209,7 @@ class TestIslrWithholding(TransactionCase):
         # Set state open in invoice
         invoice.signal_workflow('invoice_open')
         islr_wh = invoice.islr_wh_doc_id
-        #Check currency in document withholding income
+        # Check currency in document withholding income
         for concept_id in islr_wh.concept_ids:
             currency_c = concept_id.currency_base_amount /\
                 invoice.currency_id.rate_silent
@@ -396,3 +398,46 @@ class TestIslrWithholding(TransactionCase):
         if rate_min > invoice.amount_untaxed:
             rate_bool = False
         self.assertTrue(rate_bool, 'Its not correct')
+
+    def test_08_company_no_income_withholding_agent(self):
+        """Test company no income withholding agent"""
+        self.partner.islr_withholding_agent = False
+        self.assertFalse(self.partner.islr_withholding_agent,
+                         'Field not updated')
+        # Create invoice supplier
+        invoice = self._create_invoice('in_invoice')
+        # Check initial state
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
+        )
+        # Create invoice lines
+        self._create_invoice_line(invoice.id, self.concept.id)
+        # Set state open in invoice
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        # Check document withholding income
+        self.assertEqual(invoice.islr_wh_doc_id, self.doc_obj,
+                         'Error document withholding created')
+        # Test Try to create a supplier withholding document manually
+        account_p = self.doc_obj.onchange_partner_id('in_invoice',
+                                                     self.partner_amd.id)
+        with self.assertRaises(ValidationError):
+            self.doc_obj.create({
+                'name': 'ISLR MANUAL PURCHASE',
+                'partner_id': self.partner_amd.id,
+                'account_id': account_p['value']['account_id'],
+            })
+
+    # def test_09_withholding_document_manual(self):
+    #     """Test create withholding document manual"""
+    #     # Create withholding document
+    #     account_p = self.doc_obj.onchange_partner_id('in_invoice',
+    #                                                  self.partner_amd.id)
+    #     islr_wh = self.doc_obj.create({
+    #         'name': 'ISLR MANUAL PURCHASE',
+    #         'partner_id': self.partner_amd.id,
+    #         'account_id': account_p['value']['account_id'],
+    #     })
+    #     # Delete invoice auto-loaded
+    #     islr_wh.invoice_ids.unlink()
+    #     self.assertEqual(len(islr_wh.invoice_ids), 0, 'There should be lines')
