@@ -92,6 +92,11 @@ class TestIslrWithholding(TransactionCase):
     def test_01_validate_process_withholding_islr(self):
         """Test create invoice supplier with data initial and
         Test validate invoice with document withholding islr"""
+        # Update account in concept_hprof_no_mercantiles
+        s_account = self.concept.property_retencion_islr_payable
+        c_account = self.concept.property_retencion_islr_receivable
+        self.concept_hprof.property_retencion_islr_payable = s_account
+        self.concept_hprof.property_retencion_islr_receivable = c_account
         # Create invoice supplier
         invoice = self._create_invoice('in_invoice')
         # Check initial state
@@ -100,7 +105,8 @@ class TestIslrWithholding(TransactionCase):
         )
         # Create invoice lines
         self._create_invoice_line(invoice.id, self.concept.id)
-        self._create_invoice_line(invoice.id, self.concept_no_apply.id)
+        self._create_invoice_line(invoice.id, self.concept_hprof.id)
+        # self._create_invoice_line(invoice.id, self.concept_no_apply.id)
         # Set state open in invoice
         invoice.signal_workflow('invoice_open')
         self.assertEqual(
@@ -121,14 +127,15 @@ class TestIslrWithholding(TransactionCase):
         islr_wh = invoice.islr_wh_doc_id
         self.assertEqual(islr_wh.state, 'draft',
                          'State of withholding should be in draft')
-        self.assertEqual(len(islr_wh.concept_ids), 1, 'Should exist a record')
+        self.assertEqual(len(islr_wh.concept_ids), 2,
+                         'Should exist two record')
         self.assertEqual(len(islr_wh.invoice_ids), 1, 'Should exist a invoice')
-        self.assertEqual(islr_wh.amount_total_ret, 2.00,
-                         'Amount total should be 2.00')
+        self.assertEqual(islr_wh.amount_total_ret, 7.00,
+                         'Amount total should be 7.00')
         # Check xml_id
         self.assertEqual(len(islr_wh.invoice_ids), 1,
                          'Invoice not incorporated')
-        self.assertEqual(len(islr_wh.invoice_ids.islr_xml_id), 1,
+        self.assertEqual(len(islr_wh.invoice_ids.islr_xml_id), 2,
                          'xml not created')
         # Confirm document withholding income
         islr_wh.signal_workflow('act_confirm')
@@ -356,4 +363,36 @@ class TestIslrWithholding(TransactionCase):
         # Check rate
         islr_wh = invoice.islr_wh_doc_id
         self.assertEqual(islr_wh.concept_ids.islr_rates_id, correct_rate,
-                         'Rate concept is incorrect')
+                         'Rate of concept is incorrect')
+
+    def test_07_partner_exempt_islr(self):
+        """Test withholding income with partner exempt"""
+        # Set false islr_exempt in partner
+        self.partner_amd.islr_exempt = True
+        self.assertTrue(self.partner_amd.islr_exempt, "No update islr_exempt")
+        # Create invoice supplier
+        invoice = self._create_invoice('in_invoice')
+        # Check initial state
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
+        )
+        # Create invoice lines
+        self._create_invoice_line(invoice.id, self.concept.id)
+        # Set state open in invoice
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        # Check document withholding income
+        islr_wh = invoice.islr_wh_doc_id
+        self.assertEqual(islr_wh.state, 'draft', 'State should be draft')
+        self.assertEqual(islr_wh.amount_total_ret, 0.0, 'Amount should be 0')
+        # Check that the invoice base amount is less than the minimum
+        # withholding rate
+        vendor, buyer, wh_agent = islr_wh.invoice_ids._get_partners(invoice)
+        residence = islr_wh.invoice_ids._get_residence(vendor, buyer)
+        nature = islr_wh.invoice_ids._get_nature(vendor)
+        rate_min = islr_wh.invoice_ids._get_rate(self.concept.id,
+                                                 residence, nature)[1]
+        rate_bool = True
+        if rate_min > invoice.amount_untaxed:
+            rate_bool = False
+        self.assertTrue(rate_bool, 'Its not correct')
