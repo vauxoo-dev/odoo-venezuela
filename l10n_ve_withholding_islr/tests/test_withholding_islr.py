@@ -27,7 +27,7 @@ from datetime import datetime, timedelta
 from openerp.tests.common import TransactionCase
 from openerp.tools import DEFAULT_SERVER_DATE_FORMAT
 from openerp.tools import DEFAULT_SERVER_DATETIME_FORMAT
-from openerp.exceptions import ValidationError
+from openerp.exceptions import except_orm, ValidationError
 
 
 class TestIslrWithholding(TransactionCase):
@@ -428,16 +428,84 @@ class TestIslrWithholding(TransactionCase):
                 'account_id': account_p['value']['account_id'],
             })
 
-    # def test_09_withholding_document_manual(self):
-    #     """Test create withholding document manual"""
-    #     # Create withholding document
-    #     account_p = self.doc_obj.onchange_partner_id('in_invoice',
-    #                                                  self.partner_amd.id)
-    #     islr_wh = self.doc_obj.create({
-    #         'name': 'ISLR MANUAL PURCHASE',
-    #         'partner_id': self.partner_amd.id,
-    #         'account_id': account_p['value']['account_id'],
-    #     })
-    #     # Delete invoice auto-loaded
-    #     islr_wh.invoice_ids.unlink()
-    #     self.assertEqual(len(islr_wh.invoice_ids), 0, 'There should be lines')
+    def test_09_withholding_document_manual(self):
+        """Test create withholding document manual"""
+        # Create withholding document
+        account_p = self.doc_obj.onchange_partner_id('in_invoice',
+                                                     self.partner_amd.id)
+        islr_wh = self.doc_obj.create({
+            'name': 'ISLR MANUAL PURCHASE',
+            'partner_id': self.partner_amd.id,
+            'account_id': account_p['value']['account_id'],
+        })
+        # Delete invoice auto-loaded
+        islr_wh.invoice_ids.unlink()
+        self.assertEqual(len(islr_wh.invoice_ids), 0, 'There should be lines')
+        # Test try to confirm withholding document without invoices
+        with self.assertRaises(except_orm):
+            islr_wh.signal_workflow('act_confirm')
+        # Check state it is still draft
+        self.assertEqual(islr_wh.state, 'draft',
+                         'State of withholding should be in draft')
+        # Create invoice supplier
+        invoice = self._create_invoice('in_invoice')
+        # Check initial state
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
+        )
+        # Create invoice lines
+        self._create_invoice_line(invoice.id, self.concept.id)
+        # Check invoices can not be added in draft state
+        with self.assertRaises(ValidationError):
+            islr_wh.write({
+                'invoice_ids': [(0, 0, {'invoice_id': invoice.id})]
+            })
+        # Delete invoice loaded
+        islr_wh.invoice_ids.unlink()
+        self.assertEqual(len(islr_wh.invoice_ids), 0, 'There should be lines')
+        # Set state open in invoice
+        invoice.signal_workflow('invoice_open')
+        # Test add withholding document
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        islr_wh.write({
+            'invoice_ids': [(0, 0, {'invoice_id': invoice.id})]
+        })
+
+    def test_10_withholding_document_duplicate(self):
+        """Test create withholding document manual and
+        I try to add invoice already approved"""
+        # Create withholding document
+        account_p = self.doc_obj.onchange_partner_id('in_invoice',
+                                                     self.partner_amd.id)
+        islr_wh_m = self.doc_obj.create({
+            'name': 'ISLR MANUAL PURCHASE',
+            'partner_id': self.partner_amd.id,
+            'account_id': account_p['value']['account_id'],
+        })
+        # Delete invoice auto-loaded
+        islr_wh_m.invoice_ids.unlink()
+        self.assertEqual(len(islr_wh_m.invoice_ids), 0, 'There should be lines')
+        # Create invoice supplier
+        invoice = self._create_invoice('in_invoice')
+        # Check initial state
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
+        )
+        # Create invoice lines
+        self._create_invoice_line(invoice.id, self.concept.id)
+        # Set state open in invoice
+        invoice.signal_workflow('invoice_open')
+        # Confirm document withholding income
+        islr_wh = invoice.islr_wh_doc_id
+        islr_wh.signal_workflow('act_confirm')
+        self.assertEqual(islr_wh.state, 'confirmed',
+                         'State of withholding should be in confirmed')
+        # Done document withholding income
+        islr_wh.signal_workflow('act_done')
+        self.assertEqual(islr_wh.state, 'done',
+                         'State of withholding should be in done')
+        # Test add invoice approved to withholding document
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        islr_wh_m.write({
+            'invoice_ids': [(0, 0, {'invoice_id': invoice.id})]
+        })
