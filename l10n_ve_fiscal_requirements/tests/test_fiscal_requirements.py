@@ -261,17 +261,20 @@ class TestFiscalRequirements(TransactionCase):
         self.assertNotEqual(invoice.move_id, self.move_obj,
                             'There should be move')
         # Create wizard account invoice debit
-        # date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
-        # w_debit = self.inv_debit.create({
-        #     'description': 'Test debit note',
-        #     'date': date_now,
-        #     'journal_id': invoice.journal_id.id,
-        #     'comment': 'Debit note for unit test'
-        # })
+        date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        w_debit = self.inv_debit.create({
+            'description': 'Test debit note',
+            'date': date_now,
+            'journal_id': invoice.journal_id.id,
+            'comment': 'Debit note for unit test'
+        })
         # Create debit note
-        # context = {'active_id': invoice.id, 'active_ids': [invoice.id]}
-        # w_debit.with_context(context).invoice_debit()
+        context = {'active_id': invoice.id, 'active_ids': [invoice.id]}
+        w_debit.with_context(context).invoice_debit()
         # Check debit note created
+        search_inv = self.invoice_obj.search([('parent_id', '=', invoice.id),
+                                              ('type', '=', 'out_invoice')])
+        self.assertEqual(len(search_inv), 1, 'Should be 1 record')
 
     def test_07_refunds_notes(self):
         """Test fiscal requirement refunds notes"""
@@ -292,7 +295,7 @@ class TestFiscalRequirements(TransactionCase):
         # Set invoice state open
         invoice.signal_workflow('invoice_open')
         self.assertEqual(invoice.state, 'open', 'State in open')
-        # Test refund invoice (modify)
+        # # Test refund invoice (modify)
         # date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         # period_id = self.period_obj.find(date_now)
         # refund = self.inv_refund.create({
@@ -303,7 +306,8 @@ class TestFiscalRequirements(TransactionCase):
         # })
         # context = {'active_id': invoice.id, 'active_ids': [invoice.id]}
         # refund.with_context(context).invoice_refund()
-        # self.assertEqual(invoice.state, 'paid', 'State invoice should be paid')
+        # self.assertEqual(invoice.state, 'paid',
+        #                  'State invoice should be paid')
 
     def test_08_tax_unit(self):
         """Test Tax unit"""
