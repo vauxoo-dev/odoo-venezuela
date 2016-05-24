@@ -71,9 +71,12 @@ class TestIslrWithholding(TransactionCase):
             'date_document': date_now,
             'type': type_inv,
             'reference_type': 'none',
-            'name': 'invoice islr supplier',
+            'name': 'invoice islr',
             'account_id': self.partner_amd.property_account_payable.id,
         }
+        if type_inv == 'out_invoice':
+            account = self.partner_amd.property_account_receivable.id
+            invoice_dict['account_id'] = account
         if currency:
             invoice_dict['currency_id'] = currency
         return self.invoice_obj.create(invoice_dict)
@@ -217,7 +220,7 @@ class TestIslrWithholding(TransactionCase):
                 invoice.currency_id.rate_silent
             self.assertEqual(concept_id.base_amount,
                              currency_c,
-                             """"Amount base should be equal to amount invoice
+                             """Amount base should be equal to amount invoice
                              between currency amount""")
             self.assertEqual(concept_id.amount,
                              wh_currency,
@@ -227,7 +230,7 @@ class TestIslrWithholding(TransactionCase):
     def test_03_validate_process_withholding_islr_customer(self):
         """Test create invoice customer with data initial and
         Test validate invoice with document withholding islr"""
-        # Create invoice supplier
+        # Create invoice customer
         invoice = self._create_invoice('out_invoice')
         # Check initial state
         self.assertEqual(
@@ -241,6 +244,53 @@ class TestIslrWithholding(TransactionCase):
         # Check document withholding income no created
         self.assertEqual(invoice.islr_wh_doc_id, self.doc_obj,
                          'Not should be empty the withholding document')
+        # Create withholding document manually
+        account_p = self.doc_obj.onchange_partner_id('out_invoice',
+                                                     self.partner_amd.id)
+        islr_wh = self.doc_obj.create({
+            'name': 'ISLR MANUAL CUSTOMER',
+            'partner_id': self.partner_amd.id,
+            'account_id': account_p['value']['account_id'],
+            'type': 'out_invoice',
+        })
+        # Delete invoice auto-loaded
+        islr_wh.invoice_ids.unlink()
+        self.assertEqual(len(islr_wh.invoice_ids), 0,
+                         'There should be lines')
+        # Add invoice to document retention
+        islr_wh.write({
+            'invoice_ids': [(0, 0, {'invoice_id': invoice.id})]
+        })
+        self.assertEqual(len(islr_wh.invoice_ids), 1,
+                         'There should be lines')
+        # Try confirm document withholding income
+        # Raise error with taxes
+        with self.assertRaises(except_orm):
+            islr_wh.signal_workflow('act_confirm')
+        # Try compute taxes
+        # Raise error with withhold date
+        with self.assertRaises(except_orm):
+            islr_wh.compute_amount_wh()
+        # Add date witholding
+        date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        islr_wh.date_uid = date_now
+        # Compute the taxes manually
+        islr_wh.compute_amount_wh()
+        # Confirm document withholding income
+        islr_wh.signal_workflow('act_confirm')
+        self.assertEqual(islr_wh.state, 'confirmed',
+                         'State of withholding should be in confirmed')
+        # Done document withholding income
+        islr_wh.signal_workflow('act_done')
+        self.assertEqual(islr_wh.state, 'done',
+                         'State of withholding should be in done')
+        # Check payments invoice
+        self.assertEqual(len(invoice.payment_ids), 1, 'Should exits a payment')
+        self.assertEqual(
+            invoice.residual,
+            invoice.amount_total - islr_wh.amount_total_ret,
+            'Amount residual invoice should be equal amount total - amount wh'
+        )
 
     def test_04_islr_partner_child(self):
         """Test withholding islr with partner child"""
@@ -484,7 +534,8 @@ class TestIslrWithholding(TransactionCase):
         })
         # Delete invoice auto-loaded
         islr_wh_m.invoice_ids.unlink()
-        self.assertEqual(len(islr_wh_m.invoice_ids), 0, 'There should be lines')
+        self.assertEqual(len(islr_wh_m.invoice_ids), 0,
+                         'There should be lines')
         # Create invoice supplier
         invoice = self._create_invoice('in_invoice')
         # Check initial state
