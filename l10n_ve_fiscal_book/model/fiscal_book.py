@@ -877,7 +877,7 @@ class FiscalBook(orm.Model):
 
     def get_order_criteria_adjustment(self, cr, uid, book_type, context=None):
         return book_type == 'sale' \
-            and 'accounting_date asc, nro_ctrl asc' \
+            and 'accounting_date asc, ctrl_number asc' \
             or 'emission_date asc, invoice_number asc'
 
     def get_order_criteria(self, cr, uid, book_type, context=None):
