@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 ###############################################################################
 #    Module Written to OpenERP, Open Source Management Solution

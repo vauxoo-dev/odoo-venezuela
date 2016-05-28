@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 ###############################################################################
 #    Module Written to OpenERP, Open Source Management Solution
@@ -31,10 +30,10 @@ from openerp.exceptions import except_orm, ValidationError
 
 
 class TestIvaWithholding(TransactionCase):
-    ''' Test of withholding IVA'''
+    """ Test of withholding IVA """
 
     def setUp(self):
-        '''Seudo-constructor method'''
+        """Seudo-constructor method"""
         super(TestIvaWithholding, self).setUp()
         self.doc_obj = self.env['account.wh.iva']
         self.doc_line_obj = self.env['account.wh.iva.line']
@@ -62,7 +61,7 @@ class TestIvaWithholding(TransactionCase):
             'base.main_partner')
 
     def _create_invoice(self, type_inv='in_invoice'):
-        '''Function create invoice'''
+        """Function create invoice"""
         date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         invoice_dict = {
             'partner_id': self.partner_amd.id,
@@ -81,7 +80,7 @@ class TestIvaWithholding(TransactionCase):
         return self.invoice_obj.create(invoice_dict)
 
     def _create_invoice_line(self, invoice_id=None, tax=None):
-        '''Create invoice line'''
+        """Create invoice line"""
         line_dict = {
             'product_id': self.product_ipad.id,
             'quantity': 1,
@@ -94,8 +93,8 @@ class TestIvaWithholding(TransactionCase):
         return self.invoice_line_obj.create(line_dict)
 
     def test_01_validate_process_withholding_iva(self):
-        '''Test create invoice supplier with data initial and
-        Test validate invoice with document withholding iva'''
+        """Test create invoice supplier with data initial and
+        Test validate invoice with document withholding iva"""
         # Create invoice supplier
         invoice = self._create_invoice('in_invoice')
         # Check initial state
@@ -162,10 +161,10 @@ class TestIvaWithholding(TransactionCase):
         self.assertEqual(debit, credit, 'Debit and Credit should be equal')
         self.assertEqual(debit, iva_wh.total_tax_ret,
                          'Amount total withholding should be equal '
-                         'journal entrie')
+                         'journal entries')
 
     def test_02_withholding_partner_not_agent(self):
-        '''Test withholding with partner not agent'''
+        """Test withholding with partner not agent"""
         # Create invoice supplier with partner no agent
         date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         invoice_dict = {
@@ -207,7 +206,7 @@ class TestIvaWithholding(TransactionCase):
                          'Amount total should be 12.00')
 
     def test_03_not_withholding_partner_not_agent(self):
-        '''Test not withholding with partner not agent'''
+        """Test not withholding with partner not agent"""
         # Create invoice supplier with partner no agent
         date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         invoice_dict = {
@@ -239,7 +238,7 @@ class TestIvaWithholding(TransactionCase):
                          'Should be empty the withholding document')
 
     def test_04_not_withholding_company_not_agent(self):
-        '''Test not withholding with company not agent, partner not agent'''
+        """Test not withholding with company not agent, partner not agent"""
         # Set company no agent withholding
         self.company.write({'wh_iva_agent': False})
         self.assertEqual(self.company.wh_iva_agent, False, 'Should be False')
@@ -275,7 +274,7 @@ class TestIvaWithholding(TransactionCase):
                          'Should be empty the withholding document')
 
     def test_05_not_withholding_company_not_agent_partner_agent(self):
-        '''Test not withholding with company not agent, partner agent'''
+        """Test not withholding with company not agent, partner agent"""
         # Set company no agent withholding
         self.company.write({'wh_iva_agent': False})
         self.assertEqual(self.company.wh_iva_agent, False, 'Should be False')
@@ -311,7 +310,7 @@ class TestIvaWithholding(TransactionCase):
                          'Should be empty the withholding document')
 
     def test_06_txt_document_iva(self):
-        '''Test create document txt vat'''
+        """Test create document txt vat"""
         # Create document txt iva
         date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         txt_dict = {
@@ -421,7 +420,7 @@ class TestIvaWithholding(TransactionCase):
                          'State of withholding should be in cancel')
 
     def test_07_withholding_iva_invoice_customer(self):
-        '''Test process the withholding iva for invoice customer'''
+        """Test process the withholding iva for invoice customer"""
         # Create invoice customer
         invoice = self._create_invoice('out_invoice')
         self.assertEqual(
@@ -437,7 +436,7 @@ class TestIvaWithholding(TransactionCase):
                          'Should be empty the withholding document')
 
     def test_08_withholding_iva_wh_customer(self):
-        '''Test process the withholding iva for wh customer'''
+        """Test process the withholding iva for wh customer"""
         # Create document withholding iva customer
         wh_dict = {
             'name': 'AWI SALE XX',
@@ -535,4 +534,4 @@ class TestIvaWithholding(TransactionCase):
         self.assertEqual(debit, credit, 'Debit and Credit should be equal')
         self.assertEqual(debit, iva_wh.total_tax_ret,
                          'Amount total withholding should be equal '
-                         'journal entrie')
+                         'journal entries')

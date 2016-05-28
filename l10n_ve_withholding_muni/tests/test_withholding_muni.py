@@ -1,4 +1,3 @@
-#!/usr/bin/python
 # -*- coding: utf-8 -*-
 ###############################################################################
 #    Module Written to OpenERP, Open Source Management Solution
@@ -29,10 +28,10 @@ from openerp.exceptions import except_orm
 
 
 class TestMuniWithholding(TransactionCase):
-    ''' Test of withholding Municipal'''
+    """ Test of withholding Municipal """
 
     def setUp(self):
-        '''Seudo-constructor method'''
+        """Seudo-constructor method"""
         super(TestMuniWithholding, self).setUp()
         self.doc_obj = self.env['account.wh.munici']
         self.doc_line_obj = self.env['account.wh.munici.line']
@@ -58,7 +57,7 @@ class TestMuniWithholding(TransactionCase):
             'base.main_partner')
 
     def _create_invoice(self, type_inv='in_invoice'):
-        '''Function create invoice'''
+        """Function create invoice"""
         date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
         invoice_dict = {
             'partner_id': self.partner_amd.id,
@@ -77,7 +76,7 @@ class TestMuniWithholding(TransactionCase):
         return self.invoice_obj.create(invoice_dict)
 
     def _create_invoice_line(self, invoice_id=None, tax=None):
-        '''Create invoice line'''
+        """Create invoice line"""
         line_dict = {
             'product_id': self.product_ipad.id,
             'quantity': 1,
