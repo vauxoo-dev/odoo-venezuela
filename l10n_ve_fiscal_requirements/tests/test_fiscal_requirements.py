@@ -276,8 +276,8 @@ class TestFiscalRequirements(TransactionCase):
                                               ('type', '=', 'out_invoice')])
         self.assertEqual(len(search_inv), 1, 'Should be 1 record')
 
-    def test_07_refunds_notes(self):
-        """Test fiscal requirement refunds notes"""
+    def test_07_01_refunds_notes_modify(self):
+        """Test fiscal requirement refunds notes method modify"""
         # Create customer invoice
         invoice = self._create_invoice('out_invoice')
         # Check initial state
@@ -295,19 +295,132 @@ class TestFiscalRequirements(TransactionCase):
         # Set invoice state open
         invoice.signal_workflow('invoice_open')
         self.assertEqual(invoice.state, 'open', 'State in open')
-        # # Test refund invoice (modify)
-        # date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
-        # period_id = self.period_obj.find(date_now)
-        # refund = self.inv_refund.create({
-        #     'description': 'Test Refund',
-        #     'date': date_now,
-        #     'filter_refund': 'modify',
-        #     'period': period_id.id,
-        # })
-        # context = {'active_id': invoice.id, 'active_ids': [invoice.id]}
-        # refund.with_context(context).invoice_refund()
-        # self.assertEqual(invoice.state, 'paid',
-        #                  'State invoice should be paid')
+        # Test refund invoice (modify)
+        date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        period_id = self.period_obj.find(date_now)
+        context = {'active_id': invoice.id, 'active_ids': [invoice.id]}
+        refund = self.inv_refund.with_context(context).create({
+            'description': 'Test Refund',
+            'date': date_now,
+            'filter_refund': 'modify',
+            'period': period_id.id,
+            'nro_ctrl': '12-123456',
+        })
+        # Click Refund button from wizard
+        refund.with_context(context).invoice_refund()
+        # Check invoice state is now 'paid'
+        self.assertEqual(invoice.state, 'paid',
+                         'State invoice should be paid')
+        # Customer refund was properly created
+        inv_id = self.invoice_obj.search([('parent_id', '=', invoice.id),
+                                          ('type', '=', 'out_refund')])
+        self.assertEqual(inv_id.state, 'paid',
+                         'Debit note was not created properly')
+        # Check if invoice was properly created in draft state
+        inv_id = self.invoice_obj.search([('name', '=', 'Test Refund'),
+                                          ('state', '=', 'draft'),
+                                          ('type', '=', 'out_invoice')])
+        create_inv = True if inv_id else False
+        self.assertTrue(create_inv, 'Debit note was no created')
+        # Check if lines invoice and taxes were created in the new invoice
+        self.assertEqual(len(invoice.invoice_line), len(inv_id.invoice_line),
+                         'Line invoice no created')
+        self.assertEqual(inv_id.invoice_line.invoice_line_tax_id,
+                         self.tax_s_12, 'Both invoice has not the same taxes')
+
+    def test_07_02_refunds_notes_refund(self):
+        """Test fiscal requirement refunds notes method refund"""
+        # Create customer invoice
+        invoice = self._create_invoice('out_invoice')
+        # Check initial state
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
+        )
+        # Create invoice line with tax general
+        self._create_invoice_line(invoice.id, self.tax_s_12)
+        # Set invoice state proforma2
+        invoice.signal_workflow('invoice_proforma2')
+        self.assertEqual(invoice.state, 'proforma2', 'State in proforma2')
+        # Check no created journal entries
+        self.assertEqual(invoice.move_id, self.move_obj,
+                         'There should be no move')
+        # Set invoice state open
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        # Test refund invoice (refund)
+        date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        period_id = self.period_obj.find(date_now)
+        context = {'active_id': invoice.id, 'active_ids': [invoice.id]}
+        refund = self.inv_refund.with_context(context).create({
+            'description': 'Test Refund',
+            'date': date_now,
+            'filter_refund': 'refund',
+            'period': period_id.id,
+            'nro_ctrl': '12-123456',
+        })
+        # Click Refund button from wizard
+        refund.with_context(context).invoice_refund()
+        # Check invoice state is open state
+        self.assertEqual(invoice.state, 'open',
+                         'State invoice should be open')
+        # Customer refund was properly created
+        inv_id = self.invoice_obj.search([('parent_id', '=', invoice.id),
+                                          ('state', '=', 'draft'),
+                                          ('type', '=', 'out_refund')])
+        create_inv = True if inv_id else False
+        self.assertTrue(create_inv, 'Debit note was no created')
+        # Check if lines invoice and taxes were created in the new invoice
+        self.assertEqual(len(invoice.invoice_line), len(inv_id.invoice_line),
+                         'Line invoice no created')
+        self.assertEqual(inv_id.invoice_line.invoice_line_tax_id,
+                         self.tax_s_12, 'Both invoice has not the same taxes')
+
+    def test_07_03_refunds_notes_cancel(self):
+        """Test fiscal requirement refunds notes method cancel"""
+        # Create customer invoice
+        invoice = self._create_invoice('out_invoice')
+        # Check initial state
+        self.assertEqual(
+            invoice.state, 'draft', 'Initial state should be in "draft"'
+        )
+        # Create invoice line with tax general
+        self._create_invoice_line(invoice.id, self.tax_s_12)
+        # Set invoice state proforma2
+        invoice.signal_workflow('invoice_proforma2')
+        self.assertEqual(invoice.state, 'proforma2', 'State in proforma2')
+        # Check no created journal entries
+        self.assertEqual(invoice.move_id, self.move_obj,
+                         'There should be no move')
+        # Set invoice state open
+        invoice.signal_workflow('invoice_open')
+        self.assertEqual(invoice.state, 'open', 'State in open')
+        # Test refund invoice (cancel)
+        date_now = time.strftime(DEFAULT_SERVER_DATE_FORMAT)
+        period_id = self.period_obj.find(date_now)
+        context = {'active_id': invoice.id, 'active_ids': [invoice.id]}
+        refund = self.inv_refund.with_context(context).create({
+            'description': 'Test Refund',
+            'date': date_now,
+            'filter_refund': 'cancel',
+            'period': period_id.id,
+            'nro_ctrl': '12-123456',
+        })
+        # Click Refund button from wizard
+        refund.with_context(context).invoice_refund()
+        # Check invoice state is now 'paid'
+        self.assertEqual(invoice.state, 'paid',
+                         'State invoice should be paid')
+        # Customer refund was properly created
+        inv_id = self.invoice_obj.search([('parent_id', '=', invoice.id),
+                                          ('state', '=', 'paid'),
+                                          ('type', '=', 'out_refund')])
+        create_inv = True if inv_id else False
+        self.assertTrue(create_inv, 'Debit note was no created')
+        # Check if lines invoice and taxes were created in the new invoice
+        self.assertEqual(len(invoice.invoice_line), len(inv_id.invoice_line),
+                         'Line invoice no created')
+        self.assertEqual(inv_id.invoice_line.invoice_line_tax_id,
+                         self.tax_s_12, 'Both invoice has not the same taxes')
 
     def test_08_tax_unit(self):
         """Test Tax unit"""
