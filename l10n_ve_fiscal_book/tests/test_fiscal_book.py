@@ -238,10 +238,9 @@ class TestFiscalBook(TransactionCase):
         # Set wh_iva_agent true in partner of the company
         self.m_partner.write({'wh_iva_agent': True})
         self.assertTrue(self.m_partner.wh_iva_agent, 'Should be True')
-        # Update tax data demo
+        # Cancel invoice data demo
         invoice_demo = self.env.ref('account.test_invoice_1')
-        for tax in invoice_demo.tax_line:
-            tax.unlink()
+        invoice_demo.state = 'cancel'
         # Create fiscal book
         period_id = self.period_obj.find()
         values = {
