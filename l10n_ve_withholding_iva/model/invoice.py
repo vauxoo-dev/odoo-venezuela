@@ -413,7 +413,7 @@ class AccountInvoice(models.Model):
 
     @api.multi
     def button_generate_wh_doc(self):
-        context = self._context
+        context = dict(self._context)
         partner = self.env['res.partner']
         res = {}
         for inv in self:
